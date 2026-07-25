@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Caisse Enregistreuse</title>
 
+  <!-- BALISES SPÉCIFIQUES POUR iOS 18 (PWA / PLEIN ÉCRAN) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Caisse">
@@ -184,16 +185,20 @@
     }
 
     .btn-validation {
-      background: #38ef7d;
-      color: #0d5128;
+      background: #000;
+      color: #fff;
       border: none;
       border-radius: 12px;
       padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 17px;
+      font-weight: 600;
       width: 100%;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(56, 239, 125, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       touch-action: manipulation;
     }
     .btn-validation:active {
@@ -211,33 +216,82 @@
       touch-action: manipulation;
     }
 
-    /* Notification Modal */
-    .modal-overlay {
+    /* SIMULATION APPLE PAY MODAL */
+    .apple-pay-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-end;
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
     }
-    .modal-overlay.active {
+    .apple-pay-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
-    .modal-content {
-      background: white;
-      border-radius: 20px;
-      padding: 25px;
+    .apple-pay-card {
+      background: #1c1c1e;
+      width: 100%;
+      max-width: 420px;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      padding: 25px 20px 40px 20px;
+      color: white;
       text-align: center;
-      width: 80%;
-      max-width: 280px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+      transform: translateY(100%);
+      transition: transform 0.3s ease-out;
     }
-    .check-icon {
-      font-size: 50px;
-      margin-bottom: 10px;
+    .apple-pay-overlay.active .apple-pay-card {
+      transform: translateY(0);
+    }
+    .ap-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    .ap-amount {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 25px;
+      letter-spacing: -0.5px;
+    }
+    .face-id-icon {
+      width: 60px;
+      height: 60px;
+      margin: 10px auto 20px auto;
+      border: 3px solid #30d158;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      animation: pulse 1.2s infinite alternate;
+    }
+    .face-id-icon.success {
+      border-color: #30d158;
+      background: #30d158;
+      color: white;
+      animation: none;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      100% { transform: scale(1.05); opacity: 1; }
+    }
+    .ap-status {
+      font-size: 14px;
+      color: #8e8e93;
     }
   </style>
 </head>
@@ -246,16 +300,19 @@
   <div class="caisse-container">
     <h1>Caisse Enregistreuse 🛒</h1>
     
+    <!-- Écran du Total -->
     <div class="ecran">
       <div class="total-label">Total à payer</div>
       <div class="total-montant" id="totalDisplay">0,00 €</div>
     </div>
 
+    <!-- Ticket de caisse -->
     <div class="section-title">Détail du panier</div>
     <div class="ticket-container" id="ticketList">
       <div class="ticket-vide">Aucun article ajouté</div>
     </div>
 
+    <!-- Articles Quotidien (Grille Scrollable) -->
     <div class="section-title">Articles du quotidien</div>
     <div class="articles-scroll">
       <div class="articles-grid">
@@ -322,6 +379,7 @@
       </div>
     </div>
 
+    <!-- Pavé Numérique -->
     <div class="section-title">Saisie libre</div>
     <div class="pave-numerique">
       <button class="btn-num" onclick="taperChiffre('1')">1</button>
@@ -342,17 +400,21 @@
     </div>
 
     <button class="btn-validation" onclick="validerPaiement()">
-      ✅ Validation paiement
+      Pay Payer avec Apple Pay
     </button>
 
     <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
   </div>
 
-  <div class="modal-overlay" id="modalSucces">
-    <div class="modal-content">
-      <div class="check-icon">🎉</div>
-      <h2 style="color: #2b6cb0; margin: 0 0 10px 0;">Paiement Accepté !</h2>
-      <p id="messagePaiement" style="color: #4a5568; font-size: 18px; font-weight: bold;"></p>
+  <!-- OVERLAY SIMULATION APPLE PAY -->
+  <div class="apple-pay-overlay" id="applePayOverlay">
+    <div class="apple-pay-card">
+      <div class="ap-header">
+        <span>Pay</span>
+      </div>
+      <div class="ap-amount" id="apAmountDisplay">0,00 €</div>
+      <div class="face-id-icon" id="faceIdIcon">😃</div>
+      <div class="ap-status" id="apStatusText">Maintenez près du lecteur...</div>
     </div>
   </div>
 
@@ -449,18 +511,35 @@
         return;
       }
 
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
-      }
+      const overlay = document.getElementById('applePayOverlay');
+      const amountDisplay = document.getElementById('apAmountDisplay');
+      const icon = document.getElementById('faceIdIcon');
+      const statusText = document.getElementById('apStatusText');
 
-      const modal = document.getElementById('modalSucces');
-      document.getElementById('messagePaiement').innerText = `Montant réglé : ${totalFinal.toFixed(2).replace('.', ',')} €`;
-      modal.classList.add('active');
+      amountDisplay.innerText = totalFinal.toFixed(2).replace('.', ',') + ' €';
+      icon.className = 'face-id-icon';
+      icon.innerText = '😃';
+      statusText.innerText = 'Validation Face ID...';
 
+      overlay.classList.add('active');
+
+      // Étape 1 : Simulation Face ID valide après 1 sec
       setTimeout(() => {
-        modal.classList.remove('active');
-        reinitialiser();
-      }, 2200);
+        icon.className = 'face-id-icon success';
+        icon.innerText = '✓';
+        statusText.innerText = 'Terminé';
+
+        if (navigator.vibrate) {
+          navigator.vibrate([80, 40, 80]);
+        }
+
+        // Étape 2 : Fermeture de l'animation Apple Pay et reset panier
+        setTimeout(() => {
+          overlay.classList.remove('active');
+          reinitialiser();
+        }, 1200);
+
+      }, 1000);
     }
   </script>
 </body>
