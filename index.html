@@ -110,6 +110,12 @@
       border-color: #fbd38d;
       color: #c05621;
     }
+    .btn-num.plus {
+      background: #ebf8ff;
+      border-color: #90cdf4;
+      color: #2b6cb0;
+      font-size: 24px;
+    }
     .btn-validation {
       background: #38ef7d;
       color: #0d5128;
@@ -210,14 +216,14 @@
       
       <button class="btn-num action" onclick="taperChiffre('.')">.</button>
       <button class="btn-num" onclick="taperChiffre('0')">0</button>
-      <button class="btn-num action" onclick="effacerDernier()">⌫</button>
+      <button class="btn-num plus" onclick="additionnerSaisie()">+</button>
     </div>
 
     <button class="btn-validation" onclick="validerPaiement()">
       ✅ Validation paiement
     </button>
 
-    <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
+    <button class="btn-reset" onclick="reinitialiser()">Remise à zéro / ⌫</button>
   </div>
 
   <div class="modal-overlay" id="modalSucces">
@@ -229,47 +235,51 @@
   </div>
 
   <script>
-    let montantTextuel = "0";
+    let totalCumule = 0;
+    let saisieEnCours = "0";
 
     function MettreAJourEcran() {
-      document.getElementById('totalDisplay').innerText = montantTextuel + ' €';
+      let affichage = parseFloat(saisieEnCours) || 0;
+      let totalAffiche = totalCumule + affichage;
+      // Arrondir proprement à 2 décimales
+      totalAffiche = Math.round(totalAffiche * 100) / 100;
+      document.getElementById('totalDisplay').innerText = totalAffiche + ' €';
     }
 
     function ajouterArticle(prix) {
-      let totalActuel = parseFloat(montantTextuel) || 0;
-      totalActuel += prix;
-      // Arrondir proprement à 2 décimales si besoin
-      montantTextuel = (Math.round(totalActuel * 100) / 100).toString();
+      totalCumule += prix;
+      saisieEnCours = "0";
       MettreAJourEcran();
     }
 
     function taperChiffre(chiffre) {
-      if (chiffre === '.' && montantTextuel.includes('.')) return;
+      if (chiffre === '.' && saisieEnCours.includes('.')) return;
 
-      if (montantTextuel === "0" && chiffre !== '.') {
-        montantTextuel = chiffre;
+      if (saisieEnCours === "0" && chiffre !== '.') {
+        saisieEnCours = chiffre;
       } else {
-        montantTextuel += chiffre;
+        saisieEnCours += chiffre;
       }
       MettreAJourEcran();
     }
 
-    function effacerDernier() {
-      if (montantTextuel.length > 1) {
-        montantTextuel = montantTextuel.slice(0, -1);
-      } else {
-        montantTextuel = "0";
-      }
+    function additionnerSaisie() {
+      let valeurSaisie = parseFloat(saisieEnCours) || 0;
+      totalCumule += valeurSaisie;
+      saisieEnCours = "0";
       MettreAJourEcran();
     }
 
     function reinitialiser() {
-      montantTextuel = "0";
+      totalCumule = 0;
+      saisieEnCours = "0";
       MettreAJourEcran();
     }
 
     function validerPaiement() {
-      const montantFinal = parseFloat(montantTextuel);
+      let montantFinal = totalCumule + (parseFloat(saisieEnCours) || 0);
+      montantFinal = Math.round(montantFinal * 100) / 100;
+
       if (!montantFinal || montantFinal === 0) {
         alert("Saisissez un montant avant de valider !");
         return;
@@ -280,7 +290,7 @@
       }
 
       const modal = document.getElementById('modalSucces');
-      document.getElementById('messagePaiement').innerText = `Montant réglé : ${montantTextuel} €`;
+      document.getElementById('messagePaiement').innerText = `Montant réglé : ${montantFinal} €`;
       modal.classList.add('active');
 
       setTimeout(() => {
