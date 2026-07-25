@@ -26,7 +26,7 @@
       padding: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       text-align: center;
     }
     h1 {
@@ -38,21 +38,21 @@
     .ecran {
       background-color: #1a202c;
       border-radius: 12px;
-      padding: 15px;
+      padding: 12px;
       margin-bottom: 10px;
     }
     .total-label {
       color: #a0aec0;
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .total-montant {
       color: #38ef7d;
-      font-size: 40px;
+      font-size: 38px;
       font-family: monospace;
       font-weight: bold;
-      margin-top: 5px;
+      margin-top: 2px;
     }
 
     /* Ticket / Fenêtre de détail des prix */
@@ -60,9 +60,9 @@
       background: #f8fafc;
       border: 2px dashed #cbd5e0;
       border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 15px;
-      max-height: 120px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      max-height: 110px;
       overflow-y: auto;
       text-align: left;
     }
@@ -70,16 +70,16 @@
       color: #a0aec0;
       font-size: 13px;
       text-align: center;
-      margin: 10px 0;
+      margin: 8px 0;
       font-style: italic;
     }
     .ligne-ticket {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 14px;
+      font-size: 13px;
       color: #2d3748;
-      padding: 4px 0;
+      padding: 3px 0;
       border-bottom: 1px solid #edf2f7;
     }
     .ligne-ticket:last-child {
@@ -97,49 +97,63 @@
     }
 
     .section-title {
-      font-size: 13px;
+      font-size: 12px;
       color: #718096;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       text-align: left;
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Zone scrollable pour les articles */
+    .articles-scroll {
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 2px;
+      margin-bottom: 15px;
     }
     .articles-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-bottom: 15px;
     }
     .btn-article {
       background: #edf2f7;
-      border: 2px solid #cbd5e0;
+      border: 1px solid #cbd5e0;
       border-radius: 10px;
-      padding: 10px 2px;
-      font-size: 12px;
+      padding: 8px 4px;
+      font-size: 11px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
     }
     .btn-article:active {
       background-color: #cbd5e0;
     }
     .emoji {
-      font-size: 22px;
+      font-size: 20px;
     }
+    .prix-tag {
+      font-weight: bold;
+      color: #2b6cb0;
+    }
+
     /* Pavé numérique */
     .pave-numerique {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 15px;
     }
     .btn-num {
       background: #fff;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 20px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 18px;
       font-weight: bold;
       color: #2d3748;
       cursor: pointer;
@@ -156,14 +170,15 @@
       background: #ebf8ff;
       border-color: #90cdf4;
       color: #2b6cb0;
-      font-size: 24px;
+      font-size: 20px;
     }
+
     .btn-validation {
       background: #38ef7d;
       color: #0d5128;
       border: none;
-      border-radius: 15px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 15px;
       font-size: 18px;
       font-weight: bold;
       width: 100%;
@@ -174,14 +189,16 @@
       opacity: 0.8;
     }
     .btn-reset {
-      margin-top: 10px;
+      margin-top: 8px;
       background: none;
       border: none;
       color: #e53e3e;
       font-weight: bold;
       cursor: pointer;
-      padding: 8px;
+      padding: 6px;
+      font-size: 13px;
     }
+
     /* Notification Modal */
     .modal-overlay {
       position: fixed;
@@ -227,24 +244,72 @@
       <div class="ticket-vide">Aucun article ajouté</div>
     </div>
 
-    <div class="section-title">Articles rapides</div>
-    <div class="articles-grid">
-      <button class="btn-article" onclick="ajouterArticle('🍎 Pomme', 2)">
-        <span class="emoji">🍎</span>
-        <span>+2 €</span>
-      </button>
-      <button class="btn-article" onclick="ajouterArticle('🥖 Pain', 1)">
-        <span class="emoji">🥖</span>
-        <span>+1 €</span>
-      </button>
-      <button class="btn-article" onclick="ajouterArticle('🧃 Jus', 3)">
-        <span class="emoji">🧃</span>
-        <span>+3 €</span>
-      </button>
-      <button class="btn-article" onclick="ajouterArticle('🍫 Chocolat', 4)">
-        <span class="emoji">🍫</span>
-        <span>+4 €</span>
-      </button>
+    <div class="section-title">Articles du quotidien</div>
+    <div class="articles-scroll">
+      <div class="articles-grid">
+        <button class="btn-article" onclick="ajouterArticle('🥖 Baguette', 1.10)">
+          <span class="emoji">🥖</span>
+          <span>Baguette</span>
+          <span class="prix-tag">1,10 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🥛 Lait (1L)', 1.25)">
+          <span class="emoji">🥛</span>
+          <span>Lait 1L</span>
+          <span class="prix-tag">1,25 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🥚 6 Œufs', 2.10)">
+          <span class="emoji">🥚</span>
+          <span>6 Œufs</span>
+          <span class="prix-tag">2,10 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🧀 Fromage', 2.80)">
+          <span class="emoji">🧀</span>
+          <span>Fromage</span>
+          <span class="prix-tag">2,80 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🍎 Pommes 1kg', 2.50)">
+          <span class="emoji">🍎</span>
+          <span>Pommes</span>
+          <span class="prix-tag">2,50 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🍝 Pâtes 500g', 1.15)">
+          <span class="emoji">🍝</span>
+          <span>Pâtes</span>
+          <span class="prix-tag">1,15 €</span>
+        </button>
+
+        <button class="btn-article" onclick="ajouterArticle('🧃 Jus d’orange', 1.95)">
+          <span class="emoji">🧃</span>
+          <span>Jus Orange</span>
+          <span class="prix-tag">1,95 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🍫 Chocolat', 1.60)">
+          <span class="emoji">🍫</span>
+          <span>Chocolat</span>
+          <span class="prix-tag">1,60 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🍪 Paquet Biscuits', 1.85)">
+          <span class="emoji">🍪</span>
+          <span>Biscuits</span>
+          <span class="prix-tag">1,85 €</span>
+        </button>
+
+        <button class="btn-article" onclick="ajouterArticle('🧻 Papier Toilette', 3.20)">
+          <span class="emoji">🧻</span>
+          <span>P. Toilette</span>
+          <span class="prix-tag">3,20 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🧼 Savon mains', 1.40)">
+          <span class="emoji">🧼</span>
+          <span>Savon</span>
+          <span class="prix-tag">1,40 €</span>
+        </button>
+        <button class="btn-article" onclick="ajouterArticle('🪥 Dentifrice', 2.30)">
+          <span class="emoji">🪥</span>
+          <span>Dentifrice</span>
+          <span class="prix-tag">2,30 €</span>
+        </button>
+      </div>
     </div>
 
     <div class="section-title">Saisie libre</div>
@@ -286,14 +351,13 @@
     let saisieEnCours = "0";
 
     function MettreAJourEcran() {
-      // Calcul du total de tous les articles dans la liste
       let totalArticles = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       let valeurTapee = parseFloat(saisieEnCours) || 0;
       let totalGeneral = Math.round((totalArticles + valeurTapee) * 100) / 100;
 
-      document.getElementById('totalDisplay').innerText = totalGeneral + ' €';
+      // Affichage propre avec virgule pour les centimes
+      document.getElementById('totalDisplay').innerText = totalGeneral.toFixed(2).replace('.', ',') + ' €';
 
-      // Mise à jour de la fenêtre de détail
       const ticketContainer = document.getElementById('ticketList');
       if (listeArticles.length === 0) {
         ticketContainer.innerHTML = '<div class="ticket-vide">Aucun article ajouté</div>';
@@ -305,13 +369,12 @@
           div.innerHTML = `
             <span>${item.nom}</span>
             <span>
-              <strong>${item.prix} €</strong>
+              <strong>${item.prix.toFixed(2).replace('.', ',')} €</strong>
               <button class="btn-suppr-ligne" onclick="supprimerArticle(${index})">✕</button>
             </span>
           `;
           ticketContainer.appendChild(div);
         });
-        // Faire défiler automatiquement vers le bas du ticket
         ticketContainer.scrollTop = ticketContainer.scrollHeight;
       }
     }
@@ -372,7 +435,7 @@
       }
 
       const modal = document.getElementById('modalSucces');
-      document.getElementById('messagePaiement').innerText = `Montant réglé : ${totalFinal} €`;
+      document.getElementById('messagePaiement').innerText = `Montant réglé : ${totalFinal.toFixed(2).replace('.', ',')} €`;
       modal.classList.add('active');
 
       setTimeout(() => {
