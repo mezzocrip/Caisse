@@ -22,7 +22,7 @@
     .caisse-container {
       background: white;
       border-radius: 20px;
-      padding: 25px;
+      padding: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 400px;
@@ -31,59 +31,95 @@
     h1 {
       color: #333;
       margin-top: 0;
-      font-size: 24px;
+      font-size: 22px;
+      margin-bottom: 15px;
     }
     .ecran {
       background-color: #1a202c;
       border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
+      padding: 15px;
+      margin-bottom: 20px;
     }
     .total-label {
       color: #a0aec0;
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .total-montant {
       color: #38ef7d;
-      font-size: 48px;
+      font-size: 42px;
       font-family: monospace;
       font-weight: bold;
       margin-top: 5px;
     }
+    .section-title {
+      font-size: 14px;
+      color: #718096;
+      margin-bottom: 8px;
+      text-align: left;
+      font-weight: bold;
+    }
     .articles-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 25px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
     }
     .btn-article {
       background: #edf2f7;
       border: 2px solid #cbd5e0;
-      border-radius: 12px;
-      padding: 15px 10px;
-      font-size: 16px;
+      border-radius: 10px;
+      padding: 10px 5px;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.1s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 3px;
     }
     .btn-article:active {
       transform: scale(0.95);
       background-color: #e2e8f0;
     }
     .emoji {
-      font-size: 32px;
+      font-size: 24px;
+    }
+    /* Pavé numérique */
+    .pave-numerique {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .btn-num {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #2d3748;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: all 0.1s ease;
+    }
+    .btn-num:active {
+      transform: scale(0.95);
+      background-color: #edf2f7;
+    }
+    .btn-num.action {
+      background: #feebc8;
+      border-color: #fbd38d;
+      color: #c05621;
     }
     .btn-validation {
       background: linear-gradient(135deg, #11998e, #38ef7d);
       color: white;
       border: none;
       border-radius: 15px;
-      padding: 20px;
+      padding: 18px;
       font-size: 20px;
       font-weight: bold;
       width: 100%;
@@ -95,13 +131,13 @@
       transform: scale(0.98);
     }
     .btn-reset {
-      margin-top: 15px;
+      margin-top: 12px;
       background: none;
       border: none;
       color: #e53e3e;
       font-weight: bold;
       cursor: pointer;
-      padding: 10px;
+      padding: 8px;
     }
     /* Notification Modal */
     .modal-overlay {
@@ -148,79 +184,45 @@
       <div class="total-montant" id="totalDisplay">0 €</div>
     </div>
 
+    <div class="section-title">Articles rapides</div>
     <div class="articles-grid">
       <button class="btn-article" onclick="ajouterArticle(2)">
         <span class="emoji">🍎</span>
-        <span>Pomme (2€)</span>
+        <span>2 €</span>
       </button>
       <button class="btn-article" onclick="ajouterArticle(1)">
         <span class="emoji">🥖</span>
-        <span>Pain (1€)</span>
+        <span>1 €</span>
       </button>
       <button class="btn-article" onclick="ajouterArticle(3)">
         <span class="emoji">🧃</span>
-        <span>Jus (3€)</span>
+        <span>3 €</span>
       </button>
       <button class="btn-article" onclick="ajouterArticle(4)">
         <span class="emoji">🍫</span>
-        <span>Chocolat (4€)</span>
+        <span>4 €</span>
       </button>
+    </div>
+
+    <div class="section-title">Saisie du prix</div>
+    <div class="pave-numerique">
+      <button class="btn-num" onclick="taperChiffre('1')">1</button>
+      <button class="btn-num" onclick="taperChiffre('2')">2</button>
+      <button class="btn-num" onclick="taperChiffre('3')">3</button>
+      
+      <button class="btn-num" onclick="taperChiffre('4')">4</button>
+      <button class="btn-num" onclick="taperChiffre('5')">5</button>
+      <button class="btn-num" onclick="taperChiffre('6')">6</button>
+      
+      <button class="btn-num" onclick="taperChiffre('7')">7</button>
+      <button class="btn-num" onclick="taperChiffre('8')">8</button>
+      <button class="btn-num" onclick="taperChiffre('9')">9</button>
+      
+      <button class="btn-num action" onclick="taperChiffre('.')">.</button>
+      <button class="btn-num" onclick="taperChiffre('0')">0</button>
+      <button class="btn-num action" onclick="effacerDernier()">⌫</button>
     </div>
 
     <button class="btn-validation" onclick="validerPaiement()">
       ✅ Validation paiement
-    </button>
-
-    <button class="btn-reset" onclick="reinitialiser()">Annuler / Remise à zéro</button>
-  </div>
-
-  <div class="modal-overlay" id="modalSucces">
-    <div class="modal-content">
-      <div class="check-icon">🎉</div>
-      <h2 style="color: #2b6cb0; margin: 0 0 10px 0;">Paiement Accepté !</h2>
-      <p id="messagePaiement" style="color: #4a5568; font-size: 18px; font-weight: bold;"></p>
-    </div>
-  </div>
-
-  <script>
-    let total = 0;
-
-    function ajouterArticle(prix) {
-      total += prix;
-      mettreAJourAffichage();
-    }
-
-    function reinitialiser() {
-      total = 0;
-      mettreAJourAffichage();
-    }
-
-    function mettreAJourAffichage() {
-      document.getElementById('totalDisplay').textContent = total + ' €';
-    }
-
-    function validerPaiement() {
-      if (total === 0) {
-        alert("Ajoutez des articles dans la caisse avant de valider !");
-        return;
-      }
-
-      // Vibration du téléphone
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
-      }
-
-      // Affichage de la notification "Paiement accepté"
-      const modal = document.getElementById('modalSucces');
-      document.getElementById('messagePaiement').textContent = `Montant réglé : ${total} €`;
-      modal.classList.add('active');
-
-      // Masquer la notification et remettre la caisse à zéro après 2.5 secondes
-      setTimeout(() => {
-        modal.classList.remove('active');
-        reinitialiser();
-      }, 2500);
-    }
-  </script>
-</body>
-</html>
+    </button
