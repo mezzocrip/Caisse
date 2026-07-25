@@ -8,9 +8,10 @@
     * {
       box-sizing: border-box;
       user-select: none;
+      -webkit-user-select: none;
     }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: #f0f4f8;
       display: flex;
       justify-content: center;
@@ -25,7 +26,7 @@
       padding: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       text-align: center;
     }
     h1 {
@@ -38,23 +39,23 @@
       background-color: #1a202c;
       border-radius: 12px;
       padding: 15px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .total-label {
       color: #a0aec0;
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .total-montant {
       color: #38ef7d;
-      font-size: 42px;
+      font-size: 40px;
       font-family: monospace;
       font-weight: bold;
       margin-top: 5px;
     }
     .section-title {
-      font-size: 14px;
+      font-size: 13px;
       color: #718096;
       margin-bottom: 8px;
       text-align: left;
@@ -64,34 +65,32 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .btn-article {
       background: #edf2f7;
       border: 2px solid #cbd5e0;
       border-radius: 10px;
-      padding: 10px 5px;
-      font-size: 13px;
+      padding: 10px 2px;
+      font-size: 12px;
       cursor: pointer;
-      transition: all 0.1s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 3px;
     }
     .btn-article:active {
-      transform: scale(0.95);
-      background-color: #e2e8f0;
+      background-color: #cbd5e0;
     }
     .emoji {
-      font-size: 24px;
+      font-size: 22px;
     }
     /* Pavé numérique */
     .pave-numerique {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .btn-num {
       background: #fff;
@@ -102,11 +101,8 @@
       font-weight: bold;
       color: #2d3748;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      transition: all 0.1s ease;
     }
     .btn-num:active {
-      transform: scale(0.95);
       background-color: #edf2f7;
     }
     .btn-num.action {
@@ -115,23 +111,22 @@
       color: #c05621;
     }
     .btn-validation {
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      color: white;
+      background: #38ef7d;
+      color: #0d5128;
       border: none;
       border-radius: 15px;
-      padding: 18px;
-      font-size: 20px;
+      padding: 16px;
+      font-size: 18px;
       font-weight: bold;
       width: 100%;
       cursor: pointer;
-      box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
-      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(56, 239, 125, 0.4);
     }
     .btn-validation:active {
-      transform: scale(0.98);
+      opacity: 0.8;
     }
     .btn-reset {
-      margin-top: 12px;
+      margin-top: 10px;
       background: none;
       border: none;
       color: #e53e3e;
@@ -149,7 +144,7 @@
       align-items: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s;
+      transition: opacity 0.2s;
     }
     .modal-overlay.active {
       opacity: 1;
@@ -158,18 +153,13 @@
     .modal-content {
       background: white;
       border-radius: 20px;
-      padding: 30px;
+      padding: 25px;
       text-align: center;
-      transform: scale(0.8);
-      transition: transform 0.3s;
       width: 80%;
-      max-width: 300px;
-    }
-    .modal-overlay.active .modal-content {
-      transform: scale(1);
+      max-width: 280px;
     }
     .check-icon {
-      font-size: 60px;
+      font-size: 50px;
       margin-bottom: 10px;
     }
   </style>
@@ -188,23 +178,23 @@
     <div class="articles-grid">
       <button class="btn-article" onclick="ajouterArticle(2)">
         <span class="emoji">🍎</span>
-        <span>2 €</span>
+        <span>+2 €</span>
       </button>
       <button class="btn-article" onclick="ajouterArticle(1)">
         <span class="emoji">🥖</span>
-        <span>1 €</span>
+        <span>+1 €</span>
       </button>
       <button class="btn-article" onclick="ajouterArticle(3)">
         <span class="emoji">🧃</span>
-        <span>3 €</span>
+        <span>+3 €</span>
       </button>
       <button class="btn-article" onclick="ajouterArticle(4)">
         <span class="emoji">🍫</span>
-        <span>4 €</span>
+        <span>+4 €</span>
       </button>
     </div>
 
-    <div class="section-title">Saisie du prix</div>
+    <div class="section-title">Saisie libre</div>
     <div class="pave-numerique">
       <button class="btn-num" onclick="taperChiffre('1')">1</button>
       <button class="btn-num" onclick="taperChiffre('2')">2</button>
@@ -225,4 +215,79 @@
 
     <button class="btn-validation" onclick="validerPaiement()">
       ✅ Validation paiement
-    </button
+    </button>
+
+    <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
+  </div>
+
+  <div class="modal-overlay" id="modalSucces">
+    <div class="modal-content">
+      <div class="check-icon">🎉</div>
+      <h2 style="color: #2b6cb0; margin: 0 0 10px 0;">Paiement Accepté !</h2>
+      <p id="messagePaiement" style="color: #4a5568; font-size: 18px; font-weight: bold;"></p>
+    </div>
+  </div>
+
+  <script>
+    let montantTextuel = "0";
+
+    function MettreAJourEcran() {
+      document.getElementById('totalDisplay').innerText = montantTextuel + ' €';
+    }
+
+    function ajouterArticle(prix) {
+      let totalActuel = parseFloat(montantTextuel) || 0;
+      totalActuel += prix;
+      // Arrondir proprement à 2 décimales si besoin
+      montantTextuel = (Math.round(totalActuel * 100) / 100).toString();
+      MettreAJourEcran();
+    }
+
+    function taperChiffre(chiffre) {
+      if (chiffre === '.' && montantTextuel.includes('.')) return;
+
+      if (montantTextuel === "0" && chiffre !== '.') {
+        montantTextuel = chiffre;
+      } else {
+        montantTextuel += chiffre;
+      }
+      MettreAJourEcran();
+    }
+
+    function effacerDernier() {
+      if (montantTextuel.length > 1) {
+        montantTextuel = montantTextuel.slice(0, -1);
+      } else {
+        montantTextuel = "0";
+      }
+      MettreAJourEcran();
+    }
+
+    function reinitialiser() {
+      montantTextuel = "0";
+      MettreAJourEcran();
+    }
+
+    function validerPaiement() {
+      const montantFinal = parseFloat(montantTextuel);
+      if (!montantFinal || montantFinal === 0) {
+        alert("Saisissez un montant avant de valider !");
+        return;
+      }
+
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+
+      const modal = document.getElementById('modalSucces');
+      document.getElementById('messagePaiement').innerText = `Montant réglé : ${montantTextuel} €`;
+      modal.classList.add('active');
+
+      setTimeout(() => {
+        modal.classList.remove('active');
+        reinitialiser();
+      }, 2200);
+    }
+  </script>
+</body>
+</html>
