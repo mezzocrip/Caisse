@@ -39,7 +39,7 @@
       background-color: #1a202c;
       border-radius: 12px;
       padding: 15px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .total-label {
       color: #a0aec0;
@@ -54,6 +54,48 @@
       font-weight: bold;
       margin-top: 5px;
     }
+
+    /* Ticket / Fenêtre de détail des prix */
+    .ticket-container {
+      background: #f8fafc;
+      border: 2px dashed #cbd5e0;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 15px;
+      max-height: 120px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .ticket-vide {
+      color: #a0aec0;
+      font-size: 13px;
+      text-align: center;
+      margin: 10px 0;
+      font-style: italic;
+    }
+    .ligne-ticket {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: #2d3748;
+      padding: 4px 0;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .ligne-ticket:last-child {
+      border-bottom: none;
+    }
+    .btn-suppr-ligne {
+      background: #fed7d7;
+      color: #9b2c2c;
+      border: none;
+      border-radius: 5px;
+      font-size: 11px;
+      padding: 2px 6px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
     .section-title {
       font-size: 13px;
       color: #718096;
@@ -180,21 +222,26 @@
       <div class="total-montant" id="totalDisplay">0 €</div>
     </div>
 
+    <div class="section-title">Détail du panier</div>
+    <div class="ticket-container" id="ticketList">
+      <div class="ticket-vide">Aucun article ajouté</div>
+    </div>
+
     <div class="section-title">Articles rapides</div>
     <div class="articles-grid">
-      <button class="btn-article" onclick="ajouterArticle(2)">
+      <button class="btn-article" onclick="ajouterArticle('🍎 Pomme', 2)">
         <span class="emoji">🍎</span>
         <span>+2 €</span>
       </button>
-      <button class="btn-article" onclick="ajouterArticle(1)">
+      <button class="btn-article" onclick="ajouterArticle('🥖 Pain', 1)">
         <span class="emoji">🥖</span>
         <span>+1 €</span>
       </button>
-      <button class="btn-article" onclick="ajouterArticle(3)">
+      <button class="btn-article" onclick="ajouterArticle('🧃 Jus', 3)">
         <span class="emoji">🧃</span>
         <span>+3 €</span>
       </button>
-      <button class="btn-article" onclick="ajouterArticle(4)">
+      <button class="btn-article" onclick="ajouterArticle('🍫 Chocolat', 4)">
         <span class="emoji">🍫</span>
         <span>+4 €</span>
       </button>
@@ -216,14 +263,14 @@
       
       <button class="btn-num action" onclick="taperChiffre('.')">.</button>
       <button class="btn-num" onclick="taperChiffre('0')">0</button>
-      <button class="btn-num plus" onclick="additionnerSaisie()">+</button>
+      <button class="btn-num plus" onclick="ajouterSaisieManuelle()">+</button>
     </div>
 
     <button class="btn-validation" onclick="validerPaiement()">
       ✅ Validation paiement
     </button>
 
-    <button class="btn-reset" onclick="reinitialiser()">Remise à zéro / ⌫</button>
+    <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
   </div>
 
   <div class="modal-overlay" id="modalSucces">
@@ -235,20 +282,43 @@
   </div>
 
   <script>
-    let totalCumule = 0;
+    let listeArticles = [];
     let saisieEnCours = "0";
 
     function MettreAJourEcran() {
-      let affichage = parseFloat(saisieEnCours) || 0;
-      let totalAffiche = totalCumule + affichage;
-      // Arrondir proprement à 2 décimales
-      totalAffiche = Math.round(totalAffiche * 100) / 100;
-      document.getElementById('totalDisplay').innerText = totalAffiche + ' €';
+      // Calcul du total de tous les articles dans la liste
+      let totalArticles = listeArticles.reduce((acc, item) => acc + item.prix, 0);
+      let valeurTapee = parseFloat(saisieEnCours) || 0;
+      let totalGeneral = Math.round((totalArticles + valeurTapee) * 100) / 100;
+
+      document.getElementById('totalDisplay').innerText = totalGeneral + ' €';
+
+      // Mise à jour de la fenêtre de détail
+      const ticketContainer = document.getElementById('ticketList');
+      if (listeArticles.length === 0) {
+        ticketContainer.innerHTML = '<div class="ticket-vide">Aucun article ajouté</div>';
+      } else {
+        ticketContainer.innerHTML = '';
+        listeArticles.forEach((item, index) => {
+          const div = document.createElement('div');
+          div.className = 'ligne-ticket';
+          div.innerHTML = `
+            <span>${item.nom}</span>
+            <span>
+              <strong>${item.prix} €</strong>
+              <button class="btn-suppr-ligne" onclick="supprimerArticle(${index})">✕</button>
+            </span>
+          `;
+          ticketContainer.appendChild(div);
+        });
+        // Faire défiler automatiquement vers le bas du ticket
+        ticketContainer.scrollTop = ticketContainer.scrollHeight;
+      }
     }
 
-    function ajouterArticle(prix) {
-      totalCumule += prix;
-      saisieEnCours = "0";
+    function ajouterArticle(nom, prix) {
+      validerEtAjouterSaisieAUPanier();
+      listeArticles.push({ nom: nom, prix: prix });
       MettreAJourEcran();
     }
 
@@ -263,25 +333,37 @@
       MettreAJourEcran();
     }
 
-    function additionnerSaisie() {
-      let valeurSaisie = parseFloat(saisieEnCours) || 0;
-      totalCumule += valeurSaisie;
-      saisieEnCours = "0";
+    function validerEtAjouterSaisieAUPanier() {
+      let prixSaisi = parseFloat(saisieEnCours);
+      if (prixSaisi && prixSaisi > 0) {
+        listeArticles.push({ nom: 'Article divers', prix: prixSaisi });
+        saisieEnCours = "0";
+      }
+    }
+
+    function ajouterSaisieManuelle() {
+      validerEtAjouterSaisieAUPanier();
+      MettreAJourEcran();
+    }
+
+    function supprimerArticle(index) {
+      listeArticles.splice(index, 1);
       MettreAJourEcran();
     }
 
     function reinitialiser() {
-      totalCumule = 0;
+      listeArticles = [];
       saisieEnCours = "0";
       MettreAJourEcran();
     }
 
     function validerPaiement() {
-      let montantFinal = totalCumule + (parseFloat(saisieEnCours) || 0);
-      montantFinal = Math.round(montantFinal * 100) / 100;
+      validerEtAjouterSaisieAUPanier();
+      let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
+      totalFinal = Math.round(totalFinal * 100) / 100;
 
-      if (!montantFinal || montantFinal === 0) {
-        alert("Saisissez un montant avant de valider !");
+      if (!totalFinal || totalFinal === 0) {
+        alert("Ajoutez au moins un article ou un prix avant de valider !");
         return;
       }
 
@@ -290,7 +372,7 @@
       }
 
       const modal = document.getElementById('modalSucces');
-      document.getElementById('messagePaiement').innerText = `Montant réglé : ${montantFinal} €`;
+      document.getElementById('messagePaiement').innerText = `Montant réglé : ${totalFinal} €`;
       modal.classList.add('active');
 
       setTimeout(() => {
