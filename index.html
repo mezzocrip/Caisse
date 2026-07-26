@@ -334,6 +334,26 @@
     .btn-pin.btn-cancel { font-size: 13px; color: #ff453a; background: transparent; }
     .btn-pin.btn-del { font-size: 18px; color: #8e8e93; background: transparent; }
 
+    /* MODAL BANQUE & SOLDES */
+    .banque-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9997;
+    }
+    .banque-overlay.active { opacity: 1; pointer-events: auto; }
+    .banque-card {
+      background: #ffffff; border-radius: 20px; width: 90%; max-width: 420px;
+      padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .solde-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 15px; background: #f7fafc; border: 1px solid #e2e8f0;
+      border-radius: 12px; margin-bottom: 8px; font-weight: bold;
+    }
+    .solde-nom { color: #2d3748; font-size: 15px; }
+    .solde-valeur { color: #38a169; font-size: 18px; font-family: monospace; }
+
     /* MODAL HISTORIQUE DES TICKETS */
     .historique-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -420,14 +440,18 @@
     .apple-pay-overlay.active .apple-pay-card { transform: translateY(0); }
     .ap-header { font-size: 18px; font-weight: 600; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; gap: 6px; }
     .ap-amount { font-size: 36px; font-weight: 700; margin-bottom: 15px; letter-spacing: -0.5px; }
+    
     .face-id-icon {
       width: 60px; height: 60px; margin: 10px auto 15px auto; border: 3px solid #30d158;
       border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; animation: pulse 1.2s infinite alternate;
     }
     .face-id-icon.success { border-color: #30d158; background: #30d158; color: white; animation: none; }
+    .face-id-icon.error { border-color: #ff453a; background: #ff453a; color: white; animation: shake 0.4s ease-in-out; }
+
     @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 100% { transform: scale(1.05); opacity: 1; } }
     .ap-status { font-size: 15px; color: #8e8e93; font-weight: 500; }
     .ap-user { font-size: 20px; color: #30d158; font-weight: bold; margin-top: 5px; }
+    .ap-user.error { color: #ff453a; }
 
     /* FIX RECADRAGE IPAD PAYSAGE & ÉCRANS LARGES (>= 768px) */
     @media (min-width: 768px) and (orientation: landscape) {
@@ -517,6 +541,7 @@
     <div class="header-caisse">
       <h1>Caisse Enregistreuse 🛒</h1>
       <div class="header-actions">
+        <button class="btn-icon" onclick="ouvrirBanque()" title="Solde des comptes">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Historique des tickets">🧾</button>
         <button class="btn-icon" onclick="ouvrirReglagesProteges()" title="Réglages">⚙️</button>
       </div>
@@ -611,7 +636,20 @@
     </div>
   </div>
 
-  <!-- OVERLAY HISTORIQUE DES TICKETS AVEC ONGLETS PRÉNOMS -->
+  <!-- OVERLAY SOLDE ET COMPTES BANCAIRES -->
+  <div class="banque-overlay" id="banqueOverlay">
+    <div class="banque-card">
+      <div class="reglages-header">
+        <span class="reglages-title">Comptes Bancaires 🏦</span>
+        <button class="btn-close" onclick="fermerBanque()">✕</button>
+      </div>
+      <div id="soldesList">
+        <div style="text-align:center; color:#a0aec0; margin:20px 0;">Chargement des soldes...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY HISTORIQUE DES TICKETS -->
   <div class="historique-overlay" id="historiqueOverlay">
     <div class="historique-card">
       <div class="reglages-header">
@@ -660,7 +698,7 @@
     </div>
   </div>
 
-  <!-- OVERLAY SIMULATION APPLE PAY AVEC NOM DE L'UTILISATEUR -->
+  <!-- OVERLAY SIMULATION APPLE PAY AVEC ACCEPTATION / REFUS -->
   <div class="apple-pay-overlay" id="applePayOverlay">
     <div class="apple-pay-card">
       <div class="ap-header">
@@ -668,7 +706,7 @@
       </div>
       <div class="ap-amount" id="apAmountDisplay">0,00 €</div>
       <div class="face-id-icon" id="faceIdIcon">😃</div>
-      <div class="ap-status" id="apStatusText">Maintenez près du lecteur...</div>
+      <div class="ap-status" id="apStatusText">Vérification du solde...</div>
       <div class="ap-user" id="apUserDisplay"></div>
     </div>
   </div>
@@ -712,6 +750,7 @@
     let blocageSaisie = false;
     let actionApresPin = ""; // "paiement" ou "reglages"
     let tousLesTickets = [];
+    let comptesComplets = {};
     let filtrePrenomActif = "Tous";
 
     // BASE DE DONNÉES DES ARTICLES PAR CATÉGORIE
@@ -782,6 +821,71 @@
       afficherArticles();
       MettreAJourEcran();
       ecouterHistoriqueFirebase();
+      initialiserEtEcouterComptes();
+    }
+
+    /* GESTION DES COMPTES BANCAIRES & RECHARGEMENT (+100€/h) */
+    function initialiserEtEcouterComptes() {
+      const banquesRef = db.ref('banques');
+      
+      banquesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        const now = Date.now();
+        const UNE_HEURE = 3600000; // 1 heure en millisecondes
+
+        if (!data) {
+          // Premier lancement : Création des comptes avec 2000 € chacun
+          let initialData = { lastRecharge: now };
+          Object.values(USERS_MAP).forEach(prenom => {
+            initialData[prenom] = 2000.00;
+          });
+          banquesRef.set(initialData);
+        } else {
+          comptesComplets = data;
+          let lastRecharge = data.lastRecharge || now;
+          let msEcoulees = now - lastRecharge;
+
+          if (msEcoulees >= UNE_HEURE) {
+            let nbHeures = Math.floor(msEcoulees / UNE_HEURE);
+            let ajouts = nbHeures * 100; // +100 € par heure passée
+            let updates = { lastRecharge: lastRecharge + (nbHeures * UNE_HEURE) };
+
+            Object.values(USERS_MAP).forEach(prenom => {
+              let soldeActuel = data[prenom] !== undefined ? data[prenom] : 2000.00;
+              updates[prenom] = Math.round((soldeActuel + ajouts) * 100) / 100;
+            });
+
+            banquesRef.update(updates);
+          }
+          afficherSoldes();
+        }
+      });
+    }
+
+    function ouvrirBanque() {
+      afficherSoldes();
+      document.getElementById('banqueOverlay').classList.add('active');
+    }
+
+    function fermerBanque() {
+      document.getElementById('banqueOverlay').classList.remove('active');
+    }
+
+    function afficherSoldes() {
+      const container = document.getElementById('soldesList');
+      if (!container) return;
+      container.innerHTML = "";
+
+      Object.values(USERS_MAP).forEach(prenom => {
+        let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 2000.00;
+        let div = document.createElement('div');
+        div.className = 'solde-item';
+        div.innerHTML = `
+          <span class="solde-nom">${prenom}</span>
+          <span class="solde-valeur">${solde.toFixed(2).replace('.', ',')} €</span>
+        `;
+        container.appendChild(div);
+      });
     }
 
     function afficherOnglets() {
@@ -1008,7 +1112,7 @@
         if (!data) {
           tousLesTickets = [];
         } else {
-          tousLesTickets = Object.values(data).reverse(); // Les plus récents en premier
+          tousLesTickets = Object.values(data).reverse();
         }
         afficherTicketsHistorique();
       });
@@ -1183,12 +1287,26 @@
       } catch (e) { console.log("Audio non supporté"); }
     }
 
+    function jouerSonErreur() {
+      try {
+        if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.3);
+      } catch (e) { console.log("Audio non supporté"); }
+    }
+
     function validerPaiement() {
       let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       totalFinal = Math.round(totalFinal * 100) / 100;
-
-      // Enregistrement sur Firebase Realtime Database
-      enregistrerTicketFirebase(lastPinValide, lastUserValide, [...listeArticles], totalFinal);
 
       const overlay = document.getElementById('applePayOverlay');
       const amountDisplay = document.getElementById('apAmountDisplay');
@@ -1199,26 +1317,57 @@
       amountDisplay.innerText = totalFinal.toFixed(2).replace('.', ',') + ' €';
       icon.className = 'face-id-icon';
       icon.innerText = '😃';
-      statusText.innerText = 'Validation Face ID...';
+      statusText.innerText = 'Vérification du solde...';
       userDisplay.innerText = '';
+      userDisplay.className = 'ap-user';
 
       overlay.classList.add('active');
 
-      setTimeout(() => {
-        icon.className = 'face-id-icon success';
-        icon.innerText = '✓';
-        statusText.innerText = 'Paiement accepté';
-        userDisplay.innerText = 'Payé par ' + lastUserValide;
-
-        jouerSonValidation();
-        if (navigator.vibrate) { navigator.vibrate([80, 40, 80]); }
+      // Interrogation du solde Firebase
+      db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
+        let soldeDisponible = snapshot.val();
+        if (soldeDisponible === null || soldeDisponible === undefined) {
+          soldeDisponible = 2000.00;
+        }
 
         setTimeout(() => {
-          overlay.classList.remove('active');
-          reinitialiser();
-        }, 1500);
+          if (soldeDisponible >= totalFinal) {
+            // ACCEPTÉ : Déduction et enregistrement
+            let nouveauSolde = Math.round((soldeDisponible - totalFinal) * 100) / 100;
+            db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
-      }, 1000);
+            enregistrerTicketFirebase(lastPinValide, lastUserValide, [...listeArticles], totalFinal);
+
+            icon.className = 'face-id-icon success';
+            icon.innerText = '✓';
+            statusText.innerText = 'Paiement accepté';
+            userDisplay.innerText = 'Payé par ' + lastUserValide;
+
+            jouerSonValidation();
+            if (navigator.vibrate) { navigator.vibrate([80, 40, 80]); }
+
+            setTimeout(() => {
+              overlay.classList.remove('active');
+              reinitialiser();
+            }, 1600);
+
+          } else {
+            // REFUSÉ : Solde insuffisant
+            icon.className = 'face-id-icon error';
+            icon.innerText = '✕';
+            statusText.innerText = 'Paiement Refusé !';
+            userDisplay.className = 'ap-user error';
+            userDisplay.innerText = `Solde insuffisant (${soldeDisponible.toFixed(2).replace('.', ',')} €)`;
+
+            jouerSonErreur();
+            if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
+
+            setTimeout(() => {
+              overlay.classList.remove('active');
+            }, 2200);
+          }
+        }, 800);
+      });
     }
 
     // Lancement
