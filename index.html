@@ -512,6 +512,9 @@
         <div class="item-editor" style="margin-top: 5px;">
           <select id="nouvelleCategorie" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e0;">
             <option value="Boulangerie">Boulangerie</option>
+            <option value="Boucherie Halal">Boucherie Halal</option>
+            <option value="Smartphones">Smartphones</option>
+            <option value="Consoles & Tech">Consoles & Tech</option>
             <option value="Fruits & Légumes">Fruits & Légumes</option>
             <option value="Jouets">Jouets</option>
             <option value="Hygiène & Divers">Hygiène & Divers</option>
@@ -549,30 +552,64 @@
     let blocageSaisie = false;
     let actionApresPin = ""; // "paiement" ou "reglages"
 
-    // BASE DE DONNÉES DES ARTICLES PAR CATÉGORIE
+    // BASE DE DONNÉES DES ARTICLES PAR CATÉGORIE AVEC VRAIS PRIX
     let baseArticles = [
+      // BOULANGERIE
       { id: 1, cat: "Boulangerie", emoji: "🥖", nom: "Baguette", prix: 1.10 },
       { id: 2, cat: "Boulangerie", emoji: "🥐", nom: "Croissant", prix: 1.20 },
       { id: 3, cat: "Boulangerie", emoji: "🍫", nom: "Pain au chocolat", prix: 1.30 },
       { id: 4, cat: "Boulangerie", emoji: "🍪", nom: "Cookie", prix: 1.80 },
 
+      // BOUCHERIE HALAL (Prix au Kilo)
+      { id: 101, cat: "Boucherie Halal", emoji: "🌭", nom: "Merguez Halal (1kg)", prix: 13.90 },
+      { id: 102, cat: "Boucherie Halal", emoji: "🌭", nom: "Chipolatas Halal (1kg)", prix: 13.90 },
+      { id: 103, cat: "Boucherie Halal", emoji: "🍗", nom: "Escalope Poulet (1kg)", prix: 10.90 },
+      { id: 104, cat: "Boucherie Halal", emoji: "🥩", nom: "Faux-Filet Bœuf (1kg)", prix: 22.90 },
+      { id: 105, cat: "Boucherie Halal", emoji: "🥩", nom: "Côte d'Agneau (1kg)", prix: 19.90 },
+      { id: 106, cat: "Boucherie Halal", emoji: "🍖", nom: "Pilon de Poulet (1kg)", prix: 6.50 },
+      { id: 107, cat: "Boucherie Halal", emoji: "🥩", nom: "Viande Hachée (1kg)", prix: 12.90 },
+      { id: 108, cat: "Boucherie Halal", emoji: "🥩", nom: "Paleron de Bœuf (1kg)", prix: 15.90 },
+
+      // SMARTPHONES
+      { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 1259.00 },
+      { id: 202, cat: "Smartphones", emoji: "📱", nom: "iPhone 14 Pro Max", prix: 1479.00 },
+      { id: 203, cat: "Smartphones", emoji: "📱", nom: "iPhone 15 Pro Max", prix: 1479.00 },
+      { id: 204, cat: "Smartphones", emoji: "📱", nom: "iPhone 16 Pro Max", prix: 1479.00 },
+      { id: 205, cat: "Smartphones", emoji: "📱", nom: "iPhone 17 Pro Max", prix: 1479.00 },
+
+      // CONSOLES & TECH
+      { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5", prix: 549.99 },
+      { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PS5 DualSense", prix: 69.99 },
+      { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Xbox Series X", prix: 549.99 },
+      { id: 304, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette Xbox Sans Fil", prix: 59.99 },
+      { id: 305, cat: "Consoles & Tech", emoji: "📱", nom: "iPad mini 6", prix: 559.00 },
+      { id: 306, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro", prix: 1599.00 },
+      { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 15\"", prix: 1899.00 },
+      { id: 308, cat: "Consoles & Tech", emoji: "🖥️", nom: "Mac mini", prix: 699.00 },
+      { id: 309, cat: "Consoles & Tech", emoji: "📺", nom: "TV Samsung 65\"", prix: 899.00 },
+      { id: 310, cat: "Consoles & Tech", emoji: "📺", nom: "TV Samsung 75\"", prix: 1299.00 },
+
+      // FRUITS & LÉGUMES
       { id: 5, cat: "Fruits & Légumes", emoji: "🍎", nom: "Pomme", prix: 0.60 },
       { id: 6, cat: "Fruits & Légumes", emoji: "🍌", nom: "Banane", prix: 0.50 },
       { id: 7, cat: "Fruits & Légumes", emoji: "🥕", nom: "Carotte", prix: 0.40 },
       { id: 8, cat: "Fruits & Légumes", emoji: "🍓", nom: "Fraises 250g", prix: 2.50 },
 
+      // JOUETS
       { id: 9, cat: "Jouets", emoji: "🧸", nom: "Ours en peluche", prix: 8.50 },
       { id: 10, cat: "Jouets", emoji: "🚗", nom: "Petite voiture", prix: 3.20 },
       { id: 11, cat: "Jouets", emoji: "🎨", nom: "Boîte peinture", prix: 4.50 },
       { id: 12, cat: "Jouets", emoji: "🧩", nom: "Puzzle", prix: 6.00 },
 
+      // HYGIÈNE & DIVERS
       { id: 13, cat: "Hygiène & Divers", emoji: "🥛", nom: "Lait 1L", prix: 1.25 },
       { id: 14, cat: "Hygiène & Divers", emoji: "🧀", nom: "Fromage", prix: 2.80 },
       { id: 15, cat: "Hygiène & Divers", emoji: "🧼", nom: "Savon", prix: 1.40 },
-      { id: 16, cat: "Hygiène & Divers", emoji: "🧻", nom: "P. Toilette", prix: 3.20 }
+      { id: 16, cat: "Hygiène & Divers", emoji: "🧻", nom: "P. Toilette", prix: 3.20 },
+      { id: 17, cat: "Hygiène & Divers", emoji: "📚", nom: "Livre d'hiver", prix: 14.90 }
     ];
 
-    let categorieActive = "Boulangerie";
+    let categorieActive = "Consoles & Tech";
     let listeArticles = [];
     let saisieEnCours = "0";
     let audioCtx = null;
@@ -585,7 +622,15 @@
     }
 
     function afficherOnglets() {
-      const categories = ["Boulangerie", "Fruits & Légumes", "Jouets", "Hygiène & Divers"];
+      const categories = [
+        "Consoles & Tech", 
+        "Smartphones", 
+        "Boucherie Halal", 
+        "Boulangerie", 
+        "Fruits & Légumes", 
+        "Jouets", 
+        "Hygiène & Divers"
+      ];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
 
