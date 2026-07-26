@@ -55,19 +55,19 @@
     h1 {
       color: #333;
       margin: 0;
-      font-size: 20px;
+      font-size: 18px;
     }
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
     .btn-icon {
       background: #edf2f7;
       border: none;
       border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      font-size: 18px;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
       cursor: pointer;
       display: flex;
       justify-content: center;
@@ -77,7 +77,7 @@
     .ecran {
       background-color: #1a202c;
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px 12px;
       margin-bottom: 10px;
     }
     .total-label {
@@ -88,7 +88,7 @@
     }
     .total-montant {
       color: #38ef7d;
-      font-size: 38px;
+      font-size: 32px;
       font-family: monospace;
       font-weight: bold;
       margin-top: 2px;
@@ -101,7 +101,7 @@
       border-radius: 10px;
       padding: 8px 12px;
       margin-bottom: 12px;
-      max-height: 110px;
+      max-height: 130px;
       overflow-y: auto;
       text-align: left;
     }
@@ -175,10 +175,10 @@
 
     /* Zone scrollable pour les articles */
     .articles-scroll {
-      max-height: 180px;
+      max-height: 220px;
       overflow-y: auto;
       padding-right: 2px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
     .articles-grid {
       display: grid;
@@ -209,46 +209,19 @@
       color: #2b6cb0;
     }
 
-    /* Pavé numérique principal */
-    .pave-numerique {
+    .actions-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-bottom: 15px;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
     }
-    .btn-num {
-      background: #fff;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #2d3748;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .btn-num:active {
-      background-color: #edf2f7;
-    }
-    .btn-num.action {
-      background: #feebc8;
-      border-color: #fbd38d;
-      color: #c05621;
-    }
-    .btn-num.plus {
-      background: #ebf8ff;
-      border-color: #90cdf4;
-      color: #2b6cb0;
-      font-size: 20px;
-    }
-
     .btn-validation {
       background: #000;
       color: #fff;
       border: none;
       border-radius: 12px;
-      padding: 15px;
-      font-size: 18px;
+      padding: 12px;
+      font-size: 16px;
       font-weight: 600;
       width: 100%;
       cursor: pointer;
@@ -256,21 +229,34 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       touch-action: manipulation;
     }
-    .btn-validation:active {
-      opacity: 0.8;
+    .btn-quiz-mode {
+      background: #6b46c1;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      touch-action: manipulation;
     }
     .btn-reset {
-      margin-top: 8px;
       background: none;
       border: none;
       color: #e53e3e;
       font-weight: bold;
       cursor: pointer;
-      padding: 6px;
-      font-size: 13px;
+      padding: 4px;
+      font-size: 12px;
       touch-action: manipulation;
     }
 
@@ -368,7 +354,6 @@
     }
     .historique-list { overflow-y: auto; flex-grow: 1; margin-top: 10px; display: flex; flex-direction: column; gap: 15px; }
     
-    /* Design spécifique Ticket de Caisse */
     .ticket-paper {
       background: #fffdf9;
       border: 1px solid #e2e8f0;
@@ -391,7 +376,7 @@
     .ticket-paper-meta { font-size: 11px; color: #718096; margin-top: 2px; }
     .ticket-paper-items { font-size: 12px; margin-bottom: 10px; }
     .ticket-paper-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .ticket-paper-total { border-top: 1px dashed #cbd5e0; pt: 8px; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: 8px; padding-top: 6px; }
+    .ticket-paper-total { border-top: 1px dashed #cbd5e0; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: 8px; padding-top: 6px; }
 
     /* MODAL RÉGLAGES DES ARTICLES */
     .reglages-overlay {
@@ -422,6 +407,38 @@
       background: #3182ce; color: white; border: none; border-radius: 8px; padding: 8px 12px;
       font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 13px;
     }
+
+    /* MODAL QUIZ & GAINS 🧠 */
+    .quiz-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px);
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9996;
+    }
+    .quiz-overlay.active { opacity: 1; pointer-events: auto; }
+    .quiz-card {
+      background: #ffffff; border-radius: 24px; width: 92%; max-width: 440px;
+      padding: 22px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .quiz-title { font-size: 18px; font-weight: bold; color: #2d3748; }
+    .quiz-score-badge { background: #edf2f7; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #2b6cb0; }
+    
+    .quiz-mode-select { display: flex; gap: 6px; justify-content: center; margin-bottom: 15px; }
+    .quiz-mode-btn { background: #e2e8f0; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; color: #4a5568; }
+    .quiz-mode-btn.active { background: #6b46c1; color: white; }
+
+    .quiz-question-box { background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 15px; }
+    .quiz-matiere { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #718096; font-weight: bold; margin-bottom: 5px; }
+    .quiz-enonce { font-size: 18px; font-weight: bold; color: #1a202c; margin-bottom: 12px; }
+    
+    .quiz-input { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
+    .quiz-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .quiz-option-btn { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: bold; color: #2d3748; cursor: pointer; }
+    .quiz-option-btn:active { background: #cbd5e0; }
+
+    .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 10px; padding: 10px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; }
+    .quiz-quit-btn { background: #fed7d7; color: #9b2c2c; border: none; border-radius: 10px; padding: 8px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
 
     /* SIMULATION APPLE PAY MODAL */
     .apple-pay-overlay {
@@ -455,19 +472,13 @@
 
     /* FIX RECADRAGE IPAD PAYSAGE & ÉCRANS LARGES (>= 768px) */
     @media (min-width: 768px) and (orientation: landscape) {
-      body {
-        padding: 10px;
-        align-items: center;
-      }
+      body { padding: 10px; align-items: center; }
       .caisse-container {
         max-width: 980px;
         max-height: 94vh;
         padding: 15px 20px;
         display: flex;
         flex-direction: column;
-      }
-      .header-caisse {
-        margin-bottom: 10px;
       }
       .layout-ipad {
         display: grid;
@@ -477,61 +488,15 @@
         flex-grow: 1;
         overflow: hidden;
       }
-      .col-gauche {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-      .col-droite {
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        padding-right: 4px;
-      }
-      .ecran {
-        padding: 8px 12px;
-        margin-bottom: 8px;
-      }
-      .total-montant {
-        font-size: 32px;
-      }
-      .ticket-container {
-        flex-grow: 1;
-        max-height: 180px;
-        min-height: 100px;
-        margin-bottom: 8px;
-      }
-      .articles-scroll {
-        max-height: 180px;
-        margin-bottom: 10px;
-      }
-      .articles-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-      }
-      .btn-article {
-        padding: 6px 4px;
-        font-size: 11px;
-      }
-      .emoji {
-        font-size: 20px;
-      }
-      .pave-numerique {
-        gap: 6px;
-        margin-bottom: 0;
-      }
-      .btn-num {
-        padding: 8px;
-        font-size: 16px;
-      }
-      .btn-validation {
-        padding: 12px;
-        font-size: 16px;
-      }
-      .btn-reset {
-        margin-top: 4px;
-        padding: 4px;
-      }
+      .col-gauche { display: flex; flex-direction: column; justify-content: space-between; }
+      .col-droite { display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; }
+      .ecran { padding: 8px 12px; margin-bottom: 8px; }
+      .total-montant { font-size: 30px; }
+      .ticket-container { flex-grow: 1; max-height: 190px; min-height: 100px; margin-bottom: 8px; }
+      .articles-scroll { max-height: 240px; margin-bottom: 10px; }
+      .articles-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      .btn-article { padding: 6px 4px; font-size: 11px; }
+      .emoji { font-size: 20px; }
     }
   </style>
 </head>
@@ -563,39 +528,21 @@
         </div>
 
         <div>
-          <button class="btn-validation" onclick="demanderCodePin('paiement')">
-            Payer
-          </button>
+          <div class="actions-grid">
+            <button class="btn-validation" onclick="demanderCodePin('paiement')">Payer</button>
+            <button class="btn-quiz-mode" onclick="ouvrirQuiz()">Quiz 🧠</button>
+          </div>
           <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
         </div>
       </div>
 
-      <!-- Colonne Droite : Articles par catégories & Saisie Numérique -->
+      <!-- Colonne Droite : Catalogue par catégories -->
       <div class="col-droite">
         <div class="section-title">Catalogue</div>
         <div class="categories-tabs" id="categoriesTabs"></div>
 
         <div class="articles-scroll">
           <div class="articles-grid" id="articlesGrid"></div>
-        </div>
-
-        <div class="section-title">Saisie libre</div>
-        <div class="pave-numerique">
-          <button class="btn-num" onclick="taperChiffre('1')">1</button>
-          <button class="btn-num" onclick="taperChiffre('2')">2</button>
-          <button class="btn-num" onclick="taperChiffre('3')">3</button>
-          
-          <button class="btn-num" onclick="taperChiffre('4')">4</button>
-          <button class="btn-num" onclick="taperChiffre('5')">5</button>
-          <button class="btn-num" onclick="taperChiffre('6')">6</button>
-          
-          <button class="btn-num" onclick="taperChiffre('7')">7</button>
-          <button class="btn-num" onclick="taperChiffre('8')">8</button>
-          <button class="btn-num" onclick="taperChiffre('9')">9</button>
-          
-          <button class="btn-num action" onclick="taperChiffre('.')">.</button>
-          <button class="btn-num" onclick="taperChiffre('0')">0</button>
-          <button class="btn-num plus" onclick="ajouterSaisieManuelle()">+</button>
         </div>
       </div>
     </div>
@@ -604,8 +551,8 @@
   <!-- OVERLAY CODE PIN -->
   <div class="pin-overlay" id="pinOverlay">
     <div class="pin-card" id="pinCard">
-      <div class="pin-title">Code PIN requis</div>
-      <div class="pin-subtitle">Saisissez votre code à 4 chiffres</div>
+      <div class="pin-title" id="pinTitleModal">Code PIN requis</div>
+      <div class="pin-subtitle" id="pinSubtitleModal">Saisissez votre code à 4 chiffres</div>
       
       <div class="pin-dots">
         <div class="dot" id="dot0"></div>
@@ -633,6 +580,36 @@
         <button class="btn-pin" onclick="taperCodePin('0')">0</button>
         <button class="btn-pin btn-del" onclick="effacerChiffrePin()">⌫</button>
       </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY QUIZ & GAINS 🧠 -->
+  <div class="quiz-overlay" id="quizOverlay">
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <span class="quiz-title">Quiz & Gains 🧠</span>
+        <span class="quiz-score-badge" id="quizSessionScore">Gagné : 0 €</span>
+      </div>
+
+      <div class="quiz-mode-select">
+        <button class="quiz-mode-btn active" id="modeBtnFacile" onclick="changerModeQuiz('facile')">Facile</button>
+        <button class="quiz-mode-btn" id="modeBtnInter" onclick="changerModeQuiz('intermédiaire')">Intermédiaire</button>
+        <button class="quiz-mode-btn" id="modeBtnExpert" onclick="changerModeQuiz('expert')">Expert</button>
+      </div>
+
+      <div class="quiz-question-box">
+        <div class="quiz-matiere" id="quizMatiere">Mathématiques</div>
+        <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
+        
+        <div id="quizInputContainer">
+          <input type="text" id="quizReponseInput" class="quiz-input" placeholder="Ta réponse ici...">
+          <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider la réponse</button>
+        </div>
+
+        <div id="quizOptionsContainer" class="quiz-options-grid" style="display:none;"></div>
+      </div>
+
+      <button class="quiz-quit-btn" onclick="fermerQuizEtCrediter()">S'arrêter et récupérer les gains</button>
     </div>
   </div>
 
@@ -698,21 +675,21 @@
     </div>
   </div>
 
-  <!-- OVERLAY SIMULATION APPLE PAY AVEC ACCEPTATION / REFUS -->
+  <!-- OVERLAY SIMULATION APPLE PAY / GAINS -->
   <div class="apple-pay-overlay" id="applePayOverlay">
     <div class="apple-pay-card">
       <div class="ap-header">
-        <span>Pay</span>
+        <span id="apTitleHeader">Pay</span>
       </div>
       <div class="ap-amount" id="apAmountDisplay">0,00 €</div>
       <div class="face-id-icon" id="faceIdIcon">😃</div>
-      <div class="ap-status" id="apStatusText">Vérification du solde...</div>
+      <div class="ap-status" id="apStatusText">Vérification...</div>
       <div class="ap-user" id="apUserDisplay"></div>
     </div>
   </div>
 
   <script>
-    // CONFIGURATION FIREBASE CORRIGÉE
+    // CONFIGURATION FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyBtij22GLTXBbdWxbUX42rKP_HQIeah7AQ",
       authDomain: "caisse-enregistreuse-terrance.firebaseapp.com",
@@ -723,11 +700,10 @@
       databaseURL: "https://caisse-enregistreuse-terrance-default-rtdb.firebaseio.com"
     };
 
-    // Initialisation Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Blocage strict du double-tap zoom sur iOS
+    // Blocage strict zoom iOS
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function (event) {
       const now = (new Date()).getTime();
@@ -735,7 +711,6 @@
       lastTouchEnd = now;
     }, false);
 
-    // MAPPING CODES PIN ET PRÉNOMS ASSOCIÉS
     const USERS_MAP = {
       "0712": "Yves",
       "2807": "Terrance",
@@ -748,74 +723,61 @@
     let lastUserValide = "";
     let lastPinValide = "";
     let blocageSaisie = false;
-    let actionApresPin = ""; // "paiement" ou "reglages"
+    let actionApresPin = ""; // "paiement", "reglages" ou "quiz_gain"
     let tousLesTickets = [];
     let comptesComplets = {};
     let filtrePrenomActif = "Tous";
 
-    // BASE DE DONNÉES DES ARTICLES PAR CATÉGORIE
+    // VARIABLES MODULE QUIZ
+    let quizNiveau = "facile"; // facile, intermédiaire, expert
+    let gainQuizSession = 0;
+    let questionActiveCourante = null;
+
+    // BANQUES DE MOTS ET VERBES POUR GÉNÉRATION ALÉATOIRE
+    const BANQUE_ANGLAIS_FACILE = [
+      { en: "Cat", fr: "Chat" }, { en: "Dog", fr: "Chien" }, { en: "House", fr: "Maison" },
+      { en: "Apple", fr: "Pomme" }, { en: "Book", fr: "Livre" }, { en: "Water", fr: "Eau" },
+      { en: "Sun", fr: "Soleil" }, { en: "Moon", fr: "Lune" }, { en: "Car", fr: "Voiture" },
+      { en: "School", fr: "École" }, { en: "Red", fr: "Rouge" }, { en: "Blue", fr: "Bleu" }
+    ];
+
+    const BANQUE_ANGLAIS_EXPERT = [
+      { en: "Achievement", fr: "Réalisation" }, { en: "Acknowledge", fr: "Reconnaître" },
+      { en: "Breathtaking", fr: "Epoustouflant" }, { en: "Challenge", fr: "Défi" },
+      { en: "Curiosity", fr: "Curiosité" }, { en: "Determination", fr: "Détermination" },
+      { en: "Environment", fr: "Environnement" }, { en: "Improvement", fr: "Amélioration" },
+      { en: "Knowledge", fr: "Connaissance" }, { en: "Significant", fr: "Important" }
+    ];
+
+    const VERBES_FRANCAIS = [
+      { verbe: "chanter", temps: "Présent de l'indicatif (1ère pers. sing.)", sujet: "Je", rep: "chante" },
+      { verbe: "finir", temps: "Présent de l'indicatif (1ère pers. pluriel)", sujet: "Nous", rep: "finissons" },
+      { verbe: "aller", temps: "Futur simple (2ème pers. sing.)", sujet: "Tu", rep: "iras" },
+      { verbe: "faire", temps: "Imparfait de l'indicatif (3ème pers. sing.)", sujet: "Il", rep: "faisait" },
+      { verbe: "venir", temps: "Passé composé (1ère pers. sing.)", sujet: "Je", rep: "suis venu" },
+      { verbe: "prendre", temps: "Présent de l'indicatif (3ème pers. pluriel)", sujet: "Ils", rep: "prennent" }
+    ];
+
     let baseArticles = [
-      // BOULANGERIE
       { id: 1, cat: "Boulangerie", emoji: "🥖", nom: "Baguette", prix: 1.10 },
       { id: 2, cat: "Boulangerie", emoji: "🥐", nom: "Croissant", prix: 1.20 },
       { id: 3, cat: "Boulangerie", emoji: "🍫", nom: "Pain au chocolat", prix: 1.30 },
-      { id: 4, cat: "Boulangerie", emoji: "🍪", nom: "Cookie", prix: 1.80 },
-
-      // BOUCHERIE HALAL (Prix au Kilo)
       { id: 101, cat: "Boucherie Halal", emoji: "🌭", nom: "Merguez Halal (1kg)", prix: 13.90 },
       { id: 102, cat: "Boucherie Halal", emoji: "🌭", nom: "Chipolatas Halal (1kg)", prix: 13.90 },
-      { id: 103, cat: "Boucherie Halal", emoji: "🍗", nom: "Escalope Poulet (1kg)", prix: 10.90 },
-      { id: 104, cat: "Boucherie Halal", emoji: "🥩", nom: "Faux-Filet Bœuf (1kg)", prix: 22.90 },
-      { id: 105, cat: "Boucherie Halal", emoji: "🥩", nom: "Côte d'Agneau (1kg)", prix: 19.90 },
-      { id: 106, cat: "Boucherie Halal", emoji: "🍖", nom: "Pilon de Poulet (1kg)", prix: 6.50 },
-      { id: 107, cat: "Boucherie Halal", emoji: "🥩", nom: "Viande Hachée (1kg)", prix: 12.90 },
-      { id: 108, cat: "Boucherie Halal", emoji: "🥩", nom: "Paleron de Bœuf (1kg)", prix: 15.90 },
-
-      // SMARTPHONES
       { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 1259.00 },
-      { id: 202, cat: "Smartphones", emoji: "📱", nom: "iPhone 14 Pro Max", prix: 1479.00 },
       { id: 203, cat: "Smartphones", emoji: "📱", nom: "iPhone 15 Pro Max", prix: 1479.00 },
-      { id: 204, cat: "Smartphones", emoji: "📱", nom: "iPhone 16 Pro Max", prix: 1479.00 },
-      { id: 205, cat: "Smartphones", emoji: "📱", nom: "iPhone 17 Pro Max", prix: 1479.00 },
-
-      // CONSOLES & TECH
       { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5", prix: 549.99 },
       { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PS5 DualSense", prix: 69.99 },
-      { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Xbox Series X", prix: 549.99 },
-      { id: 304, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette Xbox Sans Fil", prix: 59.99 },
       { id: 305, cat: "Consoles & Tech", emoji: "📱", nom: "iPad mini 6", prix: 559.00 },
-      { id: 306, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro", prix: 1599.00 },
-      { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 15\"", prix: 1899.00 },
-      { id: 308, cat: "Consoles & Tech", emoji: "🖥️", nom: "Mac mini", prix: 699.00 },
-      { id: 309, cat: "Consoles & Tech", emoji: "📺", nom: "TV Samsung 65\"", prix: 899.00 },
-      { id: 310, cat: "Consoles & Tech", emoji: "📺", nom: "TV Samsung 75\"", prix: 1299.00 },
-
-      // FRUITS & LÉGUMES
       { id: 5, cat: "Fruits & Légumes", emoji: "🍎", nom: "Pomme", prix: 0.60 },
-      { id: 6, cat: "Fruits & Légumes", emoji: "🍌", nom: "Banane", prix: 0.50 },
-      { id: 7, cat: "Fruits & Légumes", emoji: "🥕", nom: "Carotte", prix: 0.40 },
-      { id: 8, cat: "Fruits & Légumes", emoji: "🍓", nom: "Fraises 250g", prix: 2.50 },
-
-      // JOUETS
       { id: 9, cat: "Jouets", emoji: "🧸", nom: "Ours en peluche", prix: 8.50 },
-      { id: 10, cat: "Jouets", emoji: "🚗", nom: "Petite voiture", prix: 3.20 },
-      { id: 11, cat: "Jouets", emoji: "🎨", nom: "Boîte peinture", prix: 4.50 },
-      { id: 12, cat: "Jouets", emoji: "🧩", nom: "Puzzle", prix: 6.00 },
-
-      // HYGIÈNE & DIVERS
-      { id: 13, cat: "Hygiène & Divers", emoji: "🥛", nom: "Lait 1L", prix: 1.25 },
-      { id: 14, cat: "Hygiène & Divers", emoji: "🧀", nom: "Fromage", prix: 2.80 },
-      { id: 15, cat: "Hygiène & Divers", emoji: "🧼", nom: "Savon", prix: 1.40 },
-      { id: 16, cat: "Hygiène & Divers", emoji: "🧻", nom: "P. Toilette", prix: 3.20 },
-      { id: 17, cat: "Hygiène & Divers", emoji: "📚", nom: "Livre d'hiver", prix: 14.90 }
+      { id: 13, cat: "Hygiène & Divers", emoji: "🥛", nom: "Lait 1L", prix: 1.25 }
     ];
 
     let categorieActive = "Consoles & Tech";
     let listeArticles = [];
-    let saisieEnCours = "0";
     let audioCtx = null;
 
-    // INITIALISATION DE L'INTERFACE
     function initApp() {
       afficherOnglets();
       afficherArticles();
@@ -824,21 +786,17 @@
       initialiserEtEcouterComptes();
     }
 
-    /* GESTION DES COMPTES BANCAIRES & RECHARGEMENT (+100€/h) */
+    /* GESTION COMPTES BANCAIRES */
     function initialiserEtEcouterComptes() {
       const banquesRef = db.ref('banques');
-      
       banquesRef.on('value', (snapshot) => {
         const data = snapshot.val();
         const now = Date.now();
-        const UNE_HEURE = 3600000; // 1 heure en millisecondes
+        const UNE_HEURE = 3600000;
 
         if (!data) {
-          // Premier lancement : Création des comptes avec 2000 € chacun
           let initialData = { lastRecharge: now };
-          Object.values(USERS_MAP).forEach(prenom => {
-            initialData[prenom] = 2000.00;
-          });
+          Object.values(USERS_MAP).forEach(prenom => { initialData[prenom] = 2000.00; });
           banquesRef.set(initialData);
         } else {
           comptesComplets = data;
@@ -847,14 +805,12 @@
 
           if (msEcoulees >= UNE_HEURE) {
             let nbHeures = Math.floor(msEcoulees / UNE_HEURE);
-            let ajouts = nbHeures * 100; // +100 € par heure passée
+            let ajouts = nbHeures * 100;
             let updates = { lastRecharge: lastRecharge + (nbHeures * UNE_HEURE) };
-
             Object.values(USERS_MAP).forEach(prenom => {
               let soldeActuel = data[prenom] !== undefined ? data[prenom] : 2000.00;
               updates[prenom] = Math.round((soldeActuel + ajouts) * 100) / 100;
             });
-
             banquesRef.update(updates);
           }
           afficherSoldes();
@@ -862,54 +818,31 @@
       });
     }
 
-    function ouvrirBanque() {
-      afficherSoldes();
-      document.getElementById('banqueOverlay').classList.add('active');
-    }
-
-    function fermerBanque() {
-      document.getElementById('banqueOverlay').classList.remove('active');
-    }
+    function ouvrirBanque() { afficherSoldes(); document.getElementById('banqueOverlay').classList.add('active'); }
+    function fermerBanque() { document.getElementById('banqueOverlay').classList.remove('active'); }
 
     function afficherSoldes() {
       const container = document.getElementById('soldesList');
       if (!container) return;
       container.innerHTML = "";
-
       Object.values(USERS_MAP).forEach(prenom => {
         let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 2000.00;
         let div = document.createElement('div');
         div.className = 'solde-item';
-        div.innerHTML = `
-          <span class="solde-nom">${prenom}</span>
-          <span class="solde-valeur">${solde.toFixed(2).replace('.', ',')} €</span>
-        `;
+        div.innerHTML = `<span class="solde-nom">${prenom}</span><span class="solde-valeur">${solde.toFixed(2).replace('.', ',')} €</span>`;
         container.appendChild(div);
       });
     }
 
     function afficherOnglets() {
-      const categories = [
-        "Consoles & Tech", 
-        "Smartphones", 
-        "Boucherie Halal", 
-        "Boulangerie", 
-        "Fruits & Légumes", 
-        "Jouets", 
-        "Hygiène & Divers"
-      ];
+      const categories = ["Consoles & Tech", "Smartphones", "Boucherie Halal", "Boulangerie", "Fruits & Légumes", "Jouets", "Hygiène & Divers"];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
-
       categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${cat === categorieActive ? 'active' : ''}`;
         btn.innerText = cat;
-        btn.onclick = () => {
-          categorieActive = cat;
-          afficherOnglets();
-          afficherArticles();
-        };
+        btn.onclick = () => { categorieActive = cat; afficherOnglets(); afficherArticles(); };
         container.appendChild(btn);
       });
     }
@@ -917,26 +850,19 @@
     function afficherArticles() {
       const grid = document.getElementById('articlesGrid');
       grid.innerHTML = "";
-
       const articlesFiltres = baseArticles.filter(item => item.cat === categorieActive);
       articlesFiltres.forEach(item => {
         const btn = document.createElement('button');
         btn.className = "btn-article";
         btn.onclick = () => ajouterArticle(`${item.emoji} ${item.nom}`, item.prix);
-        btn.innerHTML = `
-          <span class="emoji">${item.emoji}</span>
-          <span>${item.nom}</span>
-          <span class="prix-tag">${item.prix.toFixed(2).replace('.', ',')} €</span>
-        `;
+        btn.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.nom}</span><span class="prix-tag">${item.prix.toFixed(2).replace('.', ',')} €</span>`;
         grid.appendChild(btn);
       });
     }
 
     function MettreAJourEcran() {
       let totalArticles = listeArticles.reduce((acc, item) => acc + item.prix, 0);
-      let valeurTapee = parseFloat(saisieEnCours) || 0;
-      let totalGeneral = Math.round((totalArticles + valeurTapee) * 100) / 100;
-
+      let totalGeneral = Math.round(totalArticles * 100) / 100;
       document.getElementById('totalDisplay').innerText = totalGeneral.toFixed(2).replace('.', ',') + ' €';
 
       const ticketContainer = document.getElementById('ticketList');
@@ -947,13 +873,7 @@
         listeArticles.forEach((item, index) => {
           const div = document.createElement('div');
           div.className = 'ligne-ticket';
-          div.innerHTML = `
-            <span>${item.nom}</span>
-            <span>
-              <strong>${item.prix.toFixed(2).replace('.', ',')} €</strong>
-              <button class="btn-suppr-ligne" onclick="supprimerArticle(${index})">✕</button>
-            </span>
-          `;
+          div.innerHTML = `<span>${item.nom}</span><span><strong>${item.prix.toFixed(2).replace('.', ',')} €</strong><button class="btn-suppr-ligne" onclick="supprimerArticle(${index})">✕</button></span>`;
           ticketContainer.appendChild(div);
         });
         ticketContainer.scrollTop = ticketContainer.scrollHeight;
@@ -961,58 +881,28 @@
     }
 
     function ajouterArticle(nom, prix) {
-      validerEtAjouterSaisieAUPanier();
       listeArticles.push({ nom: nom, prix: prix });
       MettreAJourEcran();
     }
 
-    function taperChiffre(chiffre) {
-      if (chiffre === '.' && saisieEnCours.includes('.')) return;
-      if (saisieEnCours === "0" && chiffre !== '.') {
-        saisieEnCours = chiffre;
-      } else {
-        saisieEnCours += chiffre;
-      }
-      MettreAJourEcran();
-    }
-
-    function validerEtAjouterSaisieAUPanier() {
-      let prixSaisi = parseFloat(saisieEnCours);
-      if (prixSaisi && prixSaisi > 0) {
-        listeArticles.push({ nom: 'Article divers', prix: prixSaisi });
-        saisieEnCours = "0";
-      }
-    }
-
-    function ajouterSaisieManuelle() {
-      validerEtAjouterSaisieAUPanier();
-      MettreAJourEcran();
-    }
-
-    function supprimerArticle(index) {
-      listeArticles.splice(index, 1);
-      MettreAJourEcran();
-    }
-
-    function reinitialiser() {
-      listeArticles = [];
-      saisieEnCours = "0";
-      MettreAJourEcran();
-    }
+    function supprimerArticle(index) { listeArticles.splice(index, 1); MettreAJourEcran(); }
+    function reinitialiser() { listeArticles = []; MettreAJourEcran(); }
 
     /* GESTION CODE PIN */
     function demanderCodePin(action) {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
       if (action === 'paiement') {
-        validerEtAjouterSaisieAUPanier();
         let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
-        if (!totalFinal || totalFinal === 0) {
-          alert("Ajoutez au moins un article ou un prix avant de valider !");
-          return;
-        }
+        if (!totalFinal || totalFinal === 0) { alert("Ajoutez au moins un article avant de payer !"); return; }
+        document.getElementById('pinTitleModal').innerText = "Code PIN requis";
+        document.getElementById('pinSubtitleModal').innerText = "Saisissez votre code à 4 chiffres";
+      } else if (action === 'reglages') {
+        document.getElementById('pinTitleModal').innerText = "Sécurité Réglages";
+        document.getElementById('pinSubtitleModal').innerText = "Code administrateur requis";
+      } else if (action === 'quiz_gain') {
+        document.getElementById('pinTitleModal').innerText = "Validation des Gains 🧠";
+        document.getElementById('pinSubtitleModal').innerText = `Créditer ${gainQuizSession} € sur quel compte ?`;
       }
 
       actionApresPin = action;
@@ -1043,21 +933,15 @@
 
     function effacerChiffrePin() {
       if (blocageSaisie) return;
-      if (pinSaisi.length > 0) {
-        pinSaisi = pinSaisi.slice(0, -1);
-        mettreAJourPointsPin();
-      }
+      if (pinSaisi.length > 0) { pinSaisi = pinSaisi.slice(0, -1);mettreAJourPointsPin(); }
     }
 
     function mettreAJourPointsPin(isError = false) {
       for (let i = 0; i < 4; i++) {
         const dot = document.getElementById(`dot${i}`);
         dot.className = "dot";
-        if (isError) {
-          dot.classList.add('error');
-        } else if (i < pinSaisi.length) {
-          dot.classList.add('filled');
-        }
+        if (isError) { dot.classList.add('error'); }
+        else if (i < pinSaisi.length) { dot.classList.add('filled'); }
       }
     }
 
@@ -1066,19 +950,15 @@
         lastPinValide = pinSaisi;
         lastUserValide = USERS_MAP[pinSaisi];
         fermerCodePin();
-        if (actionApresPin === 'paiement') {
-          validerPaiement();
-        } else if (actionApresPin === 'reglages') {
-          ouvrirEcranReglages();
-        }
+        if (actionApresPin === 'paiement') { validerPaiement(); }
+        else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
+        else if (actionApresPin === 'quiz_gain') { crediterGainsQuizFirebase(); }
       } else {
         document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
         mettreAJourPointsPin(true);
         const pinCard = document.getElementById('pinCard');
         pinCard.classList.add('shake');
-
         if (navigator.vibrate) { navigator.vibrate([80, 50, 80]); }
-
         setTimeout(() => {
           pinCard.classList.remove('shake');
           pinSaisi = "";
@@ -1088,37 +968,206 @@
       }
     }
 
+    /* MODULE MINI-JEUX & QUIZ ALÉATOIRE */
+    function ouvrirQuiz() {
+      gainQuizSession = 0;
+      document.getElementById('quizSessionScore').innerText = `Gagné : 0 €`;
+      document.getElementById('quizOverlay').classList.add('active');
+      genererNouvelleQuestionQuiz();
+    }
+
+    function fermerQuiz() {
+      document.getElementById('quizOverlay').classList.remove('active');
+    }
+
+    function changerModeQuiz(niveau) {
+      quizNiveau = niveau;
+      document.getElementById('modeBtnFacile').className = `quiz-mode-btn ${niveau === 'facile' ? 'active' : ''}`;
+      document.getElementById('modeBtnInter').className = `quiz-mode-btn ${niveau === 'intermédiaire' ? 'active' : ''}`;
+      document.getElementById('modeBtnExpert').className = `quiz-mode-btn ${niveau === 'expert' ? 'active' : ''}`;
+      genererNouvelleQuestionQuiz();
+    }
+
+    function genererNouvelleQuestionQuiz() {
+      const types = ['maths', 'anglais', 'francais'];
+      const typeChoisi = types[Math.floor(Math.random() * types.length)];
+      
+      const inputContainer = document.getElementById('quizInputContainer');
+      const optionsContainer = document.getElementById('quizOptionsContainer');
+      const inputField = document.getElementById('quizReponseInput');
+      inputField.value = "";
+
+      if (typeChoisi === 'maths') {
+        document.getElementById('quizMatiere').innerText = "Mathématiques 📐";
+        if (quizNiveau === 'facile') {
+          const a = Math.floor(Math.random() * 10) + 1;
+          const b = Math.floor(Math.random() * 10) + 1;
+          document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
+          questionActiveCourante = { type: 'input', bonneReponse: (a * b).toString() };
+          inputContainer.style.display = "block";
+          optionsContainer.style.display = "none";
+        } else if (quizNiveau === 'intermédiaire') {
+          const a = (Math.random() * 20 + 1).toFixed(2);
+          const b = (Math.random() * 10 + 1).toFixed(2);
+          const c = Math.floor(Math.random() * 10) + 1;
+          const d = Math.floor(Math.random() * 10) + 1;
+          const operations = [
+            { enonce: `${a} + ${b} = ?`, rep: (parseFloat(a) + parseFloat(b)).toFixed(2) },
+            { enonce: `${c} × ${d} - 3 = ?`, rep: ((c * d) - 3).toString() }
+          ];
+          const op = operations[Math.floor(Math.random() * operations.length)];
+          document.getElementById('quizEnonce').innerText = op.enonce;
+          questionActiveCourante = { type: 'input', bonneReponse: op.rep };
+          inputContainer.style.display = "block";
+          optionsContainer.style.display = "none";
+        } else {
+          // Expert QCM (Pythagore / Géométrie / Calcul rapide)
+          const qcmList = [
+            { enonce: "Dans un triangle rectangle, si les cathétes mesurent 3 et 4, l'hypoténuse vaut :", rep: "5", options: ["5", "6", "7", "4.5"] },
+            { enonce: "Combien font 15% de 200 ?", rep: "30", options: ["25", "30", "35", "20"] },
+            { enonce: "Racine carrée de 144 ?", rep: "12", options: ["10", "11", "12", "14"] }
+          ];
+          const q = qcmList[Math.floor(Math.random() * qcmList.length)];
+          document.getElementById('quizEnonce').innerText = q.enonce;
+          questionActiveCourante = { type: 'qcm', bonneReponse: q.rep };
+          
+          inputContainer.style.display = "none";
+          optionsContainer.style.display = "grid";
+          optionsContainer.innerHTML = "";
+          
+          // Mélanger les options
+          const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+          shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "quiz-option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => verifierReponseDirecte(opt);
+            optionsContainer.appendChild(btn);
+          });
+        }
+      } else if (typeChoisi === 'anglais') {
+        document.getElementById('quizMatiere').innerText = "Anglais 🇬🇧";
+        const banque = quizNiveau === 'expert' ? BANQUE_ANGLAIS_EXPERT : BANQUE_ANGLAIS_FACILE;
+        const item = banque[Math.floor(Math.random() * banque.length)];
+        
+        if (quizNiveau === 'expert') {
+          document.getElementById('quizEnonce').innerText = `Traduis en français : "${item.en}"`;
+          questionActiveCourante = { type: 'input', bonneReponse: item.fr.toLowerCase() };
+          inputContainer.style.display = "block";
+          optionsContainer.style.display = "none";
+        } else {
+          document.getElementById('quizEnonce').innerText = `Traduction de "${item.en}" ?`;
+          questionActiveCourante = { type: 'qcm', bonneReponse: item.fr };
+          inputContainer.style.display = "none";
+          optionsContainer.style.display = "grid";
+          optionsContainer.innerHTML = "";
+          
+          let options = [item.fr];
+          while (options.length < 4) {
+            let randItem = banque[Math.floor(Math.random() * banque.length)].fr;
+            if (!options.includes(randItem)) options.push(randItem);
+          }
+          options.sort(() => Math.random() - 0.5);
+          options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "quiz-option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => verifierReponseDirecte(opt);
+            optionsContainer.appendChild(btn);
+          });
+        }
+      } else {
+        // Français (Conjugaison)
+        document.getElementById('quizMatiere').innerText = "Français - Conjugaison 🇫🇷";
+        const v = VERBES_FRANCAIS[Math.floor(Math.random() * VERBES_FRANCAIS.length)];
+        document.getElementById('quizEnonce').innerText = `Conjugue "${v.verbe}" (${v.temps}) pour "${v.sujet}" :`;
+        questionActiveCourante = { type: 'input', bonneReponse: v.rep.toLowerCase() };
+        inputContainer.style.display = "block";
+        optionsContainer.style.display = "none";
+      }
+    }
+
+    function verifierReponseQuiz() {
+      const val = document.getElementById('quizReponseInput').value.trim().toLowerCase();
+      if (!val) return;
+      verifierReponseDirecte(val);
+    }
+
+    function verifierReponseDirecte(reponseDonnee) {
+      const cleanReponse = reponseDonnee.toString().trim().toLowerCase();
+      const cleanBonne = questionActiveCourante.bonneReponse.toString().trim().toLowerCase();
+
+      if (cleanReponse === cleanBonne) {
+        gainQuizSession += 500;
+        document.getElementById('quizSessionScore').innerText = `Gagné : ${gainQuizSession} €`;
+        jouerSonValidation();
+        if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
+        alert("Bonne réponse ! +500 € ajoutés à la session 🎉");
+        genererNouvelleQuestionQuiz();
+      } else {
+        jouerSonErreur();
+        if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
+        alert(`Oups ! La bonne réponse était : ${questionActiveCourante.bonneReponse}`);
+        genererNouvelleQuestionQuiz();
+      }
+    }
+
+    function fermerQuizEtCrediter() {
+      fermerQuiz();
+      if (gainQuizSession > 0) {
+        demanderCodePin('quiz_gain');
+      }
+    }
+
+    function crediterGainsQuizFirebase() {
+      db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
+        let soldeActuel = snapshot.val() || 2000.00;
+        let nouveauSolde = Math.round((soldeActuel + gainQuizSession) * 100) / 100;
+        db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
+
+        // Enregistrer dans l'historique sous forme de ticket spécial Quiz
+        const now = new Date();
+        const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+        db.ref('tickets').push({
+          codePin: lastPinValide,
+          utilisateur: lastUserValide,
+          date: dateFormatee + " " + heureFormatee + " (Quiz 🧠)",
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          articles: [{ nom: "Gain Quiz & Exercices", prix: gainQuizSession }],
+          total: gainQuizSession
+        });
+
+        alert(`Succès ! ${gainQuizSession} € ont été versés à ${lastUserValide}. Nouveau solde : ${nouveauSolde.toFixed(2).replace('.', ',')} €`);
+        gainQuizSession = 0;
+      });
+    }
+
     /* HISTORIQUE ET SAUVEGARDE FIREBASE */
     function enregistrerTicketFirebase(codePin, utilisateur, articles, total) {
       const now = new Date();
       const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
       const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-      const nouveauTicket = {
+      db.ref('tickets').push({
         codePin: codePin,
         utilisateur: utilisateur,
         date: dateFormatee + " " + heureFormatee,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         articles: articles,
         total: total
-      };
-
-      db.ref('tickets').push(nouveauTicket);
+      });
     }
 
     function ecouterHistoriqueFirebase() {
       db.ref('tickets').on('value', (snapshot) => {
         const data = snapshot.val();
-        if (!data) {
-          tousLesTickets = [];
-        } else {
-          tousLesTickets = Object.values(data).sort((a, b) => {
-            return (b.timestamp || 0) - (a.timestamp || 0);
-          });
+        if (!data) { tousLesTickets = []; }
+        else {
+          tousLesTickets = Object.values(data).sort((a, b) => { return (b.timestamp || 0) - (a.timestamp || 0); });
         }
         afficherTicketsHistorique();
-      }, (error) => {
-        console.error("Erreur de lecture de l'historique Firebase :", error);
       });
     }
 
@@ -1126,22 +1175,18 @@
       const listePrenoms = ["Tous", "Yves", "Terrance", "Lamar", "Marjo", "Joyce"];
       const container = document.getElementById('prenomsTabs');
       container.innerHTML = "";
-
       listePrenoms.forEach(prenom => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${prenom === filtrePrenomActif ? 'active' : ''}`;
         btn.innerText = prenom;
-        btn.onclick = () => {
-          filtrePrenomActif = prenom;
-          afficherOngletsPrenoms();
-          afficherTicketsHistorique();
-        };
+        btn.onclick = () => { filtrePrenomActif = prenom; afficherOngletsPrenoms(); afficherTicketsHistorique(); };
         container.appendChild(btn);
       });
     }
 
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
+      if (!container) return;
       container.innerHTML = "";
 
       let ticketsAffiches = tousLesTickets;
@@ -1161,51 +1206,30 @@
 
         let itemsHtml = "";
         ticket.articles.forEach(art => {
-          itemsHtml += `
-            <div class="ticket-paper-row">
-              <span>${art.nom}</span>
-              <span>${art.prix.toFixed(2).replace('.', ',')} €</span>
-            </div>
-          `;
+          itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toFixed(2).replace('.', ',')} €</span></div>`;
         });
 
         card.innerHTML = `
           <div class="ticket-paper-header">
             <div class="ticket-paper-title">TICKET DE CAISSE</div>
-            <div class="ticket-paper-meta">Client : <strong>${nomClient}</strong> (PIN: ${ticket.codePin})</div>
+            <div class="ticket-paper-meta">Client : <strong>${nomClient}</strong></div>
             <div class="ticket-paper-meta">${ticket.date}</div>
           </div>
-          <div class="ticket-paper-items">
-            ${itemsHtml}
-          </div>
-          <div class="ticket-paper-total">
-            <span>TOTAL</span>
-            <span>${ticket.total.toFixed(2).replace('.', ',')} €</span>
-          </div>
+          <div class="ticket-paper-items">${itemsHtml}</div>
+          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toFixed(2).replace('.', ',')} €</span></div>
         `;
         container.appendChild(card);
       });
     }
 
-    function ouvrirHistorique() {
-      afficherOngletsPrenoms();
-      afficherTicketsHistorique();
-      document.getElementById('historiqueOverlay').classList.add('active');
-    }
+    function ouvrirHistorique() { afficherOngletsPrenoms(); afficherTicketsHistorique(); document.getElementById('historiqueOverlay').classList.add('active'); }
+    function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
-    function fermerHistorique() {
-      document.getElementById('historiqueOverlay').classList.remove('active');
-    }
-
-    /* GESTION RÉGLAGES DES ARTICLES */
-    function ouvrirReglagesProteges() {
-      demanderCodePin('reglages');
-    }
-
+    /* RÉGLAGES */
+    function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
     function ouvrirEcranReglages() {
       const listContainer = document.getElementById('reglagesList');
       listContainer.innerHTML = "";
-
       baseArticles.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'item-editor';
@@ -1217,85 +1241,46 @@
         `;
         listContainer.appendChild(div);
       });
-
       document.getElementById('reglagesOverlay').classList.add('active');
     }
-
-    function fermerReglages() {
-      document.getElementById('reglagesOverlay').classList.remove('active');
-      afficherArticles();
-    }
-
+    function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); afficherArticles(); }
     function modifierArticle(index, champ, valeur) {
-      if (champ === 'prix') {
-        baseArticles[index][champ] = parseFloat(valeur) || 0;
-      } else {
-        baseArticles[index][champ] = valeur;
-      }
+      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
+      else { baseArticles[index][champ] = valeur; }
     }
-
-    function supprimerArticleSysteme(index) {
-      baseArticles.splice(index, 1);
-      ouvrirEcranReglages();
-    }
-
+    function supprimerArticleSysteme(index) { baseArticles.splice(index, 1); ouvrirEcranReglages(); }
     function ajouterNouvelArticleSysteme() {
       const emoji = document.getElementById('nouveauEmoji').value || "📦";
       const nom = document.getElementById('nouveauNom').value;
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
-
-      if (!nom || isNaN(prix)) {
-        alert("Veuillez indiquer un nom et un prix valide.");
-        return;
-      }
-
-      baseArticles.push({
-        id: Date.now(),
-        cat: cat,
-        emoji: emoji,
-        nom: nom,
-        prix: prix
-      });
-
+      if (!nom || isNaN(prix)) { alert("Indiquez un nom et un prix valide."); return; }
+      baseArticles.push({ id: Date.now(), cat: cat, emoji: emoji, nom: nom, prix: prix });
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
-      
       ouvrirEcranReglages();
     }
 
-    /* ANIMATION & SON PAIEMENT APPLE PAY */
+    /* AUDIO */
     function jouerSonValidation() {
       try {
         if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-
         const now = audioCtx.currentTime;
         const osc1 = audioCtx.createOscillator();
         const gain1 = audioCtx.createGain();
-        osc1.type = 'sine';
         osc1.frequency.setValueAtTime(880, now);
         gain1.gain.setValueAtTime(0.15, now);
         gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
         osc1.connect(gain1); gain1.connect(audioCtx.destination);
         osc1.start(now); osc1.stop(now + 0.15);
-
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(1318.51, now + 0.12);
-        gain2.gain.setValueAtTime(0.2, now + 0.12);
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-        osc2.connect(gain2); gain2.connect(audioCtx.destination);
-        osc2.start(now + 0.12); osc2.stop(now + 0.35);
-      } catch (e) { console.log("Audio non supporté"); }
+      } catch (e) {}
     }
 
     function jouerSonErreur() {
       try {
         if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-
         const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -1305,7 +1290,7 @@
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.start(now); osc.stop(now + 0.3);
-      } catch (e) { console.log("Audio non supporté"); }
+      } catch (e) {}
     }
 
     function validerPaiement() {
@@ -1313,68 +1298,45 @@
       totalFinal = Math.round(totalFinal * 100) / 100;
 
       const overlay = document.getElementById('applePayOverlay');
-      const amountDisplay = document.getElementById('apAmountDisplay');
+      document.getElementById('apTitleHeader').innerText = "Pay";
+      document.getElementById('apAmountDisplay').innerText = totalFinal.toFixed(2).replace('.', ',') + ' €';
       const icon = document.getElementById('faceIdIcon');
-      const statusText = document.getElementById('apStatusText');
-      const userDisplay = document.getElementById('apUserDisplay');
-
-      amountDisplay.innerText = totalFinal.toFixed(2).replace('.', ',') + ' €';
       icon.className = 'face-id-icon';
       icon.innerText = '😃';
-      statusText.innerText = 'Vérification du solde...';
-      userDisplay.innerText = '';
-      userDisplay.className = 'ap-user';
-
+      document.getElementById('apStatusText').innerText = 'Vérification du solde...';
+      document.getElementById('apUserDisplay').innerText = '';
       overlay.classList.add('active');
 
-      // Interrogation du solde Firebase
       db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
-        let soldeDisponible = snapshot.val();
-        if (soldeDisponible === null || soldeDisponible === undefined) {
-          soldeDisponible = 2000.00;
-        }
+        let soldeDisponible = snapshot.val() !== null ? snapshot.val() : 2000.00;
 
         setTimeout(() => {
           if (soldeDisponible >= totalFinal) {
-            // ACCEPTÉ : Déduction et enregistrement
             let nouveauSolde = Math.round((soldeDisponible - totalFinal) * 100) / 100;
             db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
-
             enregistrerTicketFirebase(lastPinValide, lastUserValide, [...listeArticles], totalFinal);
 
             icon.className = 'face-id-icon success';
             icon.innerText = '✓';
-            statusText.innerText = 'Paiement accepté';
-            userDisplay.innerText = 'Payé par ' + lastUserValide;
-
+            document.getElementById('apStatusText').innerText = 'Paiement accepté';
+            document.getElementById('apUserDisplay').innerText = 'Payé par ' + lastUserValide;
             jouerSonValidation();
-            if (navigator.vibrate) { navigator.vibrate([80, 40, 80]); }
 
-            setTimeout(() => {
-              overlay.classList.remove('active');
-              reinitialiser();
-            }, 1600);
-
+            setTimeout(() => { overlay.classList.remove('active'); reinitialiser(); }, 1600);
           } else {
-            // REFUSÉ : Solde insuffisant
             icon.className = 'face-id-icon error';
             icon.innerText = '✕';
-            statusText.innerText = 'Paiement Refusé !';
-            userDisplay.className = 'ap-user error';
-            userDisplay.innerText = `Solde insuffisant (${soldeDisponible.toFixed(2).replace('.', ',')} €)`;
-
+            document.getElementById('apStatusText').innerText = 'Paiement Refusé !';
+            document.getElementById('apUserDisplay').className = 'ap-user error';
+            document.getElementById('apUserDisplay').innerText = `Solde insuffisant (${soldeDisponible.toFixed(2).replace('.', ',')} €)`;
             jouerSonErreur();
-            if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
 
-            setTimeout(() => {
-              overlay.classList.remove('active');
-            }, 2200);
+            setTimeout(() => { overlay.classList.remove('active'); }, 2200);
           }
         }, 800);
       });
     }
 
-    // Lancement
     initApp();
   </script>
 </body>
