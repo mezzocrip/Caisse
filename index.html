@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Caisse Enregistreuse Terrance</title>
 
-  <!-- BALISES SPÉCIFIQUES POUR iOS 18 (PWA / PLEIN ÉCRAN) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Caisse">
   <link rel="apple-touch-icon" href="https://fav.farm/🛒">
 
-  <!-- FIREBASE SDKs (Version Web) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -505,7 +503,7 @@
 
   <div class="caisse-container">
     <div class="header-caisse">
-      <h1>Caisse Enregistreuse 🛒</h1>
+      <h1>Caisse Enregistreuse Terrance</h1>
       <div class="header-actions">
         <button class="btn-icon" onclick="ouvrirBanque()" title="Solde des comptes">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Historique des tickets">🧾</button>
@@ -514,7 +512,6 @@
     </div>
     
     <div class="layout-ipad">
-      <!-- Colonne Gauche : Total, Ticket & Actions -->
       <div class="col-gauche">
         <div>
           <div class="ecran">
@@ -537,7 +534,6 @@
         </div>
       </div>
 
-      <!-- Colonne Droite : Catalogue par catégories -->
       <div class="col-droite">
         <div class="section-title">Catalogue</div>
         <div class="categories-tabs" id="categoriesTabs"></div>
@@ -549,7 +545,6 @@
     </div>
   </div>
 
-  <!-- OVERLAY CODE PIN -->
   <div class="pin-overlay" id="pinOverlay">
     <div class="pin-card" id="pinCard">
       <div class="pin-title" id="pinTitleModal">Code PIN requis</div>
@@ -584,7 +579,6 @@
     </div>
   </div>
 
-  <!-- OVERLAY QUIZ & GAINS 🧠 -->
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
@@ -614,7 +608,6 @@
     </div>
   </div>
 
-  <!-- OVERLAY SOLDE ET COMPTES BANCAIRES -->
   <div class="banque-overlay" id="banqueOverlay">
     <div class="banque-card">
       <div class="reglages-header">
@@ -627,7 +620,6 @@
     </div>
   </div>
 
-  <!-- OVERLAY HISTORIQUE DES TICKETS -->
   <div class="historique-overlay" id="historiqueOverlay">
     <div class="historique-card">
       <div class="reglages-header">
@@ -643,7 +635,6 @@
     </div>
   </div>
 
-  <!-- OVERLAY RÉGLAGES DES ARTICLES -->
   <div class="reglages-overlay" id="reglagesOverlay">
     <div class="reglages-card">
       <div class="reglages-header">
@@ -662,13 +653,13 @@
         </div>
         <div class="item-editor" style="margin-top: 5px;">
           <select id="nouvelleCategorie" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e0;">
-            <option value="Boulangerie">Boulangerie</option>
-            <option value="Boucherie Halal">Boucherie Halal</option>
             <option value="Smartphones">Smartphones</option>
             <option value="Consoles & Tech">Consoles & Tech</option>
-            <option value="Fruits & Légumes">Fruits & Légumes</option>
-            <option value="Jouets">Jouets</option>
-            <option value="Hygiène & Divers">Hygiène & Divers</option>
+            <option value="Écrans & TV">Écrans & TV</option>
+            <option value="Boucherie Halal">Boucherie Halal</option>
+            <option value="Immobilier Marseille">Immobilier Marseille</option>
+            <option value="Livres & Divers">Livres & Divers</option>
+            <option value="Boulangerie">Boulangerie</option>
           </select>
         </div>
         <button class="btn-ajouter-article" onclick="ajouterNouvelArticleSysteme()">+ Ajouter au catalogue</button>
@@ -676,7 +667,6 @@
     </div>
   </div>
 
-  <!-- OVERLAY SIMULATION APPLE PAY / GAINS -->
   <div class="apple-pay-overlay" id="applePayOverlay">
     <div class="apple-pay-card">
       <div class="ap-header">
@@ -760,38 +750,55 @@
     ];
 
     let baseArticles = [
-      { id: 1, cat: "Boulangerie", emoji: "🥖", nom: "Baguette", prix: 1.10 },
-      { id: 2, cat: "Boulangerie", emoji: "🥐", nom: "Croissant", prix: 1.20 },
-      { id: 3, cat: "Boulangerie", emoji: "🍫", nom: "Pain au chocolat", prix: 1.30 },
-      { id: 4, cat: "Boulangerie", emoji: "🍞", nom: "Pain de mie", prix: 1.50 },
-      { id: 101, cat: "Boucherie Halal", emoji: "🌭", nom: "Merguez Halal (1kg)", prix: 13.90 },
-      { id: 102, cat: "Boucherie Halal", emoji: "🌭", nom: "Chipolatas Halal (1kg)", prix: 13.90 },
-      { id: 103, cat: "Boucherie Halal", emoji: "🥩", nom: "Steak haché Halal (x10)", prix: 15.00 },
-      { id: 104, cat: "Boucherie Halal", emoji: "🍗", nom: "Escalopes de poulet (1kg)", prix: 11.50 },
-      { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 1259.00 },
-      { id: 202, cat: "Smartphones", emoji: "📱", nom: "iPhone 14 Pro Max", prix: 1359.00 },
-      { id: 203, cat: "Smartphones", emoji: "📱", nom: "iPhone 15 Pro Max", prix: 1479.00 },
-      { id: 204, cat: "Smartphones", emoji: "📱", nom: "Samsung Galaxy S24 Ultra", prix: 1469.00 },
-      { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5", prix: 549.99 },
-      { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PS5 DualSense", prix: 69.99 },
-      { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Nintendo Switch OLED", prix: 349.99 },
-      { id: 304, cat: "Consoles & Tech", emoji: "🕹️", nom: "Jeu PS5 / Switch", prix: 69.99 },
-      { id: 305, cat: "Consoles & Tech", emoji: "📱", nom: "iPad mini 6", prix: 559.00 },
-      { id: 5, cat: "Fruits & Légumes", emoji: "🍎", nom: "Pomme", prix: 0.60 },
-      { id: 6, cat: "Fruits & Légumes", emoji: "🍌", nom: "Banane", prix: 0.50 },
-      { id: 7, cat: "Fruits & Légumes", emoji: "🍊", nom: "Orange", prix: 0.70 },
-      { id: 8, cat: "Fruits & Légumes", emoji: "🍓", nom: "Barquette de Fraises", prix: 3.50 },
-      { id: 9, cat: "Jouets", emoji: "🧸", nom: "Ours en peluche", prix: 8.50 },
-      { id: 10, cat: "Jouets", emoji: "🚗", nom: "Voiture télécommandée", prix: 24.99 },
-      { id: 11, cat: "Jouets", emoji: "🧩", nom: "Puzzle 1000 pièces", prix: 14.99 },
-      { id: 12, cat: "Jouets", emoji: "🎲", nom: "Jeu de société", prix: 19.99 },
-      { id: 13, cat: "Hygiène & Divers", emoji: "🥛", nom: "Lait 1L", prix: 1.25 },
-      { id: 14, cat: "Hygiène & Divers", emoji: "🧻", nom: "Papier toilette (x6)", prix: 3.20 },
-      { id: 15, cat: "Hygiène & Divers", emoji: "🪥", nom: "Brosse à dents", prix: 2.50 },
-      { id: 16, cat: "Hygiène & Divers", emoji: "🧼", nom: "Gel douche", prix: 3.80 }
+      // SMARTPHONES (Tous les iPhone Pro Max demandés + Samsung)
+      { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 859.00 },
+      { id: 202, cat: "Smartphones", emoji: "📱", nom: "iPhone 14 Pro Max", prix: 999.00 },
+      { id: 203, cat: "Smartphones", emoji: "📱", nom: "iPhone 15 Pro Max", prix: 1199.00 },
+      { id: 204, cat: "Smartphones", emoji: "📱", nom: "iPhone 16 Pro Max", prix: 1479.00 },
+      { id: 205, cat: "Smartphones", emoji: "📱", nom: "iPhone 17 Pro Max", prix: 1599.00 },
+      { id: 206, cat: "Smartphones", emoji: "📱", nom: "Samsung Galaxy S24 Ultra", prix: 1469.00 },
+
+      // CONSOLES & TECH (PlayStation, Xbox, Mac, iPad, Manettes)
+      { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5 (PS5)", prix: 549.99 },
+      { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PlayStation 5 (DualSense)", prix: 69.99 },
+      { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Xbox Series X", prix: 499.99 },
+      { id: 304, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette Xbox Series", prix: 59.99 },
+      { id: 305, cat: "Consoles & Tech", emoji: "💻", nom: "iPad mini 6", prix: 559.00 },
+      { id: 306, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 14\"", prix: 1999.00 },
+      { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 15/16 pouces", prix: 2899.00 },
+      { id: 308, cat: "Consoles & Tech", emoji: "🖥️", nom: "Mac mini", prix: 699.00 },
+
+      // ÉCRANS & TV
+      { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65 pouces", prix: 799.00 },
+      { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75 pouces", prix: 1199.00 },
+
+      // BOUCHERIE HALAL (Variété complète 1kg et viandes)
+      { id: 101, cat: "Boucherie Halal", emoji: "🌭", nom: "Merguez Halal (1 kg)", prix: 13.90 },
+      { id: 102, cat: "Boucherie Halal", emoji: "🌭", nom: "Chipolatas Halal (1 kg)", prix: 13.90 },
+      { id: 103, cat: "Boucherie Halal", emoji: "🥩", nom: "Steak haché Halal (1 kg)", prix: 15.50 },
+      { id: 104, cat: "Boucherie Halal", emoji: "🍗", nom: "Escalopes de poulet Halal (1 kg)", prix: 11.50 },
+      { id: 105, cat: "Boucherie Halal", emoji: "🍗", nom: "Hauts de cuisses de poulet (1 kg)", prix: 8.90 },
+      { id: 106, cat: "Boucherie Halal", emoji: "🍗", nom: "Pilons de poulet (1 kg)", prix: 7.90 },
+      { id: 107, cat: "Boucherie Halal", emoji: "🥩", nom: "Côtes d'agneau Halal (1 kg)", prix: 19.90 },
+      { id: 108, cat: "Boucherie Halal", emoji: "🥩", nom: "Entrecôte de bœuf Halal (1 kg)", prix: 24.90 },
+      { id: 109, cat: "Boucherie Halal", emoji: "🧊", nom: "Glace Kinder Bueno / Mix (1L)", prix: 6.90 },
+
+      // IMMOBILIER MARSEILLE (Vrais prix environ Marseille, du T1 au T6 avec ou sans piscine)
+      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T1 Marseille (Centre)", prix: 115000.00 },
+      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T2 Marseille (Sans piscine)", prix: 185000.00 },
+      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T3 Marseille (Vue mer)", prix: 280000.00 },
+      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T4 Marseille (Résidence standing)", prix: 395000.00 },
+      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 Marseille (Avec piscine)", prix: 620000.00 },
+      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 Marseille (Avec piscine - 13012)", prix: 780000.00 },
+      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 Marseille (Piscine & Jardin - 8ème)", prix: 1250000.00 },
+
+      // LIVRES & DIVERS
+      { id: 601, cat: "Livres & Divers", emoji: "📚", nom: "Livre d'Hiver (Roman / Poésie)", prix: 19.90 },
+      { id: 602, cat: "Livres & Divers", emoji: "🥖", nom: "Baguette de pain", prix: 1.10 },
+      { id: 603, cat: "Livres & Divers", emoji: "🥛", nom: "Lait 1L", prix: 1.25 }
     ];
 
-    let categorieActive = "Consoles & Tech";
+    let categorieActive = "Smartphones";
     let listeArticles = [];
     let audioCtx = null;
 
@@ -846,13 +853,13 @@
         let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 2000.00;
         let div = document.createElement('div');
         div.className = 'solde-item';
-        div.innerHTML = `<span class="solde-nom">${prenom}</span><span class="solde-valeur">${solde.toFixed(2).replace('.', ',')} €</span>`;
+        div.innerHTML = `<span class="solde-nom">${prenom}</span><span class="solde-valeur">${solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>`;
         container.appendChild(div);
       });
     }
 
     function afficherOnglets() {
-      const categories = ["Consoles & Tech", "Smartphones", "Boucherie Halal", "Boulangerie", "Fruits & Légumes", "Jouets", "Hygiène & Divers"];
+      const categories = ["Smartphones", "Consoles & Tech", "Écrans & TV", "Boucherie Halal", "Immobilier Marseille", "Livres & Divers", "Boulangerie"];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
       categories.forEach(cat => {
@@ -872,7 +879,7 @@
         const btn = document.createElement('button');
         btn.className = "btn-article";
         btn.onclick = () => ajouterArticle(`${item.emoji} ${item.nom}`, item.prix);
-        btn.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.nom}</span><span class="prix-tag">${item.prix.toFixed(2).replace('.', ',')} €</span>`;
+        btn.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.nom}</span><span class="prix-tag">${item.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>`;
         grid.appendChild(btn);
       });
     }
@@ -880,7 +887,7 @@
     function MettreAJourEcran() {
       let totalArticles = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       let totalGeneral = Math.round(totalArticles * 100) / 100;
-      document.getElementById('totalDisplay').innerText = totalGeneral.toFixed(2).replace('.', ',') + ' €';
+      document.getElementById('totalDisplay').innerText = totalGeneral.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
 
       const ticketContainer = document.getElementById('ticketList');
       if (listeArticles.length === 0) {
@@ -890,7 +897,7 @@
         listeArticles.forEach((item, index) => {
           const div = document.createElement('div');
           div.className = 'ligne-ticket';
-          div.innerHTML = `<span>${item.nom}</span><span><strong>${item.prix.toFixed(2).replace('.', ',')} €</strong><button class="btn-suppr-ligne" onclick="supprimerArticle(${index})">✕</button></span>`;
+          div.innerHTML = `<span>${item.nom}</span><span><strong>${item.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</strong><button class="btn-suppr-ligne" onclick="supprimerArticle(${index})">✕</button></span>`;
           ticketContainer.appendChild(div);
         });
         ticketContainer.scrollTop = ticketContainer.scrollHeight;
@@ -950,7 +957,7 @@
 
     function effacerChiffrePin() {
       if (blocageSaisie) return;
-      if (pinSaisi.length > 0) { pinSaisi = pinSaisi.slice(0, -1);mettreAJourPointsPin(); }
+      if (pinSaisi.length > 0) { pinSaisi = pinSaisi.slice(0, -1); mettreAJourPointsPin(); }
     }
 
     function mettreAJourPointsPin(isError = false) {
@@ -1152,7 +1159,7 @@
           total: gainQuizSession
         });
 
-        alert(`Succès ! ${gainQuizSession} € ont été versés à ${lastUserValide}. Nouveau solde : ${nouveauSolde.toFixed(2).replace('.', ',')} €`);
+        alert(`Succès ! ${gainQuizSession} € ont été versés à ${lastUserValide}. Nouveau solde : ${nouveauSolde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`);
         gainQuizSession = 0;
       });
     }
@@ -1219,7 +1226,7 @@
 
         let itemsHtml = "";
         ticket.articles.forEach(art => {
-          itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toFixed(2).replace('.', ',')} €</span></div>`;
+          itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>`;
         });
 
         card.innerHTML = `
@@ -1229,7 +1236,7 @@
             <div class="ticket-paper-meta">${ticket.date}</div>
           </div>
           <div class="ticket-paper-items">${itemsHtml}</div>
-          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toFixed(2).replace('.', ',')} €</span></div>
+          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>
         `;
         container.appendChild(card);
       });
@@ -1312,7 +1319,7 @@
 
       const overlay = document.getElementById('applePayOverlay');
       document.getElementById('apTitleHeader').innerText = "Pay";
-      document.getElementById('apAmountDisplay').innerText = totalFinal.toFixed(2).replace('.', ',') + ' €';
+      document.getElementById('apAmountDisplay').innerText = totalFinal.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
       const icon = document.getElementById('faceIdIcon');
       icon.className = 'face-id-icon';
       icon.innerText = '😃';
@@ -1341,7 +1348,7 @@
             icon.innerText = '✕';
             document.getElementById('apStatusText').innerText = 'Paiement Refusé !';
             document.getElementById('apUserDisplay').className = 'ap-user error';
-            document.getElementById('apUserDisplay').innerText = `Solde insuffisant (${soldeDisponible.toFixed(2).replace('.', ',')} €)`;
+            document.getElementById('apUserDisplay').innerText = `Solde insuffisant (${soldeDisponible.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €)`;
             jouerSonErreur();
 
             setTimeout(() => { overlay.classList.remove('active'); }, 2200);
