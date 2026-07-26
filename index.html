@@ -41,7 +41,7 @@
       padding: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       text-align: center;
       position: relative;
     }
@@ -173,40 +173,41 @@
       color: white;
     }
 
-    /* Zone scrollable pour les articles */
+    /* Zone scrollable agrandie pour les articles (4 colonnes) */
     .articles-scroll {
-      max-height: 220px;
+      max-height: 280px;
       overflow-y: auto;
       padding-right: 2px;
       margin-bottom: 12px;
     }
     .articles-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
     .btn-article {
       background: #edf2f7;
       border: 1px solid #cbd5e0;
       border-radius: 10px;
-      padding: 8px 4px;
+      padding: 10px 4px;
       font-size: 11px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
       touch-action: manipulation;
     }
     .btn-article:active {
       background-color: #cbd5e0;
     }
     .emoji {
-      font-size: 20px;
+      font-size: 22px;
     }
     .prix-tag {
       font-weight: bold;
       color: #2b6cb0;
+      font-size: 11px;
     }
 
     .actions-grid {
@@ -450,7 +451,7 @@
     }
     .apple-pay-overlay.active { opacity: 1; pointer-events: auto; }
     .apple-pay-card {
-      background: #1c1c1e; width: 100%; max-width: 420px; border-top-left-radius: 25px;
+      background: #1c1c1e; width: 100%; max-width: 440px; border-top-left-radius: 25px;
       border-top-right-radius: 25px; padding: 25px 20px 40px 20px; color: white;
       text-align: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); transform: translateY(100%); transition: transform 0.3s ease-out;
     }
@@ -493,10 +494,10 @@
       .ecran { padding: 8px 12px; margin-bottom: 8px; }
       .total-montant { font-size: 30px; }
       .ticket-container { flex-grow: 1; max-height: 190px; min-height: 100px; margin-bottom: 8px; }
-      .articles-scroll { max-height: 240px; margin-bottom: 10px; }
-      .articles-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-      .btn-article { padding: 6px 4px; font-size: 11px; }
-      .emoji { font-size: 20px; }
+      .articles-scroll { max-height: 320px; margin-bottom: 10px; }
+      .articles-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+      .btn-article { padding: 8px 4px; font-size: 11px; }
+      .emoji { font-size: 22px; }
     }
   </style>
 </head>
@@ -1021,7 +1022,6 @@
           inputContainer.style.display = "block";
           optionsContainer.style.display = "none";
         } else {
-          // Expert QCM (Pythagore / Géométrie / Calcul rapide)
           const qcmList = [
             { enonce: "Dans un triangle rectangle, si les cathétes mesurent 3 et 4, l'hypoténuse vaut :", rep: "5", options: ["5", "6", "7", "4.5"] },
             { enonce: "Combien font 15% de 200 ?", rep: "30", options: ["25", "30", "35", "20"] },
@@ -1035,7 +1035,6 @@
           optionsContainer.style.display = "grid";
           optionsContainer.innerHTML = "";
           
-          // Mélanger les options
           const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
           shuffledOptions.forEach(opt => {
             const btn = document.createElement('button');
@@ -1077,7 +1076,6 @@
           });
         }
       } else {
-        // Français (Conjugaison)
         document.getElementById('quizMatiere').innerText = "Français - Conjugaison 🇫🇷";
         const v = VERBES_FRANCAIS[Math.floor(Math.random() * VERBES_FRANCAIS.length)];
         document.getElementById('quizEnonce').innerText = `Conjugue "${v.verbe}" (${v.temps}) pour "${v.sujet}" :`;
@@ -1125,7 +1123,6 @@
         let nouveauSolde = Math.round((soldeActuel + gainQuizSession) * 100) / 100;
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
-        // Enregistrer dans l'historique sous forme de ticket spécial Quiz
         const now = new Date();
         const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
