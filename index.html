@@ -712,7 +712,7 @@
   </div>
 
   <script>
-    // CONFIGURATION FIREBASE
+    // CONFIGURATION FIREBASE CORRIGÉE
     const firebaseConfig = {
       apiKey: "AIzaSyBtij22GLTXBbdWxbUX42rKP_HQIeah7AQ",
       authDomain: "caisse-enregistreuse-terrance.firebaseapp.com",
@@ -720,7 +720,7 @@
       storageBucket: "caisse-enregistreuse-terrance.firebasestorage.app",
       messagingSenderId: "775121776791",
       appId: "1:775121776791:web:3a67715c6a07b005c579d2",
-      databaseURL: "https://caisse-enregistreuse-terrance-default-rtdb.europe-west1.firebasedatabase.app"
+      databaseURL: "https://caisse-enregistreuse-terrance-default-rtdb.firebaseio.com"
     };
 
     // Initialisation Firebase
@@ -1107,14 +1107,18 @@
     }
 
     function ecouterHistoriqueFirebase() {
-      db.ref('tickets').orderByChild('timestamp').on('value', (snapshot) => {
+      db.ref('tickets').on('value', (snapshot) => {
         const data = snapshot.val();
         if (!data) {
           tousLesTickets = [];
         } else {
-          tousLesTickets = Object.values(data).reverse();
+          tousLesTickets = Object.values(data).sort((a, b) => {
+            return (b.timestamp || 0) - (a.timestamp || 0);
+          });
         }
         afficherTicketsHistorique();
+      }, (error) => {
+        console.error("Erreur de lecture de l'historique Firebase :", error);
       });
     }
 
