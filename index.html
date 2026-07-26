@@ -154,7 +154,7 @@
       color: #2b6cb0;
     }
 
-    /* Pavé numérique */
+    /* Pavé numérique principal */
     .pave-numerique {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -217,6 +217,127 @@
       padding: 6px;
       font-size: 13px;
       touch-action: manipulation;
+    }
+
+    /* ============================================================ */
+    /* MODAL CODE PIN DE PAIEMENT */
+    /* ============================================================ */
+    .pin-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 9998;
+    }
+    .pin-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .pin-card {
+      background: #1c1c1e;
+      width: 90%;
+      max-width: 360px;
+      border-radius: 24px;
+      padding: 25px 20px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      transition: transform 0.1s ease;
+    }
+    /* Animation de secousse en cas d'erreur */
+    .pin-card.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-12px); }
+      40%, 80% { transform: translateX(12px); }
+    }
+
+    .pin-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .pin-subtitle {
+      font-size: 13px;
+      color: #8e8e93;
+      margin-bottom: 15px;
+    }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #3a3a3c;
+      background: transparent;
+      transition: all 0.15s ease;
+    }
+    .dot.filled {
+      background: #0a84ff;
+      border-color: #0a84ff;
+      box-shadow: 0 0 10px rgba(10, 132, 255, 0.5);
+    }
+    .dot.error {
+      background: #ff453a;
+      border-color: #ff453a;
+      box-shadow: 0 0 10px rgba(255, 69, 58, 0.5);
+    }
+
+    .error-msg {
+      color: #ff453a;
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 20px;
+      margin-bottom: 15px;
+    }
+
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .btn-pin {
+      background: #2c2c2e;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 65px;
+      height: 65px;
+      margin: 0 auto;
+      font-size: 24px;
+      font-weight: 500;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-pin:active {
+      background: #48484a;
+    }
+    .btn-pin.btn-cancel {
+      font-size: 13px;
+      color: #ff453a;
+      background: transparent;
+    }
+    .btn-pin.btn-del {
+      font-size: 18px;
+      color: #8e8e93;
+      background: transparent;
     }
 
     /* SIMULATION APPLE PAY MODAL */
@@ -369,7 +490,7 @@
           <div class="ticket-vide">Aucun article ajouté</div>
         </div>
 
-        <button class="btn-validation" onclick="validerPaiement()">
+        <button class="btn-validation" onclick="demanderCodePin()">
           Payer
         </button>
 
@@ -466,6 +587,41 @@
     </div>
   </div>
 
+  <!-- OVERLAY CODE PIN -->
+  <div class="pin-overlay" id="pinOverlay">
+    <div class="pin-card" id="pinCard">
+      <div class="pin-title">Code PIN requis</div>
+      <div class="pin-subtitle">Saisissez votre code à 4 chiffres</div>
+      
+      <div class="pin-dots">
+        <div class="dot" id="dot0"></div>
+        <div class="dot" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+        <div class="dot" id="dot3"></div>
+      </div>
+
+      <div class="error-msg" id="pinErrorMsg"></div>
+
+      <div class="pin-grid">
+        <button class="btn-pin" onclick="taperCodePin('1')">1</button>
+        <button class="btn-pin" onclick="taperCodePin('2')">2</button>
+        <button class="btn-pin" onclick="taperCodePin('3')">3</button>
+        
+        <button class="btn-pin" onclick="taperCodePin('4')">4</button>
+        <button class="btn-pin" onclick="taperCodePin('5')">5</button>
+        <button class="btn-pin" onclick="taperCodePin('6')">6</button>
+        
+        <button class="btn-pin" onclick="taperCodePin('7')">7</button>
+        <button class="btn-pin" onclick="taperCodePin('8')">8</button>
+        <button class="btn-pin" onclick="taperCodePin('9')">9</button>
+        
+        <button class="btn-pin btn-cancel" onclick="fermerCodePin()">Annuler</button>
+        <button class="btn-pin" onclick="taperCodePin('0')">0</button>
+        <button class="btn-pin btn-del" onclick="effacerChiffrePin()">⌫</button>
+      </div>
+    </div>
+  </div>
+
   <!-- OVERLAY SIMULATION APPLE PAY -->
   <div class="apple-pay-overlay" id="applePayOverlay">
     <div class="apple-pay-card">
@@ -492,6 +648,11 @@
     let listeArticles = [];
     let saisieEnCours = "0";
     let audioCtx = null;
+
+    // CODES AUTORISÉS
+    const CODES_VALIDES = ["1608", "2807", "0712", "2410", "2006"];
+    let pinSaisi = "";
+    let blocageSaisie = false;
 
     // Génération du bip sonore type "Apple Pay / Validation"
     function jouerSonValidation() {
@@ -603,8 +764,8 @@
       MettreAJourEcran();
     }
 
-    function validerPaiement() {
-      // Déverrouille le canal audio au clic utilisateur
+    /* GESTION CODE PIN */
+    function demanderCodePin() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
@@ -617,6 +778,83 @@
         alert("Ajoutez au moins un article ou un prix avant de valider !");
         return;
       }
+
+      pinSaisi = "";
+      blocageSaisie = false;
+      mettreAJourPointsPin();
+      document.getElementById('pinErrorMsg').innerText = "";
+      document.getElementById('pinOverlay').classList.add('active');
+    }
+
+    function fermerCodePin() {
+      document.getElementById('pinOverlay').classList.remove('active');
+      pinSaisi = "";
+      blocageSaisie = false;
+    }
+
+    function taperCodePin(chiffre) {
+      if (blocageSaisie) return;
+
+      if (pinSaisi.length < 4) {
+        pinSaisi += chiffre;
+        mettreAJourPointsPin();
+
+        if (pinSaisi.length === 4) {
+          blocageSaisie = true;
+          setTimeout(verifierCodePin, 150);
+        }
+      }
+    }
+
+    function effacerChiffrePin() {
+      if (blocageSaisie) return;
+      if (pinSaisi.length > 0) {
+        pinSaisi = pinSaisi.slice(0, -1);
+        mettreAJourPointsPin();
+      }
+    }
+
+    function mettreAJourPointsPin(isError = false) {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        dot.className = "dot";
+        if (isError) {
+          dot.classList.add('error');
+        } else if (i < pinSaisi.length) {
+          dot.classList.add('filled');
+        }
+      }
+    }
+
+    function verifierCodePin() {
+      if (CODES_VALIDES.includes(pinSaisi)) {
+        fermerCodePin();
+        validerPaiement();
+      } else {
+        // En cas d'erreur : affichage message + vibration + animation shake
+        document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
+        mettreAJourPointsPin(true);
+        
+        const pinCard = document.getElementById('pinCard');
+        pinCard.classList.add('shake');
+
+        if (navigator.vibrate) {
+          navigator.vibrate([80, 50, 80]);
+        }
+
+        // Réinitialisation de la saisie après l'animation de secousse
+        setTimeout(() => {
+          pinCard.classList.remove('shake');
+          pinSaisi = "";
+          mettreAJourPointsPin();
+          blocageSaisie = false;
+        }, 400);
+      }
+    }
+
+    function validerPaiement() {
+      let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
+      totalFinal = Math.round(totalFinal * 100) / 100;
 
       const overlay = document.getElementById('applePayOverlay');
       const amountDisplay = document.getElementById('apAmountDisplay');
