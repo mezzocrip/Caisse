@@ -29,15 +29,18 @@
       padding: 15px;
       touch-action: manipulation;
     }
+
+    /* Container Standard (Mobile Portrait) */
     .caisse-container {
       background: white;
       border-radius: 20px;
       padding: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
     }
+
     h1 {
       color: #333;
       margin-top: 0;
@@ -293,6 +296,59 @@
       font-size: 14px;
       color: #8e8e93;
     }
+
+    /* ============================================================ */
+    /* ADAPTATION SPÉCIFIQUE IPAD EN PAYSAGE OU ÉCRANS LARGES (>= 768px) */
+    /* ============================================================ */
+    @media (min-width: 768px) and (orientation: landscape) {
+      body {
+        padding: 20px;
+      }
+      .caisse-container {
+        max-width: 950px;
+        padding: 25px;
+      }
+      .layout-ipad {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 25px;
+        align-items: start;
+      }
+      .col-gauche {
+        display: flex;
+        flex-direction: column;
+      }
+      .col-droite {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+      .ticket-container {
+        max-height: 280px;
+        min-height: 180px;
+      }
+      .articles-scroll {
+        max-height: 240px;
+      }
+      .articles-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .btn-article {
+        padding: 12px 6px;
+        font-size: 12px;
+      }
+      .emoji {
+        font-size: 24px;
+      }
+      .pave-numerique {
+        gap: 8px;
+      }
+      .btn-num {
+        padding: 14px;
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -300,110 +356,114 @@
   <div class="caisse-container">
     <h1>Caisse Enregistreuse 🛒</h1>
     
-    <!-- Écran du Total -->
-    <div class="ecran">
-      <div class="total-label">Total à payer</div>
-      <div class="total-montant" id="totalDisplay">0,00 €</div>
-    </div>
+    <div class="layout-ipad">
+      <!-- Colonne Gauche : Total, Ticket & Actions -->
+      <div class="col-gauche">
+        <div class="ecran">
+          <div class="total-label">Total à payer</div>
+          <div class="total-montant" id="totalDisplay">0,00 €</div>
+        </div>
 
-    <!-- Ticket de caisse -->
-    <div class="section-title">Détail du panier</div>
-    <div class="ticket-container" id="ticketList">
-      <div class="ticket-vide">Aucun article ajouté</div>
-    </div>
+        <div class="section-title">Détail du panier</div>
+        <div class="ticket-container" id="ticketList">
+          <div class="ticket-vide">Aucun article ajouté</div>
+        </div>
 
-    <!-- Articles Quotidien (Grille Scrollable) -->
-    <div class="section-title">Articles du quotidien</div>
-    <div class="articles-scroll">
-      <div class="articles-grid">
-        <button class="btn-article" onclick="ajouterArticle('🥖 Baguette', 1.10)">
-          <span class="emoji">🥖</span>
-          <span>Baguette</span>
-          <span class="prix-tag">1,10 €</span>
+        <button class="btn-validation" onclick="validerPaiement()">
+          Payer
         </button>
-        <button class="btn-article" onclick="ajouterArticle('🥛 Lait (1L)', 1.25)">
-          <span class="emoji">🥛</span>
-          <span>Lait 1L</span>
-          <span class="prix-tag">1,25 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🥚 6 Œufs', 2.10)">
-          <span class="emoji">🥚</span>
-          <span>6 Œufs</span>
-          <span class="prix-tag">2,10 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🧀 Fromage', 2.80)">
-          <span class="emoji">🧀</span>
-          <span>Fromage</span>
-          <span class="prix-tag">2,80 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🍎 Pommes 1kg', 2.50)">
-          <span class="emoji">🍎</span>
-          <span>Pommes</span>
-          <span class="prix-tag">2,50 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🍝 Pâtes 500g', 1.15)">
-          <span class="emoji">🍝</span>
-          <span>Pâtes</span>
-          <span class="prix-tag">1,15 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🧃 Jus d’orange', 1.95)">
-          <span class="emoji">🧃</span>
-          <span>Jus Orange</span>
-          <span class="prix-tag">1,95 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🍫 Chocolat', 1.60)">
-          <span class="emoji">🍫</span>
-          <span>Chocolat</span>
-          <span class="prix-tag">1,60 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🍪 Paquet Biscuits', 1.85)">
-          <span class="emoji">🍪</span>
-          <span>Biscuits</span>
-          <span class="prix-tag">1,85 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🧻 Papier Toilette', 3.20)">
-          <span class="emoji">🧻</span>
-          <span>P. Toilette</span>
-          <span class="prix-tag">3,20 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🧼 Savon mains', 1.40)">
-          <span class="emoji">🧼</span>
-          <span>Savon</span>
-          <span class="prix-tag">1,40 €</span>
-        </button>
-        <button class="btn-article" onclick="ajouterArticle('🪥 Dentifrice', 2.30)">
-          <span class="emoji">🪥</span>
-          <span>Dentifrice</span>
-          <span class="prix-tag">2,30 €</span>
-        </button>
+
+        <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
+      </div>
+
+      <!-- Colonne Droite : Articles & Saisie Numérique -->
+      <div class="col-droite">
+        <div class="section-title">Articles du quotidien</div>
+        <div class="articles-scroll">
+          <div class="articles-grid">
+            <button class="btn-article" onclick="ajouterArticle('🥖 Baguette', 1.10)">
+              <span class="emoji">🥖</span>
+              <span>Baguette</span>
+              <span class="prix-tag">1,10 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🥛 Lait (1L)', 1.25)">
+              <span class="emoji">🥛</span>
+              <span>Lait 1L</span>
+              <span class="prix-tag">1,25 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🥚 6 Œufs', 2.10)">
+              <span class="emoji">🥚</span>
+              <span>6 Œufs</span>
+              <span class="prix-tag">2,10 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🧀 Fromage', 2.80)">
+              <span class="emoji">🧀</span>
+              <span>Fromage</span>
+              <span class="prix-tag">2,80 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🍎 Pommes 1kg', 2.50)">
+              <span class="emoji">🍎</span>
+              <span>Pommes</span>
+              <span class="prix-tag">2,50 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🍝 Pâtes 500g', 1.15)">
+              <span class="emoji">🍝</span>
+              <span>Pâtes</span>
+              <span class="prix-tag">1,15 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🧃 Jus d’orange', 1.95)">
+              <span class="emoji">🧃</span>
+              <span>Jus Orange</span>
+              <span class="prix-tag">1,95 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🍫 Chocolat', 1.60)">
+              <span class="emoji">🍫</span>
+              <span>Chocolat</span>
+              <span class="prix-tag">1,60 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🍪 Paquet Biscuits', 1.85)">
+              <span class="emoji">🍪</span>
+              <span>Biscuits</span>
+              <span class="prix-tag">1,85 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🧻 Papier Toilette', 3.20)">
+              <span class="emoji">🧻</span>
+              <span>P. Toilette</span>
+              <span class="prix-tag">3,20 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🧼 Savon mains', 1.40)">
+              <span class="emoji">🧼</span>
+              <span>Savon</span>
+              <span class="prix-tag">1,40 €</span>
+            </button>
+            <button class="btn-article" onclick="ajouterArticle('🪥 Dentifrice', 2.30)">
+              <span class="emoji">🪥</span>
+              <span>Dentifrice</span>
+              <span class="prix-tag">2,30 €</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="section-title">Saisie libre</div>
+        <div class="pave-numerique">
+          <button class="btn-num" onclick="taperChiffre('1')">1</button>
+          <button class="btn-num" onclick="taperChiffre('2')">2</button>
+          <button class="btn-num" onclick="taperChiffre('3')">3</button>
+          
+          <button class="btn-num" onclick="taperChiffre('4')">4</button>
+          <button class="btn-num" onclick="taperChiffre('5')">5</button>
+          <button class="btn-num" onclick="taperChiffre('6')">6</button>
+          
+          <button class="btn-num" onclick="taperChiffre('7')">7</button>
+          <button class="btn-num" onclick="taperChiffre('8')">8</button>
+          <button class="btn-num" onclick="taperChiffre('9')">9</button>
+          
+          <button class="btn-num action" onclick="taperChiffre('.')">.</button>
+          <button class="btn-num" onclick="taperChiffre('0')">0</button>
+          <button class="btn-num plus" onclick="ajouterSaisieManuelle()">+</button>
+        </div>
       </div>
     </div>
-
-    <!-- Pavé Numérique -->
-    <div class="section-title">Saisie libre</div>
-    <div class="pave-numerique">
-      <button class="btn-num" onclick="taperChiffre('1')">1</button>
-      <button class="btn-num" onclick="taperChiffre('2')">2</button>
-      <button class="btn-num" onclick="taperChiffre('3')">3</button>
-      
-      <button class="btn-num" onclick="taperChiffre('4')">4</button>
-      <button class="btn-num" onclick="taperChiffre('5')">5</button>
-      <button class="btn-num" onclick="taperChiffre('6')">6</button>
-      
-      <button class="btn-num" onclick="taperChiffre('7')">7</button>
-      <button class="btn-num" onclick="taperChiffre('8')">8</button>
-      <button class="btn-num" onclick="taperChiffre('9')">9</button>
-      
-      <button class="btn-num action" onclick="taperChiffre('.')">.</button>
-      <button class="btn-num" onclick="taperChiffre('0')">0</button>
-      <button class="btn-num plus" onclick="ajouterSaisieManuelle()">+</button>
-    </div>
-
-    <button class="btn-validation" onclick="validerPaiement()">
-      Payer
-    </button>
-
-    <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
   </div>
 
   <!-- OVERLAY SIMULATION APPLE PAY -->
