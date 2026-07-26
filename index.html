@@ -381,20 +381,85 @@
     @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 100% { transform: scale(1.05); opacity: 1; } }
     .ap-status { font-size: 14px; color: #8e8e93; }
 
-    /* ADAPTATION SPÉCIFIQUE IPAD EN PAYSAGE OU ÉCRANS LARGES (>= 768px) */
+    /* FIX RECADRAGE IPAD PAYSAGE & ÉCRANS LARGES (>= 768px) */
     @media (min-width: 768px) and (orientation: landscape) {
-      body { padding: 20px; }
-      .caisse-container { max-width: 950px; padding: 25px; }
-      .layout-ipad { display: grid; grid-template-columns: 320px 1fr; gap: 25px; align-items: start; }
-      .col-gauche { display: flex; flex-direction: column; }
-      .col-droite { display: flex; flex-direction: column; gap: 15px; }
-      .ticket-container { max-height: 280px; min-height: 180px; }
-      .articles-scroll { max-height: 240px; }
-      .articles-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-      .btn-article { padding: 12px 6px; font-size: 12px; }
-      .emoji { font-size: 24px; }
-      .pave-numerique { gap: 8px; }
-      .btn-num { padding: 14px; font-size: 20px; }
+      body {
+        padding: 10px;
+        align-items: center;
+      }
+      .caisse-container {
+        max-width: 980px;
+        max-height: 94vh;
+        padding: 15px 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .header-caisse {
+        margin-bottom: 10px;
+      }
+      .layout-ipad {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
+        align-items: stretch;
+        flex-grow: 1;
+        overflow: hidden;
+      }
+      .col-gauche {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .col-droite {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+      .ecran {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+      }
+      .total-montant {
+        font-size: 32px;
+      }
+      .ticket-container {
+        flex-grow: 1;
+        max-height: 180px;
+        min-height: 100px;
+        margin-bottom: 8px;
+      }
+      .articles-scroll {
+        max-height: 180px;
+        margin-bottom: 10px;
+      }
+      .articles-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+      .btn-article {
+        padding: 6px 4px;
+        font-size: 11px;
+      }
+      .emoji {
+        font-size: 20px;
+      }
+      .pave-numerique {
+        gap: 6px;
+        margin-bottom: 0;
+      }
+      .btn-num {
+        padding: 8px;
+        font-size: 16px;
+      }
+      .btn-validation {
+        padding: 12px;
+        font-size: 16px;
+      }
+      .btn-reset {
+        margin-top: 4px;
+        padding: 4px;
+      }
     }
   </style>
 </head>
@@ -409,21 +474,24 @@
     <div class="layout-ipad">
       <!-- Colonne Gauche : Total, Ticket & Actions -->
       <div class="col-gauche">
-        <div class="ecran">
-          <div class="total-label">Total à payer</div>
-          <div class="total-montant" id="totalDisplay">0,00 €</div>
+        <div>
+          <div class="ecran">
+            <div class="total-label">Total à payer</div>
+            <div class="total-montant" id="totalDisplay">0,00 €</div>
+          </div>
+
+          <div class="section-title">Détail du panier</div>
+          <div class="ticket-container" id="ticketList">
+            <div class="ticket-vide">Aucun article ajouté</div>
+          </div>
         </div>
 
-        <div class="section-title">Détail du panier</div>
-        <div class="ticket-container" id="ticketList">
-          <div class="ticket-vide">Aucun article ajouté</div>
+        <div>
+          <button class="btn-validation" onclick="demanderCodePin('paiement')">
+            Payer
+          </button>
+          <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
         </div>
-
-        <button class="btn-validation" onclick="demanderCodePin('paiement')">
-          Payer
-        </button>
-
-        <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
       </div>
 
       <!-- Colonne Droite : Articles par catégories & Saisie Numérique -->
@@ -546,7 +614,7 @@
       lastTouchEnd = now;
     }, false);
 
-    // CODES PIN AUTORISÉS (1806 mis à jour)
+    // CODES PIN AUTORISÉS
     const CODES_VALIDES = ["1806", "2807", "0712", "2410", "2006"];
     let pinSaisi = "";
     let blocageSaisie = false;
