@@ -587,9 +587,9 @@
       </div>
 
       <div class="quiz-mode-select">
-        <button class="quiz-mode-btn active" id="modeBtnFacile" onclick="changerModeQuiz('facile')">Facile</button>
-        <button class="quiz-mode-btn" id="modeBtnInter" onclick="changerModeQuiz('intermédiaire')">Intermédiaire</button>
-        <button class="quiz-mode-btn" id="modeBtnExpert" onclick="changerModeQuiz('expert')">Expert</button>
+        <button class="quiz-mode-btn active" id="modeBtnFacile" onclick="changerModeQuiz('facile')">Facile (150€)</button>
+        <button class="quiz-mode-btn" id="modeBtnInter" onclick="changerModeQuiz('intermédiaire')">Intermédiaire (300€)</button>
+        <button class="quiz-mode-btn" id="modeBtnExpert" onclick="changerModeQuiz('expert')">Difficile (600€)</button>
       </div>
 
       <div class="quiz-question-box">
@@ -721,6 +721,7 @@
 
     // VARIABLES MODULE QUIZ
     let quizNiveau = "facile"; // facile, intermédiaire, expert
+    let gainParReponse = 150; // Gains selon le niveau choisie
     let gainQuizSession = 0;
     let questionActiveCourante = null;
 
@@ -783,7 +784,7 @@
       { id: 108, cat: "Boucherie Halal", emoji: "🥩", nom: "Entrecôte de bœuf Halal (1 kg)", prix: 24.90 },
       { id: 109, cat: "Boucherie Halal", emoji: "🧊", nom: "Glace Kinder Bueno / Mix (1L)", prix: 6.90 },
 
-      // IMMOBILIER MARSEILLE (Vrais prix environ Marseille, du T1 au T6 avec ou sans piscine)
+      // IMMOBILIER MARSEILLE (Vrais prix environ Marseille, du T1 al T6 avec ou sans piscine)
       { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T1 Marseille (Centre)", prix: 115000.00 },
       { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T2 Marseille (Sans piscine)", prix: 185000.00 },
       { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T3 Marseille (Vue mer)", prix: 280000.00 },
@@ -815,28 +816,13 @@
       const banquesRef = db.ref('banques');
       banquesRef.on('value', (snapshot) => {
         const data = snapshot.val();
-        const now = Date.now();
-        const UNE_HEURE = 3600000;
 
         if (!data) {
-          let initialData = { lastRecharge: now };
+          let initialData = {};
           Object.values(USERS_MAP).forEach(prenom => { initialData[prenom] = 2000.00; });
           banquesRef.set(initialData);
         } else {
           comptesComplets = data;
-          let lastRecharge = data.lastRecharge || now;
-          let msEcoulees = now - lastRecharge;
-
-          if (msEcoulees >= UNE_HEURE) {
-            let nbHeures = Math.floor(msEcoulees / UNE_HEURE);
-            let ajouts = nbHeures * 100;
-            let updates = { lastRecharge: lastRecharge + (nbHeures * UNE_HEURE) };
-            Object.values(USERS_MAP).forEach(prenom => {
-              let soldeActuel = data[prenom] !== undefined ? data[prenom] : 2000.00;
-              updates[prenom] = Math.round((soldeActuel + ajouts) * 100) / 100;
-            });
-            banquesRef.update(updates);
-          }
           afficherSoldes();
         }
       });
@@ -997,7 +983,7 @@
       gainQuizSession = 0;
       document.getElementById('quizSessionScore').innerText = `Gagné : 0 €`;
       document.getElementById('quizOverlay').classList.add('active');
-      genererNouvelleQuestionQuiz();
+      changerModeQuiz('facile');
     }
 
     function fermerQuiz() {
@@ -1006,6 +992,14 @@
 
     function changerModeQuiz(niveau) {
       quizNiveau = niveau;
+      if (niveau === 'facile') {
+        gainParReponse = 150;
+      } else if (niveau === 'intermédiaire') {
+        gainParReponse = 300;
+      } else if (niveau === 'expert') {
+        gainParReponse = 600;
+      }
+
       document.getElementById('modeBtnFacile').className = `quiz-mode-btn ${niveau === 'facile' ? 'active' : ''}`;
       document.getElementById('modeBtnInter').className = `quiz-mode-btn ${niveau === 'intermédiaire' ? 'active' : ''}`;
       document.getElementById('modeBtnExpert').className = `quiz-mode-btn ${niveau === 'expert' ? 'active' : ''}`;
@@ -1119,11 +1113,11 @@
       const cleanBonne = questionActiveCourante.bonneReponse.toString().trim().toLowerCase();
 
       if (cleanReponse === cleanBonne) {
-        gainQuizSession += 500;
+        gainQuizSession += gainParReponse;
         document.getElementById('quizSessionScore').innerText = `Gagné : ${gainQuizSession} €`;
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
-        alert("Bonne réponse ! +500 € ajoutés à la session 🎉");
+        alert(`Bonne réponse ! +${gainParReponse} € ajoutés à la session 🎉`);
         genererNouvelleQuestionQuiz();
       } else {
         jouerSonErreur();
