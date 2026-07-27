@@ -433,7 +433,7 @@
     
     .quiz-input { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
     .quiz-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .quiz-option-btn { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; font-size: 14px; font-weight: bold; color: #2d3748; cursor: pointer; }
+    .quiz-option-btn { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 10px; padding: 12px 8px; font-size: 14px; font-weight: bold; color: #2d3748; cursor: pointer; }
     .quiz-option-btn:active { background: #cbd5e0; }
 
     .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 10px; padding: 10px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; }
@@ -721,37 +721,50 @@
 
     // VARIABLES MODULE QUIZ
     let quizNiveau = "facile"; // facile, intermédiaire, expert
-    let gainParReponse = 150; // Gains selon le niveau choisie
+    let gainParReponse = 150; // Gains selon le niveau choisi
     let gainQuizSession = 0;
     let questionActiveCourante = null;
 
-    // BANQUES DE MOTS ET VERBES POUR GÉNÉRATION ALÉATOIRE
+    // BANQUES POUR GENERATION DYNAMIQUE (ANGLAIS)
     const BANQUE_ANGLAIS_FACILE = [
       { en: "Cat", fr: "Chat" }, { en: "Dog", fr: "Chien" }, { en: "House", fr: "Maison" },
       { en: "Apple", fr: "Pomme" }, { en: "Book", fr: "Livre" }, { en: "Water", fr: "Eau" },
       { en: "Sun", fr: "Soleil" }, { en: "Moon", fr: "Lune" }, { en: "Car", fr: "Voiture" },
-      { en: "School", fr: "École" }, { en: "Red", fr: "Rouge" }, { en: "Blue", fr: "Bleu" }
+      { en: "School", fr: "École" }, { en: "Red", fr: "Rouge" }, { en: "Blue", fr: "Bleu" },
+      { en: "Tree", fr: "Arbre" }, { en: "Friend", fr: "Ami" }, { en: "Door", fr: "Porte" }
     ];
 
     const BANQUE_ANGLAIS_EXPERT = [
       { en: "Achievement", fr: "Réalisation" }, { en: "Acknowledge", fr: "Reconnaître" },
-      { en: "Breathtaking", fr: "Epoustouflant" }, { en: "Challenge", fr: "Défi" },
+      { en: "Breathtaking", fr: "Époustouflant" }, { en: "Challenge", fr: "Défi" },
       { en: "Curiosity", fr: "Curiosité" }, { en: "Determination", fr: "Détermination" },
       { en: "Environment", fr: "Environnement" }, { en: "Improvement", fr: "Amélioration" },
       { en: "Knowledge", fr: "Connaissance" }, { en: "Significant", fr: "Important" }
     ];
 
-    const VERBES_FRANCAIS = [
-      { verbe: "chanter", temps: "Présent de l'indicatif (1ère pers. sing.)", sujet: "Je", rep: "chante" },
-      { verbe: "finir", temps: "Présent de l'indicatif (1ère pers. pluriel)", sujet: "Nous", rep: "finissons" },
-      { verbe: "aller", temps: "Futur simple (2ème pers. sing.)", sujet: "Tu", rep: "iras" },
-      { verbe: "faire", temps: "Imparfait de l'indicatif (3ème pers. sing.)", sujet: "Il", rep: "faisait" },
-      { verbe: "venir", temps: "Passé composé (1ère pers. sing.)", sujet: "Je", rep: "suis venu" },
-      { verbe: "prendre", temps: "Présent de l'indicatif (3ème pers. pluriel)", sujet: "Ils", rep: "prennent" }
+    // STRUCTURES POUR GENERATION DYNAMIQUE (CONJUGAISON FRANCAIS)
+    const SUJETS_FRANCAIS = [
+      { nom: "Je", index: 0 },
+      { nom: "Tu", index: 1 },
+      { nom: "Il / Elle", index: 2 },
+      { nom: "Nous", index: 3 },
+      { nom: "Vous", index: 4 },
+      { nom: "Ils / Elles", index: 5 }
+    ];
+
+    const VERBES_DYNAMIQUES = [
+      { verbe: "chanter", formes: ["chante", "chantes", "chante", "chantons", "chantez", "chantent"] },
+      { verbe: "finir", formes: ["finis", "finis", "finit", "finissons", "finissez", "finissent"] },
+      { verbe: "manger", formes: ["mange", "manges", "mange", "mangeons", "mangez", "mangent"] },
+      { verbe: "prendre", formes: ["prends", "prends", "prend", "prenons", "prenez", "prennent"] },
+      { verbe: "faire", formes: ["fais", "fais", "fait", "faisons", "faites", "font"] },
+      { verbe: "aller", formes: ["vais", "vas", "va", "allons", "allez", "vont"] },
+      { verbe: "avoir", formes: ["ai", "as", "a", "avons", "avez", "ont"] },
+      { verbe: "être", formes: ["suis", "es", "est", "sommes", "êtes", "sont"] }
     ];
 
     let baseArticles = [
-      // SMARTPHONES (Tous les iPhone Pro Max demandés + Samsung)
+      // SMARTPHONES
       { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 859.00 },
       { id: 202, cat: "Smartphones", emoji: "📱", nom: "iPhone 14 Pro Max", prix: 999.00 },
       { id: 203, cat: "Smartphones", emoji: "📱", nom: "iPhone 15 Pro Max", prix: 1199.00 },
@@ -759,7 +772,7 @@
       { id: 205, cat: "Smartphones", emoji: "📱", nom: "iPhone 17 Pro Max", prix: 1599.00 },
       { id: 206, cat: "Smartphones", emoji: "📱", nom: "Samsung Galaxy S24 Ultra", prix: 1469.00 },
 
-      // CONSOLES & TECH (PlayStation, Xbox, Mac, iPad, Manettes)
+      // CONSOLES & TECH
       { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5 (PS5)", prix: 549.99 },
       { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PlayStation 5 (DualSense)", prix: 69.99 },
       { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Xbox Series X", prix: 499.99 },
@@ -773,7 +786,7 @@
       { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65 pouces", prix: 799.00 },
       { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75 pouces", prix: 1199.00 },
 
-      // BOUCHERIE HALAL (Variété complète 1kg et viandes)
+      // BOUCHERIE HALAL
       { id: 101, cat: "Boucherie Halal", emoji: "🌭", nom: "Merguez Halal (1 kg)", prix: 13.90 },
       { id: 102, cat: "Boucherie Halal", emoji: "🌭", nom: "Chipolatas Halal (1 kg)", prix: 13.90 },
       { id: 103, cat: "Boucherie Halal", emoji: "🥩", nom: "Steak haché Halal (1 kg)", prix: 15.50 },
@@ -784,7 +797,7 @@
       { id: 108, cat: "Boucherie Halal", emoji: "🥩", nom: "Entrecôte de bœuf Halal (1 kg)", prix: 24.90 },
       { id: 109, cat: "Boucherie Halal", emoji: "🧊", nom: "Glace Kinder Bueno / Mix (1L)", prix: 6.90 },
 
-      // IMMOBILIER MARSEILLE (Vrais prix environ Marseille, du T1 al T6 avec ou sans piscine)
+      // IMMOBILIER MARSEILLE
       { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T1 Marseille (Centre)", prix: 115000.00 },
       { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T2 Marseille (Sans piscine)", prix: 185000.00 },
       { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T3 Marseille (Vue mer)", prix: 280000.00 },
@@ -978,7 +991,7 @@
       }
     }
 
-    /* MODULE MINI-JEUX & QUIZ ALÉATOIRE */
+    /* MODULE MINI-JEUX & QUIZ GENERATION ALÉATOIRE 100% */
     function ouvrirQuiz() {
       gainQuizSession = 0;
       document.getElementById('quizSessionScore').innerText = `Gagné : 0 €`;
@@ -1015,91 +1028,94 @@
       const inputField = document.getElementById('quizReponseInput');
       inputField.value = "";
 
+      // 1. MATHÉMATIQUES (Génération 100% aléatoire)
       if (typeChoisi === 'maths') {
         document.getElementById('quizMatiere').innerText = "Mathématiques 📐";
+        let a, b, reponseExacte, enonce;
+
         if (quizNiveau === 'facile') {
-          const a = Math.floor(Math.random() * 10) + 1;
-          const b = Math.floor(Math.random() * 10) + 1;
-          document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
-          questionActiveCourante = { type: 'input', bonneReponse: (a * b).toString() };
-          inputContainer.style.display = "block";
-          optionsContainer.style.display = "none";
+          a = Math.floor(Math.random() * 10) + 1;
+          b = Math.floor(Math.random() * 10) + 1;
+          const isMult = Math.random() > 0.5;
+          reponseExacte = isMult ? (a * b) : (a + b);
+          enonce = `${a} ${isMult ? '×' : '+'} ${b} = ?`;
         } else if (quizNiveau === 'intermédiaire') {
-          const a = (Math.random() * 20 + 1).toFixed(2);
-          const b = (Math.random() * 10 + 1).toFixed(2);
-          const c = Math.floor(Math.random() * 10) + 1;
-          const d = Math.floor(Math.random() * 10) + 1;
-          const operations = [
-            { enonce: `${a} + ${b} = ?`, rep: (parseFloat(a) + parseFloat(b)).toFixed(2) },
-            { enonce: `${c} × ${d} - 3 = ?`, rep: ((c * d) - 3).toString() }
-          ];
-          const op = operations[Math.floor(Math.random() * operations.length)];
-          document.getElementById('quizEnonce').innerText = op.enonce;
-          questionActiveCourante = { type: 'input', bonneReponse: op.rep };
-          inputContainer.style.display = "block";
-          optionsContainer.style.display = "none";
+          a = Math.floor(Math.random() * 40) + 10;
+          b = Math.floor(Math.random() * a) + 1;
+          const isSub = Math.random() > 0.5;
+          reponseExacte = isSub ? (a - b) : (a + b);
+          enonce = `${a} ${isSub ? '-' : '+'} ${b} = ?`;
         } else {
-          const qcmList = [
-            { enonce: "Dans un triangle rectangle, si les cathétes mesurent 3 et 4, l'hypoténuse vaut :", rep: "5", options: ["5", "6", "7", "4.5"] },
-            { enonce: "Combien font 15% de 200 ?", rep: "30", options: ["25", "30", "35", "20"] },
-            { enonce: "Racine carrée de 144 ?", rep: "12", options: ["10", "11", "12", "14"] }
-          ];
-          const q = qcmList[Math.floor(Math.random() * qcmList.length)];
-          document.getElementById('quizEnonce').innerText = q.enonce;
-          questionActiveCourante = { type: 'qcm', bonneReponse: q.rep };
-          
-          inputContainer.style.display = "none";
-          optionsContainer.style.display = "grid";
-          optionsContainer.innerHTML = "";
-          
-          const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
-          shuffledOptions.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = "quiz-option-btn";
-            btn.innerText = opt;
-            btn.onclick = () => verifierReponseDirecte(opt);
-            optionsContainer.appendChild(btn);
-          });
+          a = Math.floor(Math.random() * 12) + 2;
+          b = Math.floor(Math.random() * 10) + 2;
+          const c = Math.floor(Math.random() * 15) + 1;
+          reponseExacte = (a * b) + c;
+          enonce = `(${a} × ${b}) + ${c} = ?`;
         }
-      } else if (typeChoisi === 'anglais') {
-        document.getElementById('quizMatiere').innerText = "Anglais 🇬🇧";
-        const banque = quizNiveau === 'expert' ? BANQUE_ANGLAIS_EXPERT : BANQUE_ANGLAIS_FACILE;
-        const item = banque[Math.floor(Math.random() * banque.length)];
-        
-        if (quizNiveau === 'expert') {
-          document.getElementById('quizEnonce').innerText = `Traduis en français : "${item.en}"`;
-          questionActiveCourante = { type: 'input', bonneReponse: item.fr.toLowerCase() };
-          inputContainer.style.display = "block";
-          optionsContainer.style.display = "none";
-        } else {
-          document.getElementById('quizEnonce').innerText = `Traduction de "${item.en}" ?`;
-          questionActiveCourante = { type: 'qcm', bonneReponse: item.fr };
-          inputContainer.style.display = "none";
-          optionsContainer.style.display = "grid";
-          optionsContainer.innerHTML = "";
-          
-          let options = [item.fr];
-          while (options.length < 4) {
-            let randItem = banque[Math.floor(Math.random() * banque.length)].fr;
-            if (!options.includes(randItem)) options.push(randItem);
-          }
-          options.sort(() => Math.random() - 0.5);
-          options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = "quiz-option-btn";
-            btn.innerText = opt;
-            btn.onclick = () => verifierReponseDirecte(opt);
-            optionsContainer.appendChild(btn);
-          });
-        }
-      } else {
-        document.getElementById('quizMatiere').innerText = "Français - Conjugaison 🇫🇷";
-        const v = VERBES_FRANCAIS[Math.floor(Math.random() * VERBES_FRANCAIS.length)];
-        document.getElementById('quizEnonce').innerText = `Conjugue "${v.verbe}" (${v.temps}) pour "${v.sujet}" :`;
-        questionActiveCourante = { type: 'input', bonneReponse: v.rep.toLowerCase() };
+
+        document.getElementById('quizEnonce').innerText = enonce;
+        questionActiveCourante = { type: 'input', bonneReponse: reponseExacte.toString() };
         inputContainer.style.display = "block";
         optionsContainer.style.display = "none";
+      } 
+      
+      // 2. ANGLAIS (Génération QCM)
+      else if (typeChoisi === 'anglais') {
+        document.getElementById('quizMatiere').innerText = "Anglais 🇬🇧";
+        const banque = (quizNiveau === 'expert') ? BANQUE_ANGLAIS_EXPERT : BANQUE_ANGLAIS_FACILE;
+        const itemCorrect = banque[Math.floor(Math.random() * banque.length)];
+        
+        document.getElementById('quizEnonce').innerText = `Que veut dire "${itemCorrect.en}" ?`;
+        questionActiveCourante = { type: 'qcm', bonneReponse: itemCorrect.fr };
+        
+        let options = [itemCorrect.fr];
+        while (options.length < 4 && options.length < banque.length) {
+          let randItem = banque[Math.floor(Math.random() * banque.length)].fr;
+          if (!options.includes(randItem)) options.push(randItem);
+        }
+        
+        afficherQCM(options);
+      } 
+      
+      // 3. FRANÇAIS / CONJUGAISON (Génération QCM)
+      else {
+        document.getElementById('quizMatiere').innerText = "Français - Conjugaison 🇫🇷";
+        const sujet = SUJETS_FRANCAIS[Math.floor(Math.random() * SUJETS_FRANCAIS.length)];
+        const verbeData = VERBES_DYNAMIQUES[Math.floor(Math.random() * VERBES_DYNAMIQUES.length)];
+        const bonneForme = verbeData.formes[sujet.index];
+
+        document.getElementById('quizEnonce').innerText = `${sujet.nom} (... ${verbeData.verbe} ...) au présent :`;
+        questionActiveCourante = { type: 'qcm', bonneReponse: bonneForme };
+
+        let fauxChoix = Object.values(verbeData.formes).filter(f => f !== bonneForme);
+        let options = [bonneForme];
+        
+        fauxChoix.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < fauxChoix.length && options.length < 4; i++) {
+          if (!options.includes(fauxChoix[i])) options.push(fauxChoix[i]);
+        }
+
+        afficherQCM(options);
       }
+    }
+
+    function afficherQCM(optionsArray) {
+      const inputContainer = document.getElementById('quizInputContainer');
+      const optionsContainer = document.getElementById('quizOptionsContainer');
+
+      inputContainer.style.display = "none";
+      optionsContainer.style.display = "grid";
+      optionsContainer.innerHTML = "";
+
+      const shuffled = [...optionsArray].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = "quiz-option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => verifierReponseDirecte(opt);
+        optionsContainer.appendChild(btn);
+      });
     }
 
     function verifierReponseQuiz() {
