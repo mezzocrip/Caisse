@@ -338,6 +338,7 @@
     }
     .solde-nom { color: #2d3748; font-size: 15px; }
     .solde-valeur { color: #38a169; font-size: 18px; font-family: monospace; }
+    .immo-details { font-size: 11px; color: #718096; font-weight: normal; margin-top: 2px; }
 
     /* MODAL HISTORIQUE DES TICKETS */
     .historique-overlay {
@@ -717,6 +718,7 @@
     let actionApresPin = "";
     let tousLesTickets = [];
     let comptesComplets = {};
+    let possessionsImmo = {};
     let filtrePrenomActif = "Tous";
 
     // VARIABLES MODULE QUIZ
@@ -800,6 +802,9 @@
       { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 Marseille (Avec piscine)", prix: 620000.00 },
       { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 Marseille (Avec piscine - 13012)", prix: 780000.00 },
       { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 Marseille (Piscine & Jardin - 8ème)", prix: 1250000.00 },
+      { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
+      { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
+      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (+10 000€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 },
 
       { id: 601, cat: "Livres & Divers", emoji: "📚", nom: "Livre d'Hiver (Roman / Poésie)", prix: 19.90 },
       { id: 602, cat: "Livres & Divers", emoji: "🥖", nom: "Baguette de pain", prix: 1.10 },
@@ -826,9 +831,11 @@
       MettreAJourEcran();
       ecouterHistoriqueFirebase();
       initialiserEtEcouterComptes();
+      ecouterPossessionsImmo();
+      setInterval(traiterRevenusHorairesImmo, 10000); // Mise à jour passive des rentes toutes les 10 secondes
     }
 
-    /* GESTION COMPTES BANCAIRES */
+    /* GESTION COMPTES BANCAIRES ET IMMOBILIER */
     function initialiserEtEcouterComptes() {
       const banquesRef = db.ref('banques');
       banquesRef.on('value', (snapshot) => {
@@ -844,6 +851,75 @@
       });
     }
 
+    function ecouterPossessionsImmo() {
+      db.ref('immobilier').on('value', (snapshot) => {
+        possessionsImmo = snapshot.val() || {};
+        traiterRevenusHorairesImmo();
+        afficherSoldes();
+      });
+    }
+
+    function traiterRevenusHorairesImmo() {
+      if (!possessionsImmo) return;
+      const maintenant = Date.now();
+      let updatesBanque = {};
+      let updatesImmo = {};
+
+      Object.keys(possessionsImmo).forEach(user => {
+        const biens = possessionsImmo[user];
+        if (!biens) return;
+
+        let gainTotalARecup = 0;
+
+        const typesBiens = [
+          { key: 'snack', tauXHeure: 1000 },
+          { key: 'hotel', tauXHeure: 3500 },
+          { key: 'centreCommercial', tauXHeure: 10000 }
+        ];
+
+        typesBiens.forEach(type => {
+          if (biens[type.key]) {
+            const dataBien = biens[type.key];
+            const qte = dataBien.quantite || 0;
+            const dernierPaiement = dataBien.dernierPaiement || maintenant;
+            const secondesEcoulees = (maintenant - dernierPaiement) / 1000;
+
+            if (qte > 0 && secondesEcoulees > 0) {
+              const gainParSeconde = (type.tauXHeure / 3600) * qte;
+              const gainBiens = secondesEcoulees * gainParSeconde;
+              gainTotalARecup += gainBiens;
+
+              updatesImmo[`immobilier/${user}/${type.key}/dernierPaiement`] = maintenant;
+            }
+          }
+        });
+
+        if (gainTotalARecup > 0) {
+          let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 2000.00;
+          updatesBanque[`banques/${user}`] = Math.round((soldeActuel + gainTotalARecup) * 100) / 100;
+        }
+      });
+
+      if (Object.keys(updatesBanque).length > 0) {
+        db.ref().update(updatesBanque);
+      }
+      if (Object.keys(updatesImmo).length > 0) {
+        db.ref().update(updatesImmo);
+      }
+    }
+
+    function ajouterPossessionImmo(user, item) {
+      if (!item.immoKey) return;
+      const ref = db.ref(`immobilier/${user}/${item.immoKey}`);
+      ref.once('value', (snapshot) => {
+        const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now() };
+        ref.set({
+          quantite: currentData.quantite + 1,
+          dernierPaiement: Date.now()
+        });
+      });
+    }
+
     function ouvrirBanque() { afficherSoldes(); document.getElementById('banqueOverlay').classList.add('active'); }
     function fermerBanque() { document.getElementById('banqueOverlay').classList.remove('active'); }
 
@@ -853,9 +929,18 @@
       container.innerHTML = "";
       Object.values(USERS_MAP).forEach(prenom => {
         let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 2000.00;
+        let userBiens = possessionsImmo[prenom] || {};
+        let immoTextes = [];
+
+        if (userBiens.snack && userBiens.snack.quantite > 0) immoTextes.push(`${userBiens.snack.quantite} Snack(s)`);
+        if (userBiens.hotel && userBiens.hotel.quantite > 0) immoTextes.push(`${userBiens.hotel.quantite} Hôtel(s)`);
+        if (userBiens.centreCommercial && userBiens.centreCommercial.quantite > 0) immoTextes.push(`${userBiens.centreCommercial.quantite} Centre(s) Com.`);
+
+        let detailsHtml = immoTextes.length > 0 ? `<div class="immo-details">🏠 ${immoTextes.join(', ')}</div>` : '';
+
         let div = document.createElement('div');
         div.className = 'solde-item';
-        div.innerHTML = `<span class="solde-nom">${prenom}</span><span class="solde-valeur">${solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>`;
+        div.innerHTML = `<div><span class="solde-nom">${prenom}</span>${detailsHtml}</div><span class="solde-valeur">${solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>`;
         container.appendChild(div);
       });
     }
@@ -880,7 +965,7 @@
       articlesFiltres.forEach(item => {
         const btn = document.createElement('button');
         btn.className = "btn-article";
-        btn.onclick = () => ajouterArticle(`${item.emoji} ${item.nom}`, item.prix);
+        btn.onclick = () => ajouterArticle(`${item.emoji} ${item.nom}`, item.prix, item);
         btn.innerHTML = `<span class="emoji">${item.emoji}</span><span>${item.nom}</span><span class="prix-tag">${item.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>`;
         grid.appendChild(btn);
       });
@@ -906,8 +991,8 @@
       }
     }
 
-    function ajouterArticle(nom, prix) {
-      listeArticles.push({ nom: nom, prix: prix });
+    function ajouterArticle(nom, prix, fullItem) {
+      listeArticles.push({ nom: nom, prix: prix, immoKey: fullItem ? fullItem.immoKey : null });
       MettreAJourEcran();
     }
 
@@ -1348,6 +1433,14 @@
           if (soldeDisponible >= totalFinal) {
             let nouveauSolde = Math.round((soldeDisponible - totalFinal) * 100) / 100;
             db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
+            
+            // Enregistrement des acquisitions immobilières le cas échéant
+            listeArticles.forEach(item => {
+              if (item.immoKey) {
+                ajouterPossessionImmo(lastUserValide, item);
+              }
+            });
+
             enregistrerTicketFirebase(lastPinValide, lastUserValide, [...listeArticles], totalFinal);
 
             icon.className = 'face-id-icon success';
