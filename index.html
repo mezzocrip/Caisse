@@ -408,6 +408,33 @@
       font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 13px;
     }
 
+    /* MODAL SELECTION NIVEAU QUIZ */
+    .quiz-level-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px);
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9995;
+    }
+    .quiz-level-overlay.active { opacity: 1; pointer-events: auto; }
+    .level-card {
+      background: white; border-radius: 24px; width: 90%; max-width: 400px;
+      padding: 24px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .level-title { font-size: 20px; font-weight: bold; color: #2d3748; margin-bottom: 6px; }
+    .level-subtitle { font-size: 13px; color: #718096; margin-bottom: 20px; }
+    .level-btn-group { display: flex; flex-direction: column; gap: 12px; }
+    .btn-level {
+      border: none; border-radius: 14px; padding: 14px; text-align: left;
+      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      transition: transform 0.1s ease;
+    }
+    .btn-level:active { transform: scale(0.98); }
+    .btn-level-facile { background: #e6fffa; border: 2px solid #319795; color: #234e52; }
+    .btn-level-moyen { background: #feebc8; border: 2px solid #dd6b20; color: #7b341e; }
+    .btn-level-difficile { background: #fed7d7; border: 2px solid #e53e3e; color: #742a2a; }
+    .level-name { font-size: 16px; font-weight: bold; }
+    .level-desc { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
     /* MODAL QUIZ 🧠 */
     .quiz-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -420,13 +447,12 @@
       background: #ffffff; border-radius: 24px; width: 92%; max-width: 440px;
       padding: 22px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
     }
-    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .quiz-title { font-size: 18px; font-weight: bold; color: #2d3748; }
-    .quiz-score-badge { background: #edf2f7; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #2b6cb0; }
-    .quiz-score-badge.negative { color: #e53e3e; background: #fff5f5; }
+    .quiz-user-badge { background: #3182ce; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
 
     .quiz-timer-box {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: bold;
       color: #dd6b20;
       background: #feebc8;
@@ -443,13 +469,13 @@
 
     .quiz-question-box { background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 15px; }
     .quiz-matiere { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #718096; font-weight: bold; margin-bottom: 5px; }
-    .quiz-enonce { font-size: 28px; font-weight: bold; color: #1a202c; margin-bottom: 12px; }
-    .quiz-streak-info { font-size: 12px; color: #e53e3e; font-weight: bold; min-height: 16px; margin-bottom: 8px; }
+    .quiz-enonce { font-size: 32px; font-weight: bold; color: #1a202c; margin-bottom: 12px; }
+    .quiz-reward-info { font-size: 12px; color: #38a169; font-weight: bold; margin-bottom: 8px; }
 
-    .quiz-input { width: 100%; padding: 10px; font-size: 22px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
+    .quiz-input { width: 100%; padding: 10px; font-size: 24px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
 
     .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 16px; font-weight: bold; width: 100%; cursor: pointer; }
-    .quiz-quit-btn { background: #edf2f7; color: #4a5568; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
+    .quiz-quit-btn { background: #edf2f7; color: #e53e3e; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
 
     /* SIMULATION APPLE PAY MODAL */
     .apple-pay-overlay {
@@ -540,7 +566,7 @@
         <div>
           <div class="actions-grid">
             <button class="btn-validation" onclick="demanderCodePin('paiement')">Payer</button>
-            <button class="btn-quiz-mode" onclick="ouvrirQuiz()">Quiz 🧠</button>
+            <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Quiz 🧠</button>
           </div>
           <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
         </div>
@@ -591,11 +617,46 @@
     </div>
   </div>
 
+  <!-- SELECTION NIVEAU QUIZ -->
+  <div class="quiz-level-overlay" id="quizLevelOverlay">
+    <div class="level-card">
+      <div class="level-title">Niveau de difficulté 🧠</div>
+      <div class="level-subtitle">Choisissez votre vitesse et vos gains</div>
+
+      <div class="level-btn-group">
+        <button class="btn-level btn-level-facile" onclick="demarrerQuizAvecNiveau('facile')">
+          <div>
+            <div class="level-name">🟢 Facile</div>
+            <div class="level-desc">10 secondes par réponse</div>
+          </div>
+          <div class="level-name">+1 000 €</div>
+        </button>
+
+        <button class="btn-level btn-level-moyen" onclick="demarrerQuizAvecNiveau('intermediaire')">
+          <div>
+            <div class="level-name">🟠 Intermédiaire</div>
+            <div class="level-desc">6 secondes par réponse</div>
+          </div>
+          <div class="level-name">+3 000 €</div>
+        </button>
+
+        <button class="btn-level btn-level-difficile" onclick="demarrerQuizAvecNiveau('difficile')">
+          <div>
+            <div class="level-name">🔴 Difficile</div>
+            <div class="level-desc">3 secondes par réponse</div>
+          </div>
+          <div class="level-name">+6 000 €</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUIZ EN JEU -->
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
         <span class="quiz-title">Multiplications 🧠</span>
-        <span class="quiz-score-badge" id="quizSessionScore">Bilan : 0 €</span>
+        <span class="quiz-user-badge" id="quizUserBadge">Joueur</span>
       </div>
 
       <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
@@ -603,15 +664,15 @@
       <div class="quiz-question-box">
         <div class="quiz-matiere">Table de Multiplication (1 à 10)</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
-        <div class="quiz-streak-info" id="quizStreakInfo"></div>
+        <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
         <div id="quizInputContainer">
           <input type="number" id="quizReponseInput" class="quiz-input" placeholder="Résultat ?" autofocus>
-          <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider (+1 000€)</button>
+          <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider</button>
         </div>
       </div>
 
-      <button class="quiz-quit-btn" onclick="fermerQuizEtCrediter()">Valider le bilan sur un compte</button>
+      <button class="quiz-quit-btn" onclick="quitterQuizManuel()">Quitter le jeu</button>
     </div>
   </div>
 
@@ -728,10 +789,11 @@
     let possessionsImmo = {};
     let filtrePrenomActif = "Tous";
 
-    // VARIABLES MODULE QUIZ MULTIPLICATIONS ET CHRONO
-    let gainParReponse = 1000; // Gains de 1000€ par bonne réponse
-    let gainQuizSession = 0;
-    let erreursConsecutives = 0;
+    // VARIABLES NIVEAUX & QUIZ MULTIPLICATIONS
+    let niveauQuizActif = "facile";
+    let chronoMaxParQuestion = 10;
+    let gainParQuestion = 1000;
+    let questionsJoueesDansSession = 0;
     let questionActiveCourante = null;
     let tempsRestant = 10;
     let intervalChrono = null;
@@ -1001,10 +1063,9 @@
       } else if (action === 'reglages') {
         document.getElementById('pinTitleModal').innerText = "Sécurité Réglages";
         document.getElementById('pinSubtitleModal').innerText = "Code administrateur requis";
-      } else if (action === 'quiz_gain') {
-        document.getElementById('pinTitleModal').innerText = "Validation du Bilan 🧠";
-        let textAction = gainQuizSession >= 0 ? `Créditer +${gainQuizSession} €` : `Débiter ${gainQuizSession} €`;
-        document.getElementById('pinSubtitleModal').innerText = `${textAction} sur quel compte ?`;
+      } else if (action === 'quiz_login') {
+        document.getElementById('pinTitleModal').innerText = "Connexion Quiz 🧠";
+        document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour jouer";
       }
 
       actionApresPin = action;
@@ -1054,7 +1115,7 @@
         fermerCodePin();
         if (actionApresPin === 'paiement') { validerPaiement(); }
         else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
-        else if (actionApresPin === 'quiz_gain') { crediterGainsQuizFirebase(); }
+        else if (actionApresPin === 'quiz_login') { ouvrirSelectionNiveauQuiz(); }
       } else {
         document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
         mettreAJourPointsPin(true);
@@ -1070,13 +1131,42 @@
       }
     }
 
-    /* MODULE QUIZ MULTIPLICATIONS - 1000€ ET CHRONO DE 10S */
-    function ouvrirQuiz() {
-      gainQuizSession = 0;
-      erreursConsecutives = 0;
-      mettreAJourBadgeScore();
+    /* MODULE QUIZ MULTIPLICATIONS - DYNAMIQUE AVEC NIVEAUX & PENALITES */
+    function ouvrirSelectionNiveauQuiz() {
+      document.getElementById('quizLevelOverlay').classList.add('active');
+    }
+
+    function demarrerQuizAvecNiveau(niveau) {
+      niveauQuizActif = niveau;
+      questionsJoueesDansSession = 0;
+
+      if (niveau === 'facile') {
+        chronoMaxParQuestion = 10;
+        gainParQuestion = 1000;
+      } else if (niveau === 'intermediaire') {
+        chronoMaxParQuestion = 6;
+        gainParQuestion = 3000;
+      } else if (niveau === 'difficile') {
+        chronoMaxParQuestion = 3;
+        gainParQuestion = 6000;
+      }
+
+      document.getElementById('quizRewardInfo').innerText = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} € | Erreur / Temps : -${gainParQuestion.toLocaleString('fr-FR')} €`;
+      document.getElementById('quizUserBadge').innerText = lastUserValide;
+
+      document.getElementById('quizLevelOverlay').classList.remove('active');
       document.getElementById('quizOverlay').classList.add('active');
+
       genererNouvelleQuestionQuiz();
+    }
+
+    function quitterQuizManuel() {
+      if (questionsJoueesDansSession === 0) {
+        // Abandon direct sans avoir joué une seule fois : Pénalité 10000€
+        appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Quiz Instantané ⚠️");
+        alert(`⚠️ ABANDON IMMÉDIAT !\nVous n'avez répondu à aucune question.\nPénalité de -10 000 € appliquée à ${lastUserValide}.`);
+      }
+      fermerQuiz();
     }
 
     function fermerQuiz() {
@@ -1086,7 +1176,7 @@
 
     function relancerChrono() {
       clearInterval(intervalChrono);
-      tempsRestant = 10;
+      tempsRestant = chronoMaxParQuestion;
       mettreAJourAffichageChrono();
 
       intervalChrono = setInterval(() => {
@@ -1103,7 +1193,7 @@
     function mettreAJourAffichageChrono() {
       const box = document.getElementById('quizTimerBox');
       box.innerText = `⏳ ${tempsRestant}s`;
-      if (tempsRestant <= 3) {
+      if (tempsRestant <= Math.ceil(chronoMaxParQuestion / 3)) {
         box.className = "quiz-timer-box danger";
       } else {
         box.className = "quiz-timer-box";
@@ -1111,36 +1201,13 @@
     }
 
     function traiterTempsEcouleQuiz() {
-      erreursConsecutives++;
-      let perte = (erreursConsecutives >= 3) ? 1000 : 500;
-      gainQuizSession -= perte;
-
+      questionsJoueesDansSession++;
       jouerSonErreur();
       if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
 
-      mettreAJourBadgeScore();
-      alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${perte} €`);
+      appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Temps écoulé`);
+      alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
       genererNouvelleQuestionQuiz();
-    }
-
-    function mettreAJourBadgeScore() {
-      const badge = document.getElementById('quizSessionScore');
-      if (gainQuizSession >= 0) {
-        badge.className = "quiz-score-badge";
-        badge.innerText = `Bilan : +${gainQuizSession} €`;
-      } else {
-        badge.className = "quiz-score-badge negative";
-        badge.innerText = `Bilan : ${gainQuizSession} €`;
-      }
-
-      const streakInfo = document.getElementById('quizStreakInfo');
-      if (erreursConsecutives >= 2) {
-        streakInfo.innerText = `⚠️ Attention ! Prochaine erreur = -1000 € !`;
-      } else if (erreursConsecutives === 1) {
-        streakInfo.innerText = `⚠️ 1 erreur commise (-500 €)`;
-      } else {
-        streakInfo.innerText = ``;
-      }
     }
 
     function genererNouvelleQuestionQuiz() {
@@ -1148,7 +1215,6 @@
       inputField.value = "";
       inputField.focus();
 
-      // Tirage aléatoire strict dans les tables de 1 à 10
       const a = Math.floor(Math.random() * 10) + 1;
       const b = Math.floor(Math.random() * 10) + 1;
       const reponseExacte = a * b;
@@ -1160,28 +1226,23 @@
     }
 
     function verifierReponseQuiz() {
-      clearInterval(intervalChrono); // Stopper le chrono
+      clearInterval(intervalChrono);
       const inputField = document.getElementById('quizReponseInput');
       const val = inputField.value.trim();
-      if (!val) return;
+      if (!val) { relancerChrono(); return; }
+
+      questionsJoueesDansSession++;
 
       if (val === questionActiveCourante.bonneReponse) {
-        erreursConsecutives = 0;
-        gainQuizSession += gainParReponse; // +1000 €
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
-        mettreAJourBadgeScore();
+        appliquerMouvementSoldeFirebase(gainParQuestion, `Quiz (${niveauQuizActif}) - Bonne réponse`);
         genererNouvelleQuestionQuiz();
       } else {
-        erreursConsecutives++;
-        let perte = (erreursConsecutives >= 3) ? 1000 : 500;
-        gainQuizSession -= perte;
-        
         jouerSonErreur();
         if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
-        
-        mettreAJourBadgeScore();
-        alert(`Faux ! La bonne réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${perte} €`);
+        appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Erreur`);
+        alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
         genererNouvelleQuestionQuiz();
       }
     }
@@ -1192,19 +1253,11 @@
       }
     });
 
-    function fermerQuizEtCrediter() {
-      fermerQuiz();
-      if (gainQuizSession !== 0) {
-        demanderCodePin('quiz_gain');
-      }
-    }
-
-    function crediterGainsQuizFirebase() {
+    function appliquerMouvementSoldeFirebase(montant, motif) {
+      if (!lastUserValide) return;
       db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
         let soldeActuel = snapshot.val() !== null ? snapshot.val() : 2000.00;
-        let nouveauSolde = Math.round((soldeActuel + gainQuizSession) * 100) / 100;
-        
-        if (nouveauSolde < 0) nouveauSolde = 0;
+        let nouveauSolde = Math.round((soldeActuel + montant) * 100) / 100;
 
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
@@ -1212,24 +1265,14 @@
         const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-        let nomOp = gainQuizSession >= 0 ? "Gain Quiz Multiplications 🧠" : "Pénalité Quiz Multiplications 🧠";
-
         db.ref('tickets').push({
           codePin: lastPinValide,
           utilisateur: lastUserValide,
-          date: dateFormatee + " " + heureFormatee + " (Quiz)",
+          date: dateFormatee + " " + heureFormatee + " (" + motif + ")",
           timestamp: firebase.database.ServerValue.TIMESTAMP,
-          articles: [{ nom: nomOp, prix: gainQuizSession }],
-          total: gainQuizSession
+          articles: [{ nom: motif, prix: montant }],
+          total: montant
         });
-
-        let msg = gainQuizSession >= 0 ? 
-          `Succès ! +${gainQuizSession} € ont été versés à ${lastUserValide}.` : 
-          `Bilan enregistré. ${gainQuizSession} € retenus sur le compte de ${lastUserValide}.`;
-
-        alert(`${msg}\nNouveau solde : ${nouveauSolde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`);
-        gainQuizSession = 0;
-        erreursConsecutives = 0;
       });
     }
 
