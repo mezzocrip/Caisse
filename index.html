@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Caisse Enregistreuse Terrance</title>
+  <title>Marseille Monopoly</title>
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Caisse">
-  <link rel="apple-touch-icon" href="https://fav.farm/🛒">
+  <meta name="apple-mobile-web-app-title" content="Marseille Monopoly">
+  <link rel="apple-touch-icon" href="https://fav.farm/🎲">
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -51,9 +51,11 @@
       margin-bottom: 15px;
     }
     h1 {
-      color: #333;
+      color: #1a202c;
       margin: 0;
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
     .header-actions {
       display: flex;
@@ -354,13 +356,14 @@
     }
     .historique-list { overflow-y: auto; flex-grow: 1; margin-top: 10px; display: flex; flex-direction: column; gap: 15px; }
     
+    /* FIX VISIBILITÉ NOMS ET TICKETS DE CAISSE */
     .ticket-paper {
       background: #fffdf9;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #cbd5e0;
       border-radius: 8px;
       padding: 15px;
       font-family: 'Courier New', Courier, monospace;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
       position: relative;
     }
     .ticket-paper::after {
@@ -371,14 +374,15 @@
       background: linear-gradient(-45deg, transparent 4px, #fffdf9 4px), linear-gradient(45deg, transparent 4px, #fffdf9 4px);
       background-size: 8px 8px;
     }
-    .ticket-paper-header { text-align: center; border-bottom: 1px dashed #cbd5e0; padding-bottom: 8px; margin-bottom: 10px; }
-    .ticket-paper-title { font-weight: bold; font-size: 15px; color: #1a202c; }
-    .ticket-paper-meta { font-size: 11px; color: #718096; margin-top: 2px; }
+    .ticket-paper-header { text-align: center; border-bottom: 2px dashed #a0aec0; padding-bottom: 10px; margin-bottom: 10px; }
+    .ticket-paper-title { font-weight: 900; font-size: 16px; color: #000; letter-spacing: 0.5px; }
+    .ticket-paper-user { font-size: 15px; font-weight: 800; color: #1a202c; background: #edf2f7; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-top: 5px; }
+    .ticket-paper-meta { font-size: 12px; color: #4a5568; font-weight: bold; margin-top: 4px; }
     .ticket-paper-items { font-size: 12px; margin-bottom: 10px; }
-    .ticket-paper-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .ticket-paper-total { border-top: 1px dashed #cbd5e0; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: 8px; padding-top: 6px; }
+    .ticket-paper-row { display: flex; justify-content: space-between; margin-bottom: 4px; color: #2d3748; }
+    .ticket-paper-total { border-top: 2px dashed #a0aec0; display: flex; justify-content: space-between; font-weight: 900; font-size: 15px; color: #000; margin-top: 8px; padding-top: 6px; }
 
-    /* MODAL RÉGLAGES DES ARTICLES */
+    /* MODAL RÉGLAGES DES ARTICLES & JOUEURS */
     .reglages-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
@@ -399,7 +403,7 @@
     .item-editor input { padding: 6px 8px; border-radius: 6px; border: 1px solid #cbd5e0; font-size: 13px; }
     .item-editor input.emoji-input { width: 45px; text-align: center; }
     .item-editor input.nom-input { flex-grow: 1; }
-    .item-editor input.prix-input { width: 65px; }
+    .item-editor input.prix-input { width: 75px; }
 
     .form-ajout { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-top: 10px; }
     .form-ajout-title { font-size: 12px; font-weight: bold; color: #4a5568; margin-bottom: 6px; }
@@ -541,7 +545,7 @@
 
   <div class="caisse-container">
     <div class="header-caisse">
-      <h1>Caisse Enregistreuse Terrance</h1>
+      <h1>Marseille Monopoly 🎲</h1>
       <div class="header-actions">
         <button class="btn-icon" onclick="ouvrirBanque()" title="Solde des comptes">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Historique des tickets">🧾</button>
@@ -655,14 +659,14 @@
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
-        <span class="quiz-title">Multiplications 🧠</span>
+        <span class="quiz-title">Multiplications (5 à 20) 🧠</span>
         <span class="quiz-user-badge" id="quizUserBadge">Joueur</span>
       </div>
 
       <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
 
       <div class="quiz-question-box">
-        <div class="quiz-matiere">Table de Multiplication (1 à 10)</div>
+        <div class="quiz-matiere">Tables de Multiplication de 5 à 20</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
@@ -706,33 +710,55 @@
   <div class="reglages-overlay" id="reglagesOverlay">
     <div class="reglages-card">
       <div class="reglages-header">
-        <span class="reglages-title">Réglages des Articles</span>
+        <span class="reglages-title">Réglages Système</span>
         <button class="btn-close" onclick="fermerReglages()">✕</button>
       </div>
 
-      <div class="reglages-list" id="reglagesList"></div>
-
-      <div class="form-ajout">
-        <div class="form-ajout-title">Ajouter un nouvel article</div>
-        <div class="item-editor">
-          <input type="text" id="nouveauEmoji" class="emoji-input" placeholder="Emoji" value="🍕">
-          <input type="text" id="nouveauNom" class="nom-input" placeholder="Nom de l'article">
-          <input type="number" step="0.01" id="nouveauPrix" class="prix-input" placeholder="Prix €">
-        </div>
-        <div class="item-editor" style="margin-top: 5px;">
-          <select id="nouvelleCategorie" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e0;">
-            <option value="Smartphones">Smartphones</option>
-            <option value="Consoles & Tech">Consoles & Tech</option>
-            <option value="Automobiles">Automobiles & Véhicules</option>
-            <option value="Écrans & TV">Écrans & TV</option>
-            <option value="Boucherie Halal">Boucherie Halal</option>
-            <option value="Immobilier Marseille">Immobilier Marseille</option>
-            <option value="Livres & Divers">Livres & Divers</option>
-            <option value="Boulangerie">Boulangerie</option>
-          </select>
-        </div>
-        <button class="btn-ajouter-article" onclick="ajouterNouvelArticleSysteme()">+ Ajouter au catalogue</button>
+      <!-- ONGLETS DE PARAMÈTRES -->
+      <div class="categories-tabs" style="margin-bottom: 12px;">
+        <button class="tab-btn active" id="btnTabArticles" onclick="changerOngletReglages('articles')">📦 Articles</button>
+        <button class="tab-btn" id="btnTabJoueurs" onclick="changerOngletReglages('joueurs')">👤 Joueurs</button>
       </div>
+
+      <!-- VUE ARTICLES -->
+      <div id="vueReglagesArticles" style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
+        <div class="reglages-list" id="reglagesList"></div>
+
+        <div class="form-ajout">
+          <div class="form-ajout-title">Ajouter un nouvel article</div>
+          <div class="item-editor">
+            <input type="text" id="nouveauEmoji" class="emoji-input" placeholder="Emoji" value="🍕">
+            <input type="text" id="nouveauNom" class="nom-input" placeholder="Nom de l'article">
+            <input type="number" step="0.01" id="nouveauPrix" class="prix-input" placeholder="Prix €">
+          </div>
+          <div class="item-editor" style="margin-top: 5px;">
+            <select id="nouvelleCategorie" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e0;">
+              <option value="Smartphones">Smartphones</option>
+              <option value="Consoles & Tech">Consoles & Tech</option>
+              <option value="Automobiles">Automobiles & Véhicules</option>
+              <option value="Écrans & TV">Écrans & TV</option>
+              <option value="Immobilier Marseille">Immobilier Marseille</option>
+              <option value="Livres & Divers">Livres & Divers</option>
+            </select>
+          </div>
+          <button class="btn-ajouter-article" onclick="ajouterNouvelArticleSysteme()">+ Ajouter au catalogue</button>
+        </div>
+      </div>
+
+      <!-- VUE JOUEURS (GESTION PIN) -->
+      <div id="vueReglagesJoueurs" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
+        <div class="reglages-list" id="joueursList"></div>
+
+        <div class="form-ajout">
+          <div class="form-ajout-title">Inscrire un nouveau joueur (Départ: 20 000€)</div>
+          <div class="item-editor">
+            <input type="text" id="nouveauJoueurNom" class="nom-input" placeholder="Prénom du joueur">
+            <input type="number" id="nouveauJoueurPin" class="prix-input" placeholder="PIN (4 ch.)" maxlength="4">
+          </div>
+          <button class="btn-ajouter-article" style="background:#2b6cb0;" onclick="ajouterNouveauJoueurSysteme()">+ Enregistrer le joueur</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -771,7 +797,8 @@
       lastTouchEnd = now;
     }, false);
 
-    const USERS_MAP = {
+    // JOUEURS PAR DÉFAUT SI FIREBASE EST VIDE
+    let USERS_MAP = {
       "0712": "Yves",
       "2807": "Terrance",
       "2006": "Lamar",
@@ -837,16 +864,6 @@
       { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65 pouces", prix: 799.00 },
       { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75 pouces", prix: 1199.00 },
 
-      { id: 101, cat: "Boucherie Halal", emoji: "🌭", nom: "Merguez Halal (1 kg)", prix: 13.90 },
-      { id: 102, cat: "Boucherie Halal", emoji: "🌭", nom: "Chipolatas Halal (1 kg)", prix: 13.90 },
-      { id: 103, cat: "Boucherie Halal", emoji: "🥩", nom: "Steak haché Halal (1 kg)", prix: 15.50 },
-      { id: 104, cat: "Boucherie Halal", emoji: "🍗", nom: "Escalopes de poulet Halal (1 kg)", prix: 11.50 },
-      { id: 105, cat: "Boucherie Halal", emoji: "🍗", nom: "Hauts de cuisses de poulet (1 kg)", prix: 8.90 },
-      { id: 106, cat: "Boucherie Halal", emoji: "🍗", nom: "Pilons de poulet (1 kg)", prix: 7.90 },
-      { id: 107, cat: "Boucherie Halal", emoji: "🥩", nom: "Côtes d'agneau Halal (1 kg)", prix: 19.90 },
-      { id: 108, cat: "Boucherie Halal", emoji: "🥩", nom: "Entrecôte de bœuf Halal (1 kg)", prix: 24.90 },
-      { id: 109, cat: "Boucherie Halal", emoji: "🧊", nom: "Glace Kinder Bueno / Mix (1L)", prix: 6.90 },
-
       { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T1 Marseille (Centre)", prix: 115000.00 },
       { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T2 Marseille (Sans piscine)", prix: 185000.00 },
       { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T3 Marseille (Vue mer)", prix: 280000.00 },
@@ -858,19 +875,7 @@
       { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
       { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (+10 000€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 },
 
-      { id: 601, cat: "Livres & Divers", emoji: "📚", nom: "Livre d'Hiver (Roman / Poésie)", prix: 19.90 },
-      { id: 602, cat: "Livres & Divers", emoji: "🥖", nom: "Baguette de pain", prix: 1.10 },
-      { id: 603, cat: "Livres & Divers", emoji: "🥛", nom: "Lait 1L", prix: 1.25 },
-
-      { id: 701, cat: "Boulangerie", emoji: "🥖", nom: "Baguette Tradiction", prix: 1.30 },
-      { id: 702, cat: "Boulangerie", emoji: "🥐", nom: "Croissant au beurre", prix: 1.20 },
-      { id: 703, cat: "Boulangerie", emoji: "🍫", nom: "Pain au chocolat", prix: 1.30 },
-      { id: 704, cat: "Boulangerie", emoji: "🥐", nom: "Brioche tressée", prix: 4.50 },
-      { id: 705, cat: "Boulangerie", emoji: "🥧", nom: "Tartelette aux pommes", prix: 3.20 },
-      { id: 706, cat: "Boulangerie", emoji: "🍰", nom: "Éclair au chocolat", prix: 3.50 },
-      { id: 707, cat: "Boulangerie", emoji: "🥪", nom: "Sandwich Jambon Beurre", prix: 4.80 },
-      { id: 708, cat: "Boulangerie", emoji: "🥪", nom: "Sandwich Poulet CRUDITÉS", prix: 5.20 },
-      { id: 709, cat: "Boulangerie", emoji: "🍕", nom: "Part de Pizza Bressane", prix: 3.80 }
+      { id: 601, cat: "Livres & Divers", emoji: "📚", nom: "Livre d'Hiver (Roman / Poésie)", prix: 19.90 }
     ];
 
     let categorieActive = "Smartphones";
@@ -878,6 +883,7 @@
     let audioCtx = null;
 
     function initApp() {
+      ecouterJoueursFirebase();
       afficherOnglets();
       afficherArticles();
       MettreAJourEcran();
@@ -887,6 +893,19 @@
       setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
+    /* SYNCHRONISATION DYNAMIQUE DES JOUEURS DANS FIREBASE */
+    function ecouterJoueursFirebase() {
+      db.ref('utilisateurs').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data) {
+          db.ref('utilisateurs').set(USERS_MAP);
+        } else {
+          USERS_MAP = data;
+          afficherOngletsPrenoms();
+        }
+      });
+    }
+
     /* GESTION COMPTES BANCAIRES ET IMMOBILIER */
     function initialiserEtEcouterComptes() {
       const banquesRef = db.ref('banques');
@@ -894,7 +913,7 @@
         const data = snapshot.val();
         if (!data) {
           let initialData = {};
-          Object.values(USERS_MAP).forEach(prenom => { initialData[prenom] = 2000.00; });
+          Object.values(USERS_MAP).forEach(prenom => { initialData[prenom] = 20000.00; });
           banquesRef.set(initialData);
         } else {
           comptesComplets = data;
@@ -947,7 +966,7 @@
         });
 
         if (gainTotalARecup > 0) {
-          let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 2000.00;
+          let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
           updatesBanque[`banques/${user}`] = Math.round((soldeActuel + gainTotalARecup) * 100) / 100;
         }
       });
@@ -980,7 +999,7 @@
       if (!container) return;
       container.innerHTML = "";
       Object.values(USERS_MAP).forEach(prenom => {
-        let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 2000.00;
+        let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
         let userBiens = possessionsImmo[prenom] || {};
         let immoTextes = [];
 
@@ -998,7 +1017,7 @@
     }
 
     function afficherOnglets() {
-      const categories = ["Smartphones", "Consoles & Tech", "Automobiles", "Écrans & TV", "Boucherie Halal", "Immobilier Marseille", "Livres & Divers", "Boulangerie"];
+      const categories = ["Smartphones", "Consoles & Tech", "Automobiles", "Écrans & TV", "Immobilier Marseille", "Livres & Divers"];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
       categories.forEach(cat => {
@@ -1131,7 +1150,7 @@
       }
     }
 
-    /* MODULE QUIZ MULTIPLICATIONS - DYNAMIQUE AVEC NIVEAUX & PENALITES */
+    /* MODULE QUIZ MULTIPLICATIONS DE 5 A 20 */
     function ouvrirSelectionNiveauQuiz() {
       document.getElementById('quizLevelOverlay').classList.add('active');
     }
@@ -1162,7 +1181,6 @@
 
     function quitterQuizManuel() {
       if (questionsJoueesDansSession === 0) {
-        // Abandon direct sans avoir joué une seule fois : Pénalité 10000€
         appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Quiz Instantané ⚠️");
         alert(`⚠️ ABANDON IMMÉDIAT !\nVous n'avez répondu à aucune question.\nPénalité de -10 000 € appliquée à ${lastUserValide}.`);
       }
@@ -1210,13 +1228,14 @@
       genererNouvelleQuestionQuiz();
     }
 
+    /* FIX SPECIFIQUE: TABLES DE 5 A 20 EN RANDOM */
     function genererNouvelleQuestionQuiz() {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value = "";
       inputField.focus();
 
-      const a = Math.floor(Math.random() * 10) + 1;
-      const b = Math.floor(Math.random() * 10) + 1;
+      const a = Math.floor(Math.random() * 16) + 5; // Nombre entre 5 et 20
+      const b = Math.floor(Math.random() * 16) + 5; // Nombre entre 5 et 20
       const reponseExacte = a * b;
 
       document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
@@ -1256,7 +1275,7 @@
     function appliquerMouvementSoldeFirebase(montant, motif) {
       if (!lastUserValide) return;
       db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
-        let soldeActuel = snapshot.val() !== null ? snapshot.val() : 2000.00;
+        let soldeActuel = snapshot.val() !== null ? snapshot.val() : 20000.00;
         let nouveauSolde = Math.round((soldeActuel + montant) * 100) / 100;
 
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
@@ -1304,8 +1323,9 @@
     }
 
     function afficherOngletsPrenoms() {
-      const listePrenoms = ["Tous", "Yves", "Terrance", "Lamar", "Marjo", "Joyce"];
+      const listePrenoms = ["Tous", ...Object.values(USERS_MAP)];
       const container = document.getElementById('prenomsTabs');
+      if (!container) return;
       container.innerHTML = "";
       listePrenoms.forEach(prenom => {
         const btn = document.createElement('button');
@@ -1316,6 +1336,7 @@
       });
     }
 
+    /* FIX CLARTÉ & LISIBILITÉ NOM JOUEUR DANS TICKETS */
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
       if (!container) return;
@@ -1332,7 +1353,7 @@
       }
 
       ticketsAffiches.forEach(ticket => {
-        const nomClient = ticket.utilisateur || USERS_MAP[ticket.codePin] || "Client";
+        const nomClient = ticket.utilisateur || USERS_MAP[ticket.codePin] || "Joueur";
         const card = document.createElement('div');
         card.className = 'ticket-paper';
 
@@ -1343,12 +1364,12 @@
 
         card.innerHTML = `
           <div class="ticket-paper-header">
-            <div class="ticket-paper-title">TICKET DE CAISSE</div>
-            <div class="ticket-paper-meta">Client : <strong>${nomClient}</strong></div>
-            <div class="ticket-paper-meta">${ticket.date}</div>
+            <div class="ticket-paper-title">MARSEILLE MONOPOLY</div>
+            <div class="ticket-paper-user">👤 Joueur : ${nomClient}</div>
+            <div class="ticket-paper-meta">📅 ${ticket.date}</div>
           </div>
           <div class="ticket-paper-items">${itemsHtml}</div>
-          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>
+          <div class="ticket-paper-total"><span>TOTAL PAYÉ</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>
         `;
         container.appendChild(card);
       });
@@ -1357,9 +1378,30 @@
     function ouvrirHistorique() { afficherOngletsPrenoms(); afficherTicketsHistorique(); document.getElementById('historiqueOverlay').classList.add('active'); }
     function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
-    /* RÉGLAGES */
+    /* RÉGLAGES UNIFIÉS (ARTICLES & JOUEURS) */
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
     function ouvrirEcranReglages() {
+      changerOngletReglages('articles');
+      document.getElementById('reglagesOverlay').classList.add('active');
+    }
+
+    function changerOngletReglages(type) {
+      if (type === 'articles') {
+        document.getElementById('btnTabArticles').className = "tab-btn active";
+        document.getElementById('btnTabJoueurs').className = "tab-btn";
+        document.getElementById('vueReglagesArticles').style.display = "flex";
+        document.getElementById('vueReglagesJoueurs').style.display = "none";
+        chargerReglagesArticles();
+      } else {
+        document.getElementById('btnTabArticles').className = "tab-btn";
+        document.getElementById('btnTabJoueurs').className = "tab-btn active";
+        document.getElementById('vueReglagesArticles').style.display = "none";
+        document.getElementById('vueReglagesJoueurs').style.display = "flex";
+        chargerReglagesJoueurs();
+      }
+    }
+
+    function chargerReglagesArticles() {
       const listContainer = document.getElementById('reglagesList');
       listContainer.innerHTML = "";
       baseArticles.forEach((item, index) => {
@@ -1373,14 +1415,31 @@
         `;
         listContainer.appendChild(div);
       });
-      document.getElementById('reglagesOverlay').classList.add('active');
     }
+
+    function chargerReglagesJoueurs() {
+      const listContainer = document.getElementById('joueursList');
+      listContainer.innerHTML = "";
+      Object.keys(USERS_MAP).forEach((pin) => {
+        const nom = USERS_MAP[pin];
+        const div = document.createElement('div');
+        div.className = 'item-editor';
+        div.innerHTML = `
+          <span style="font-weight:bold; width: 100px;">${nom}</span>
+          <span style="font-family:monospace; background:#e2e8f0; padding:4px 8px; border-radius:6px; flex-grow:1; text-align:center;">PIN: ${pin}</span>
+          <button class="btn-suppr-ligne" onclick="supprimerJoueurSysteme('${pin}')">✕</button>
+        `;
+        listContainer.appendChild(div);
+      });
+    }
+
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); afficherArticles(); }
     function modifierArticle(index, champ, valeur) {
       if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
       else { baseArticles[index][champ] = valeur; }
     }
-    function supprimerArticleSysteme(index) { baseArticles.splice(index, 1); ouvrirEcranReglages(); }
+    function supprimerArticleSysteme(index) { baseArticles.splice(index, 1); chargerReglagesArticles(); }
+    
     function ajouterNouvelArticleSysteme() {
       const emoji = document.getElementById('nouveauEmoji').value || "📦";
       const nom = document.getElementById('nouveauNom').value;
@@ -1390,7 +1449,42 @@
       baseArticles.push({ id: Date.now(), cat: cat, emoji: emoji, nom: nom, prix: prix });
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
-      ouvrirEcranReglages();
+      chargerReglagesArticles();
+    }
+
+    /* AJOUT DYNAMIQUE DE JOUEURS AVEC MOT DE PASSE ENREGISTRÉ DANS FIREBASE */
+    function ajouterNouveauJoueurSysteme() {
+      const nom = document.getElementById('nouveauJoueurNom').value.trim();
+      const pin = document.getElementById('nouveauJoueurPin').value.trim();
+
+      if (!nom || pin.length !== 4 || isNaN(pin)) {
+        alert("Veuillez saisir un prénom valide et un code PIN à 4 chiffres.");
+        return;
+      }
+
+      if (USERS_MAP[pin]) {
+        alert("Ce code PIN est déjà utilisé par un autre joueur.");
+        return;
+      }
+
+      // 1. Ajouter le joueur dans la liste Firebase
+      db.ref(`utilisateurs/${pin}`).set(nom);
+
+      // 2. Initialiser son solde de départ à 20 000€
+      db.ref(`banques/${nom}`).set(20000.00);
+
+      document.getElementById('nouveauJoueurNom').value = "";
+      document.getElementById('nouveauJoueurPin').value = "";
+      alert(`✅ Joueur ${nom} enregistré avec succès !\nCode PIN : ${pin}\nSolde initial : 20 000 €`);
+      chargerReglagesJoueurs();
+    }
+
+    function supprimerJoueurSysteme(pin) {
+      const nom = USERS_MAP[pin];
+      if (confirm(`Voulez-vous supprimer le joueur ${nom} ?`)) {
+        db.ref(`utilisateurs/${pin}`).remove();
+        chargerReglagesJoueurs();
+      }
     }
 
     /* AUDIO */
@@ -1440,7 +1534,7 @@
       overlay.classList.add('active');
 
       db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
-        let soldeDisponible = snapshot.val() !== null ? snapshot.val() : 2000.00;
+        let soldeDisponible = snapshot.val() !== null ? snapshot.val() : 20000.00;
 
         setTimeout(() => {
           if (soldeDisponible >= totalFinal) {
