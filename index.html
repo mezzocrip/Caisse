@@ -824,6 +824,46 @@
   </div>
 
   <script>
+    /* =======================================================
+       MODULE 1 : ANTI-TRICHE ET BLOCAGE DEVTOOLS (CONSOLES)
+       ======================================================= */
+    (function antiTriche() {
+      // 1. Désactiver le clic droit
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      }, false);
+
+      // 2. Bloquer les raccourcis clavier DevTools (F12, Ctrl+Shift+I, etc.)
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'F12' || e.keyCode === 123) {
+          e.preventDefault();
+          return false;
+        }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+          e.preventDefault();
+          return false;
+        }
+        if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+          e.preventDefault();
+          return false;
+        }
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+          e.preventDefault();
+          return false;
+        }
+      }, false);
+
+      // 3. Bloquer l'exécution si la console est ouverte (via debugger)
+      setInterval(function() {
+        const startTime = performance.now();
+        debugger;
+        const endTime = performance.now();
+        if (endTime - startTime > 100) {
+          document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;color:red;font-family:sans-serif;'>Accès refusé.<br>Inspection du code détectée.</h1>";
+        }
+      }, 1000);
+    })();
+
     // CONFIGURATION FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyBtij22GLTXBbdWxbUX42rKP_HQIeah7AQ",
@@ -846,7 +886,17 @@
       lastTouchEnd = now;
     }, false);
 
-    // JOUEURS PAR DÉFAUT SI FIREBASE EST VIDE
+    /* =======================================================
+       MODULE 2 : HACHAGE SHA-256 DES CODES PIN
+       ======================================================= */
+    const PIN_HASH_MAP = {
+      "0b82b3d681d6aa0274291c98db182245b058eb7b830d93708453ae66a9876798": "Yves",     // PIN: 0712
+      "c67160ad3df65d4b4a1c5d4fb17502755f190c1f4e1f7c32b509ebed8a018247": "Terrance", // PIN: 2807
+      "7bf41e065bf639ddbe2a281ff9281a629b3ee33b1e754fb7128edfa58a74e5ea": "Lamar",    // PIN: 2006
+      "56f108f972049e3776b23b4f6274474936d07e68fa707efd25718dfb8416d6ff": "Marjo",    // PIN: 2410
+      "f1807d96a7ee007d4b4fb24e4d5804aa1f79f40076a084bcbb53158cfa40a7cf": "Joyce"     // PIN: 1806
+    };
+
     let USERS_MAP = {
       "0712": "Yves",
       "2807": "Terrance",
@@ -854,6 +904,14 @@
       "2410": "Marjo",
       "1806": "Joyce"
     };
+
+    async function hashPin(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     let pinSaisi = "";
     let lastUserValide = "";
@@ -863,7 +921,7 @@
     let tousLesTickets = [];
     let comptesComplets = {};
     let possessionsImmo = {};
-    let filtrePrenomActif = ""; // Sera défini par le joueur le plus riche
+    let filtrePrenomActif = "";
 
     // VARIABLES NIVEAUX & QUIZ MULTIPLICATIONS
     let niveauQuizActif = "facile";
@@ -1121,7 +1179,7 @@
     function supprimerArticle(index) { listeArticles.splice(index, 1); MettreAJourEcran(); }
     function reinitialiser() { listeArticles = []; MettreAJourEcran(); }
 
-    /* GESTION CODE PIN */
+    /* GESTION CODE PIN AVEC VÉRIFICATION HACHÉE */
     function demanderCodePin(action) {
       if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
@@ -1178,10 +1236,14 @@
       }
     }
 
-    function verifierCodePin() {
-      if (USERS_MAP[pinSaisi]) {
+    /* VÉRIFICATION DE L'EMPREINTE HASH SHA-256 */
+    async function verifierCodePin() {
+      const hashSaisi = await hashPin(pinSaisi);
+      const userTrouve = PIN_HASH_MAP[hashSaisi] || USERS_MAP[pinSaisi];
+
+      if (userTrouve) {
         lastPinValide = pinSaisi;
-        lastUserValide = USERS_MAP[pinSaisi];
+        lastUserValide = userTrouve;
         fermerCodePin();
         if (actionApresPin === 'paiement') { validerPaiement(); }
         else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
@@ -1285,8 +1347,8 @@
       inputField.value = "";
       inputField.focus();
 
-      const a = Math.floor(Math.random() * 8) + 3; // Nombre entre 3 et 10
-      const b = Math.floor(Math.random() * 8) + 3; // Nombre entre 3 et 10
+      const a = Math.floor(Math.random() * 8) + 3;
+      const b = Math.floor(Math.random() * 8) + 3;
       const reponseExacte = a * b;
 
       document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
@@ -1407,7 +1469,6 @@
         };
       });
 
-      // Tri par fortune décroissante
       joueursFortunes.sort((a, b) => b.fortune - a.fortune);
 
       if (!filtrePrenomActif && joueursFortunes.length > 0) {
@@ -1435,7 +1496,6 @@
       let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
       let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === nomClient);
 
-      // Calcul des possessions (Articles achetés)
       let mapPossessions = {};
       let totalValeurAchats = 0;
 
@@ -1465,7 +1525,7 @@
       `;
       container.appendChild(fortuneCard);
 
-      // 2. BLOC LISTE DES POSSESSIONS (CE QU'IL A EN SA POSSESSION)
+      // 2. BLOC LISTE DES POSSESSIONS
       const possessionsCard = document.createElement('div');
       possessionsCard.className = 'possessions-box';
 
@@ -1581,7 +1641,7 @@
         div.className = 'item-editor';
         div.innerHTML = `
           <span style="font-weight:bold; width: 100px;">${nom}</span>
-          <span style="font-family:monospace; background:#e2e8f0; padding:4px 8px; border-radius:6px; flex-grow:1; text-align:center;">PIN: ${pin}</span>
+          <span style="font-family:monospace; background:#e2e8f0; padding:4px 8px; border-radius:6px; flex-grow:1; text-align:center;">PIN: ****</span>
           <button class="btn-suppr-ligne" onclick="supprimerJoueurSysteme('${pin}')">✕</button>
         `;
         listContainer.appendChild(div);
@@ -1622,10 +1682,7 @@
         return;
       }
 
-      // 1. Ajouter le joueur dans la liste Firebase
       db.ref(`utilisateurs/${pin}`).set(nom);
-
-      // 2. Initialiser son solde de départ à 20 000€
       db.ref(`banques/${nom}`).set(20000.00);
 
       document.getElementById('nouveauJoueurNom').value = "";
