@@ -168,7 +168,7 @@
       font-weight: bold;
       white-space: nowrap;
       cursor: pointer;
-      flex-shrink: 0; /* Évite que les noms de joueurs ne rétrécissent */
+      flex-shrink: 0;
     }
     .tab-btn.active {
       background: #3182ce;
@@ -344,7 +344,7 @@
     .solde-valeur { color: #38a169; font-size: 18px; font-family: monospace; }
     .immo-details { font-size: 11px; color: #718096; font-weight: normal; margin-top: 2px; }
 
-    /* MODAL ACQUISITION DES TICKETS */
+    /* MODAL ACQUISITION DES TICKETS ET POSSESSIONS */
     .historique-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
@@ -358,6 +358,54 @@
     }
     .historique-list { overflow-y: auto; flex-grow: 1; margin-top: 10px; display: flex; flex-direction: column; gap: 15px; }
     
+    /* CARTES DES POSSESSIONS */
+    .fortune-box {
+      background: linear-gradient(135deg, #2b6cb0, #2c5282);
+      color: white;
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 10px rgba(43, 108, 176, 0.2);
+    }
+    .fortune-total { font-size: 22px; font-weight: bold; font-family: monospace; margin-top: 4px; }
+    .fortune-sub { font-size: 11px; opacity: 0.9; }
+
+    .possessions-box {
+      background: white;
+      border: 1px solid #cbd5e0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+    .possessions-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2d3748;
+      border-bottom: 2px solid #edf2f7;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .possession-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #4a5568;
+      padding: 5px 0;
+      border-bottom: 1px dashed #edf2f7;
+    }
+    .possession-item:last-child { border-bottom: none; }
+    .possession-badge {
+      background: #ebf8ff;
+      color: #2b6cb0;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
     /* FIX VISIBILITÉ NOMS ET TICKETS DE CAISSE */
     .ticket-paper {
       background: #fffdf9;
@@ -704,7 +752,7 @@
       <div class="prenoms-tabs" id="prenomsTabs"></div>
 
       <div class="historique-list" id="historiqueList">
-        <div style="text-align:center; color:#a0aec0; margin-top:20px;">Chargement des tickets...</div>
+        <div style="text-align:center; color:#a0aec0; margin-top:20px;">Chargement des données...</div>
       </div>
     </div>
   </div>
@@ -815,7 +863,7 @@
     let tousLesTickets = [];
     let comptesComplets = {};
     let possessionsImmo = {};
-    let filtrePrenomActif = "Tous";
+    let filtrePrenomActif = ""; // Sera défini par le joueur le plus riche
 
     // VARIABLES NIVEAUX & QUIZ MULTIPLICATIONS
     let niveauQuizActif = "facile";
@@ -917,6 +965,8 @@
         } else {
           comptesComplets = data;
           afficherSoldes();
+          afficherOngletsPrenoms();
+          afficherTicketsHistorique();
         }
       });
     }
@@ -926,6 +976,8 @@
         possessionsImmo = snapshot.val() || {};
         traiterRevenusHorairesImmo();
         afficherSoldes();
+        afficherOngletsPrenoms();
+        afficherTicketsHistorique();
       });
     }
 
@@ -1317,42 +1369,146 @@
         else {
           tousLesTickets = Object.values(data).sort((a, b) => { return (b.timestamp || 0) - (a.timestamp || 0); });
         }
+        afficherOngletsPrenoms();
         afficherTicketsHistorique();
       });
     }
 
+    // CALCUL DE LA FORTUNE PAR JOUEUR (BANQUE + ACHATS)
+    function calculerFortuneJoueur(prenom) {
+      let soldeBanque = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
+      let totalAchats = 0;
+
+      tousLesTickets.forEach(ticket => {
+        let userTicket = ticket.utilisateur || USERS_MAP[ticket.codePin];
+        if (userTicket === prenom) {
+          if (ticket.articles && Array.isArray(ticket.articles)) {
+            ticket.articles.forEach(art => {
+              if (art.prix > 0) {
+                totalAchats += art.prix;
+              }
+            });
+          }
+        }
+      });
+
+      return Math.round((soldeBanque + totalAchats) * 100) / 100;
+    }
+
     function afficherOngletsPrenoms() {
-      const listePrenoms = ["Tous", ...Object.values(USERS_MAP)];
       const container = document.getElementById('prenomsTabs');
       if (!container) return;
       container.innerHTML = "";
-      listePrenoms.forEach(prenom => {
+
+      let joueursFortunes = Object.values(USERS_MAP).map(prenom => {
+        return {
+          prenom: prenom,
+          fortune: calculerFortuneJoueur(prenom)
+        };
+      });
+
+      // Tri par fortune décroissante
+      joueursFortunes.sort((a, b) => b.fortune - a.fortune);
+
+      if (!filtrePrenomActif && joueursFortunes.length > 0) {
+        filtrePrenomActif = joueursFortunes[0].prenom;
+      }
+
+      joueursFortunes.forEach(j => {
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${prenom === filtrePrenomActif ? 'active' : ''}`;
-        btn.innerText = prenom;
-        btn.onclick = () => { filtrePrenomActif = prenom; afficherOngletsPrenoms(); afficherTicketsHistorique(); };
+        btn.className = `tab-btn ${j.prenom === filtrePrenomActif ? 'active' : ''}`;
+        btn.innerText = `${j.prenom} (${j.fortune.toLocaleString('fr-FR')} €)`;
+        btn.onclick = () => { filtrePrenomActif = j.prenom; afficherOngletsPrenoms(); afficherTicketsHistorique(); };
         container.appendChild(btn);
       });
     }
 
-    /* LISIBILITÉ NOM JOUEUR DANS TICKETS ACQUISITION */
+    /* AFFICHAGE DES ACQUISITIONS, FORTUNE ET POSSESSIONS DU JOUEUR */
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
       if (!container) return;
       container.innerHTML = "";
 
-      let ticketsAffiches = tousLesTickets;
-      if (filtrePrenomActif !== "Tous") {
-        ticketsAffiches = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === filtrePrenomActif);
+      if (!filtrePrenomActif) return;
+
+      let nomClient = filtrePrenomActif;
+      let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
+      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === nomClient);
+
+      // Calcul des possessions (Articles achetés)
+      let mapPossessions = {};
+      let totalValeurAchats = 0;
+
+      ticketsJoueur.forEach(ticket => {
+        if (ticket.articles && Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(art => {
+            if (art.prix > 0) {
+              totalValeurAchats += art.prix;
+              if (!mapPossessions[art.nom]) {
+                mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix };
+              }
+              mapPossessions[art.nom].quantite += 1;
+            }
+          });
+        }
+      });
+
+      let fortuneTotale = Math.round((soldeBanque + totalValeurAchats) * 100) / 100;
+
+      // 1. BLOC RESUMÉ FORTUNE
+      const fortuneCard = document.createElement('div');
+      fortuneCard.className = 'fortune-box';
+      fortuneCard.innerHTML = `
+        <div style="font-weight:bold; font-size: 14px;">👑 Fortune de ${nomClient}</div>
+        <div class="fortune-total">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+        <div class="fortune-sub">💵 Banque : ${soldeBanque.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} € | 📦 Possessions : ${totalValeurAchats.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+      `;
+      container.appendChild(fortuneCard);
+
+      // 2. BLOC LISTE DES POSSESSIONS (CE QU'IL A EN SA POSSESSION)
+      const possessionsCard = document.createElement('div');
+      possessionsCard.className = 'possessions-box';
+
+      let itemsPossessionsHtml = "";
+      Object.keys(mapPossessions).forEach(nomItem => {
+        let itemData = mapPossessions[nomItem];
+        let totalItem = itemData.quantite * itemData.prixUnitaire;
+        itemsPossessionsHtml += `
+          <div class="possession-item">
+            <span><strong>${nomItem}</strong> (x${itemData.quantite})</span>
+            <span class="possession-badge">${totalItem.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
+          </div>
+        `;
+      });
+
+      if (itemsPossessionsHtml === "") {
+        itemsPossessionsHtml = `<div style="text-align:center; color:#a0aec0; font-size: 12px; font-style: italic; padding: 5px 0;">Aucune possession ou bien acheté pour le moment.</div>`;
       }
 
-      if (ticketsAffiches.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:#a0aec0; margin-top:20px;">Aucune acquisition enregistrée pour ${filtrePrenomActif}.</div>`;
+      possessionsCard.innerHTML = `
+        <div class="possessions-title">📦 Possessions & Biens Acquis</div>
+        <div>${itemsPossessionsHtml}</div>
+      `;
+      container.appendChild(possessionsCard);
+
+      // 3. BLOC HISTORIQUE DES TICKETS
+      const titreTickets = document.createElement('div');
+      titreTickets.className = 'section-title';
+      titreTickets.style.margin = "10px 0 5px 0";
+      titreTickets.innerText = "🧾 Historique des Tickets de Caisse";
+      container.appendChild(titreTickets);
+
+      if (ticketsJoueur.length === 0) {
+        const videDiv = document.createElement('div');
+        videDiv.style.textAlign = 'center';
+        videDiv.style.color = '#a0aec0';
+        videDiv.style.marginTop = '10px';
+        videDiv.innerText = `Aucun ticket de caisse enregistré pour ${nomClient}.`;
+        container.appendChild(videDiv);
         return;
       }
 
-      ticketsAffiches.forEach(ticket => {
-        const nomClient = ticket.utilisateur || USERS_MAP[ticket.codePin] || "Joueur";
+      ticketsJoueur.forEach(ticket => {
         const card = document.createElement('div');
         card.className = 'ticket-paper';
 
@@ -1368,7 +1524,7 @@
             <div class="ticket-paper-meta">📅 ${ticket.date}</div>
           </div>
           <div class="ticket-paper-items">${itemsHtml}</div>
-          <div class="ticket-paper-total"><span>TOTAL PAYÉ</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>
+          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>
         `;
         container.appendChild(card);
       });
