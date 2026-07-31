@@ -1257,6 +1257,52 @@
       }
     }
 
+    /* VALIDER LE PAIEMENT */
+    function validerPaiement() {
+      let totalPaye = listeArticles.reduce((acc, item) => acc + item.prix, 0);
+      let user = lastUserValide;
+      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+
+      if (soldeActuel < totalPaye) {
+        alert(`Fonds insuffisants pour ${user} ! Solde actuel : ${soldeActuel.toLocaleString('fr-FR')} €`);
+        return;
+      }
+
+      // Déduire le solde bancaire
+      let nouveauSolde = Math.round((soldeActuel - totalPaye) * 100) / 100;
+      db.ref(`banques/${user}`).set(nouveauSolde);
+
+      // Ajouter les possessions immobilières le cas échéant
+      listeArticles.forEach(item => {
+        if (item.immoKey) {
+          ajouterPossessionImmo(user, item);
+        }
+      });
+
+      // Enregistrer le ticket
+      enregistrerTicketFirebase(lastPinValide, user, listeArticles, totalPaye);
+
+      // Animation Pay & reset
+      const apOverlay = document.getElementById('applePayOverlay');
+      document.getElementById('apAmountDisplay').innerText = totalPaye.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+      document.getElementById('apUserDisplay').innerText = user;
+      document.getElementById('apStatusText').innerText = "Paiement en cours...";
+      document.getElementById('faceIdIcon').className = "face-id-icon";
+      document.getElementById('faceIdIcon').innerText = "😃";
+      apOverlay.classList.add('active');
+
+      setTimeout(() => {
+        jouerSonValidation();
+        document.getElementById('faceIdIcon').className = "face-id-icon success";
+        document.getElementById('faceIdIcon').innerText = "✓";
+        document.getElementById('apStatusText').innerText = "Payé avec succès";
+        setTimeout(() => {
+          apOverlay.classList.remove('active');
+          reinitialiser();
+        }, 1200);
+      }, 1000);
+    }
+
     /* MODULE QUIZ MULTIPLICATIONS DE 3 A 10 */
     function ouvrirSelectionNiveauQuiz() {
       document.getElementById('quizLevelOverlay').classList.add('active');
@@ -1430,7 +1476,7 @@
       });
     }
 
-    // CALCUL DE LA FORTUNE PAR JOUEUR (BANQUE + ACHATS)
+    // CALCUL DE LA FORTUNE PAR JOUEUR (BANQUE + ACHATS HORS QUIZ)
     function calculerFortuneJoueur(prenom) {
       let soldeBanque = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
       let totalAchats = 0;
@@ -1440,7 +1486,8 @@
         if (userTicket === prenom) {
           if (ticket.articles && Array.isArray(ticket.articles)) {
             ticket.articles.forEach(art => {
-              if (art.prix > 0) {
+              // Exclure les entrées du Quiz et ne garder que les vrais articles achetés
+              if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
                 totalAchats += art.prix;
               }
             });
@@ -1478,7 +1525,7 @@
       });
     }
 
-    /* AFFICHAGE DES ACQUISITIONS, FORTUNE ET POSSESSIONS DU JOUEUR */
+    /* AFFICHAGE DES ACQUISITIONS, FORTUNE ET POSSESSIONS DU JOUEUR (SEULEMENT ACHATS + CAGNOTTE) */
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
       if (!container) return;
@@ -1496,7 +1543,8 @@
       ticketsJoueur.forEach(ticket => {
         if (ticket.articles && Array.isArray(ticket.articles)) {
           ticket.articles.forEach(art => {
-            if (art.prix > 0) {
+            // Exclure les gains / pénalités du quiz dans les possessions
+            if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
               totalValeurAchats += art.prix;
               if (!mapPossessions[art.nom]) {
                 mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix };
@@ -1515,7 +1563,7 @@
       fortuneCard.innerHTML = `
         <div style="font-weight:bold; font-size: 14px;">👑 Fortune de ${nomClient}</div>
         <div class="fortune-total">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
-        <div class="fortune-sub">💵 Banque : ${soldeBanque.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} € | 📦 Possessions : ${totalValeurAchats.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+        <div class="fortune-sub">💵 Cagnotte (Banque) : ${soldeBanque.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} € | 📦 Achats : ${totalValeurAchats.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
       `;
       container.appendChild(fortuneCard);
 
@@ -1545,7 +1593,7 @@
       `;
       container.appendChild(possessionsCard);
 
-      // 3. BLOC HISTORIQUE DES TICKETS
+      // 3. BLOC HISTORIQUE DES TICKETS DE CAISSE
       const titreTickets = document.createElement('div');
       titreTickets.className = 'section-title';
       titreTickets.style.margin = "10px 0 5px 0";
@@ -1723,57 +1771,6 @@
         osc.connect(gain); gain.connect(audioCtx.destination);
         osc.start(now); osc.stop(now + 0.3);
       } catch (e) {}
-    }
-
-    function validerPaiement() {
-      let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
-      totalFinal = Math.round(totalFinal * 100) / 100;
-
-      if (totalFinal <= 0) return;
-
-      const user = lastUserValide;
-      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
-
-      if (soldeActuel < totalFinal) {
-        alert(`❌ Fonds insuffisants !\n${user} dispose de ${soldeActuel.toLocaleString('fr-FR')} € alors que le montant requis est de ${totalFinal.toLocaleString('fr-FR')} €.`);
-        return;
-      }
-
-      document.getElementById('apAmountDisplay').innerText = totalFinal.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
-      document.getElementById('apUserDisplay').innerText = `Paiement pour : ${user}`;
-      document.getElementById('apUserDisplay').className = "ap-user";
-      document.getElementById('apStatusText').innerText = "Double-cliquez pour payer";
-      document.getElementById('faceIdIcon').innerHTML = "😃";
-      document.getElementById('faceIdIcon').className = "face-id-icon";
-
-      const overlay = document.getElementById('applePayOverlay');
-      overlay.classList.add('active');
-
-      setTimeout(() => {
-        document.getElementById('apStatusText').innerText = "Validation du paiement...";
-        setTimeout(() => {
-          let nouveauSolde = Math.round((soldeActuel - totalFinal) * 100) / 100;
-          db.ref(`banques/${user}`).set(nouveauSolde);
-
-          listeArticles.forEach(item => {
-            if (item.immoKey) {
-              ajouterPossessionImmo(user, item);
-            }
-          });
-
-          enregistrerTicketFirebase(lastPinValide, user, [...listeArticles], totalFinal);
-
-          document.getElementById('faceIdIcon').innerHTML = "✓";
-          document.getElementById('faceIdIcon').className = "face-id-icon success";
-          document.getElementById('apStatusText').innerText = "Paiement Effectué !";
-          jouerSonValidation();
-
-          setTimeout(() => {
-            overlay.classList.remove('active');
-            reinitialiser();
-          }, 1200);
-        }, 1000);
-      }, 800);
     }
   </script>
 </body>
