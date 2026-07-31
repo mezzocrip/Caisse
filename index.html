@@ -408,7 +408,7 @@
       font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 13px;
     }
 
-    /* MODAL QUIZ & GAINS 🧠 */
+    /* MODAL QUIZ 🧠 */
     .quiz-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px);
@@ -423,22 +423,33 @@
     .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .quiz-title { font-size: 18px; font-weight: bold; color: #2d3748; }
     .quiz-score-badge { background: #edf2f7; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; color: #2b6cb0; }
-    
-    .quiz-mode-select { display: flex; gap: 6px; justify-content: center; margin-bottom: 15px; }
-    .quiz-mode-btn { background: #e2e8f0; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; color: #4a5568; }
-    .quiz-mode-btn.active { background: #6b46c1; color: white; }
+    .quiz-score-badge.negative { color: #e53e3e; background: #fff5f5; }
+
+    .quiz-timer-box {
+      font-size: 15px;
+      font-weight: bold;
+      color: #dd6b20;
+      background: #feebc8;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .quiz-timer-box.danger {
+      color: #e53e3e;
+      background: #fed7d7;
+      animation: pulse 0.5s infinite alternate;
+    }
 
     .quiz-question-box { background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 15px; }
     .quiz-matiere { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #718096; font-weight: bold; margin-bottom: 5px; }
-    .quiz-enonce { font-size: 18px; font-weight: bold; color: #1a202c; margin-bottom: 12px; }
-    
-    .quiz-input { width: 100%; padding: 10px; font-size: 16px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
-    .quiz-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-    .quiz-option-btn { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 10px; padding: 12px 8px; font-size: 14px; font-weight: bold; color: #2d3748; cursor: pointer; }
-    .quiz-option-btn:active { background: #cbd5e0; }
+    .quiz-enonce { font-size: 28px; font-weight: bold; color: #1a202c; margin-bottom: 12px; }
+    .quiz-streak-info { font-size: 12px; color: #e53e3e; font-weight: bold; min-height: 16px; margin-bottom: 8px; }
 
-    .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 10px; padding: 10px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; }
-    .quiz-quit-btn { background: #fed7d7; color: #9b2c2c; border: none; border-radius: 10px; padding: 8px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
+    .quiz-input { width: 100%; padding: 10px; font-size: 22px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
+
+    .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 16px; font-weight: bold; width: 100%; cursor: pointer; }
+    .quiz-quit-btn { background: #edf2f7; color: #4a5568; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
 
     /* SIMULATION APPLE PAY MODAL */
     .apple-pay-overlay {
@@ -583,29 +594,24 @@
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
-        <span class="quiz-title">Quiz & Gains 🧠</span>
-        <span class="quiz-score-badge" id="quizSessionScore">Gagné : 0 €</span>
+        <span class="quiz-title">Multiplications 🧠</span>
+        <span class="quiz-score-badge" id="quizSessionScore">Bilan : 0 €</span>
       </div>
 
-      <div class="quiz-mode-select">
-        <button class="quiz-mode-btn active" id="modeBtnFacile" onclick="changerModeQuiz('facile')">Facile (150€)</button>
-        <button class="quiz-mode-btn" id="modeBtnInter" onclick="changerModeQuiz('intermédiaire')">Intermédiaire (300€)</button>
-        <button class="quiz-mode-btn" id="modeBtnExpert" onclick="changerModeQuiz('expert')">Difficile (600€)</button>
-      </div>
+      <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
 
       <div class="quiz-question-box">
-        <div class="quiz-matiere" id="quizMatiere">Mathématiques</div>
+        <div class="quiz-matiere">Table de Multiplication (1 à 10)</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
+        <div class="quiz-streak-info" id="quizStreakInfo"></div>
         
         <div id="quizInputContainer">
-          <input type="text" id="quizReponseInput" class="quiz-input" placeholder="Ta réponse ici...">
-          <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider la réponse</button>
+          <input type="number" id="quizReponseInput" class="quiz-input" placeholder="Résultat ?" autofocus>
+          <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider (+1 000€)</button>
         </div>
-
-        <div id="quizOptionsContainer" class="quiz-options-grid" style="display:none;"></div>
       </div>
 
-      <button class="quiz-quit-btn" onclick="fermerQuizEtCrediter()">S'arrêter et récupérer les gains</button>
+      <button class="quiz-quit-btn" onclick="fermerQuizEtCrediter()">Valider le bilan sur un compte</button>
     </div>
   </div>
 
@@ -656,6 +662,7 @@
           <select id="nouvelleCategorie" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e0;">
             <option value="Smartphones">Smartphones</option>
             <option value="Consoles & Tech">Consoles & Tech</option>
+            <option value="Automobiles">Automobiles & Véhicules</option>
             <option value="Écrans & TV">Écrans & TV</option>
             <option value="Boucherie Halal">Boucherie Halal</option>
             <option value="Immobilier Marseille">Immobilier Marseille</option>
@@ -721,49 +728,13 @@
     let possessionsImmo = {};
     let filtrePrenomActif = "Tous";
 
-    // VARIABLES MODULE QUIZ
-    let quizNiveau = "facile";
-    let gainParReponse = 150;
+    // VARIABLES MODULE QUIZ MULTIPLICATIONS ET CHRONO
+    let gainParReponse = 1000; // Gains de 1000€ par bonne réponse
     let gainQuizSession = 0;
+    let erreursConsecutives = 0;
     let questionActiveCourante = null;
-
-    // BANQUES POUR GENERATION QCM (ANGLAIS)
-    const BANQUE_ANGLAIS_FACILE = [
-      { en: "Cat", fr: "Chat" }, { en: "Dog", fr: "Chien" }, { en: "House", fr: "Maison" },
-      { en: "Apple", fr: "Pomme" }, { en: "Book", fr: "Livre" }, { en: "Water", fr: "Eau" },
-      { en: "Sun", fr: "Soleil" }, { en: "Moon", fr: "Lune" }, { en: "Car", fr: "Voiture" },
-      { en: "School", fr: "École" }, { en: "Red", fr: "Rouge" }, { en: "Blue", fr: "Bleu" },
-      { en: "Tree", fr: "Arbre" }, { en: "Friend", fr: "Ami" }, { en: "Door", fr: "Porte" }
-    ];
-
-    const BANQUE_ANGLAIS_EXPERT = [
-      { en: "Achievement", fr: "Réalisation" }, { en: "Acknowledge", fr: "Reconnaître" },
-      { en: "Breathtaking", fr: "Époustouflant" }, { en: "Challenge", fr: "Défi" },
-      { en: "Curiosity", fr: "Curiosité" }, { en: "Determination", fr: "Détermination" },
-      { en: "Environment", fr: "Environnement" }, { en: "Improvement", fr: "Amélioration" },
-      { en: "Knowledge", fr: "Connaissance" }, { en: "Significant", fr: "Important" }
-    ];
-
-    // STRUCTURES POUR GENERATION QCM (FRANÇAIS CONJUGAISON)
-    const SUJETS_FRANCAIS = [
-      { nom: "Je", index: 0 },
-      { nom: "Tu", index: 1 },
-      { nom: "Il / Elle", index: 2 },
-      { nom: "Nous", index: 3 },
-      { nom: "Vous", index: 4 },
-      { nom: "Ils / Elles", index: 5 }
-    ];
-
-    const VERBES_DYNAMIQUES = [
-      { verbe: "chanter", formes: ["chante", "chantes", "chante", "chantons", "chantez", "chantent"] },
-      { verbe: "finir", formes: ["finis", "finis", "finit", "finissons", "finissez", "finissent"] },
-      { verbe: "manger", formes: ["mange", "manges", "mange", "mangeons", "mangez", "mangent"] },
-      { verbe: "prendre", formes: ["prends", "prends", "prend", "prenons", "prenez", "prennent"] },
-      { verbe: "faire", formes: ["fais", "fais", "fait", "faisons", "faites", "font"] },
-      { verbe: "aller", formes: ["vais", "vas", "va", "allons", "allez", "vont"] },
-      { verbe: "avoir", formes: ["ai", "as", "a", "avons", "avez", "ont"] },
-      { verbe: "être", formes: ["suis", "es", "est", "sommes", "êtes", "sont"] }
-    ];
+    let tempsRestant = 10;
+    let intervalChrono = null;
 
     let baseArticles = [
       { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 859.00 },
@@ -781,6 +752,25 @@
       { id: 306, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 14\"", prix: 1999.00 },
       { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 15/16 pouces", prix: 2899.00 },
       { id: 308, cat: "Consoles & Tech", emoji: "🖥️", nom: "Mac mini", prix: 699.00 },
+
+      { id: 801, cat: "Automobiles", emoji: "🚗", nom: "Audi A3 Sportback", prix: 36790.00 },
+      { id: 802, cat: "Automobiles", emoji: "🚗", nom: "Fiat 500 Électrique", prix: 18790.00 },
+      { id: 803, cat: "Automobiles", emoji: "🚗", nom: "Citroën C4", prix: 27800.00 },
+      { id: 804, cat: "Automobiles", emoji: "🚙", nom: "Renault Clio 5", prix: 19900.00 },
+      { id: 805, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 3008", prix: 38850.00 },
+      { id: 806, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 5008", prix: 40490.00 },
+      { id: 807, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model 3", prix: 39990.00 },
+      { id: 808, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model Y", prix: 44990.00 },
+      { id: 809, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model S", prix: 92990.00 },
+      { id: 810, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model X", prix: 99990.00 },
+      { id: 811, cat: "Automobiles", emoji: "📐", nom: "Tesla Cybertruck", prix: 102000.00 },
+      { id: 812, cat: "Automobiles", emoji: "⚡", nom: "BYD Dolphin", prix: 33990.00 },
+      { id: 813, cat: "Automobiles", emoji: "⚡", nom: "BYD Atto 3", prix: 37990.00 },
+      { id: 814, cat: "Automobiles", emoji: "⚡", nom: "BYD Seal", prix: 46990.00 },
+      { id: 815, cat: "Automobiles", emoji: "⚡", nom: "BYD Sealion 7", prix: 47990.00 },
+      { id: 816, cat: "Automobiles", emoji: "⚡", nom: "BYD Tang", prix: 70990.00 },
+      { id: 817, cat: "Automobiles", emoji: "⚡", nom: "BYD Han", prix: 70800.00 },
+      { id: 818, cat: "Automobiles", emoji: "👑", nom: "Range Rover Autograph", prix: 144900.00 },
 
       { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65 pouces", prix: 799.00 },
       { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75 pouces", prix: 1199.00 },
@@ -832,7 +822,7 @@
       ecouterHistoriqueFirebase();
       initialiserEtEcouterComptes();
       ecouterPossessionsImmo();
-      setInterval(traiterRevenusHorairesImmo, 10000); // Mise à jour passive des rentes toutes les 10 secondes
+      setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
     /* GESTION COMPTES BANCAIRES ET IMMOBILIER */
@@ -946,13 +936,13 @@
     }
 
     function afficherOnglets() {
-      const categories = ["Smartphones", "Consoles & Tech", "Écrans & TV", "Boucherie Halal", "Immobilier Marseille", "Livres & Divers", "Boulangerie"];
+      const categories = ["Smartphones", "Consoles & Tech", "Automobiles", "Écrans & TV", "Boucherie Halal", "Immobilier Marseille", "Livres & Divers", "Boulangerie"];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
       categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${cat === categorieActive ? 'active' : ''}`;
-        btn.innerText = cat;
+        btn.innerText = cat === "Automobiles" ? "🚗 Autos" : cat;
         btn.onclick = () => { categorieActive = cat; afficherOnglets(); afficherArticles(); };
         container.appendChild(btn);
       });
@@ -1012,8 +1002,9 @@
         document.getElementById('pinTitleModal').innerText = "Sécurité Réglages";
         document.getElementById('pinSubtitleModal').innerText = "Code administrateur requis";
       } else if (action === 'quiz_gain') {
-        document.getElementById('pinTitleModal').innerText = "Validation des Gains 🧠";
-        document.getElementById('pinSubtitleModal').innerText = `Créditer ${gainQuizSession} € sur quel compte ?`;
+        document.getElementById('pinTitleModal').innerText = "Validation du Bilan 🧠";
+        let textAction = gainQuizSession >= 0 ? `Créditer +${gainQuizSession} €` : `Débiter ${gainQuizSession} €`;
+        document.getElementById('pinSubtitleModal').innerText = `${textAction} sur quel compte ?`;
       }
 
       actionApresPin = action;
@@ -1079,187 +1070,166 @@
       }
     }
 
-    /* MODULE QUIZ - MATHS (SAISIE) ET FRANÇAIS/ANGLAIS (EXCLUSIVEMENT QCM) */
+    /* MODULE QUIZ MULTIPLICATIONS - 1000€ ET CHRONO DE 10S */
     function ouvrirQuiz() {
       gainQuizSession = 0;
-      document.getElementById('quizSessionScore').innerText = `Gagné : 0 €`;
+      erreursConsecutives = 0;
+      mettreAJourBadgeScore();
       document.getElementById('quizOverlay').classList.add('active');
-      changerModeQuiz('facile');
-    }
-
-    function fermerQuiz() {
-      document.getElementById('quizOverlay').classList.remove('active');
-    }
-
-    function changerModeQuiz(niveau) {
-      quizNiveau = niveau;
-      if (niveau === 'facile') { gainParReponse = 150; }
-      else if (niveau === 'intermédiaire') { gainParReponse = 300; }
-      else if (niveau === 'expert') { gainParReponse = 600; }
-
-      document.getElementById('modeBtnFacile').className = `quiz-mode-btn ${niveau === 'facile' ? 'active' : ''}`;
-      document.getElementById('modeBtnInter').className = `quiz-mode-btn ${niveau === 'intermédiaire' ? 'active' : ''}`;
-      document.getElementById('modeBtnExpert').className = `quiz-mode-btn ${niveau === 'expert' ? 'active' : ''}`;
       genererNouvelleQuestionQuiz();
     }
 
-    function genererNouvelleQuestionQuiz() {
-      const types = ['maths', 'anglais', 'francais'];
-      const typeChoisi = types[Math.floor(Math.random() * types.length)];
-      
-      const inputContainer = document.getElementById('quizInputContainer');
-      const optionsContainer = document.getElementById('quizOptionsContainer');
-      const inputField = document.getElementById('quizReponseInput');
-      inputField.value = "";
+    function fermerQuiz() {
+      clearInterval(intervalChrono);
+      document.getElementById('quizOverlay').classList.remove('active');
+    }
 
-      // 1. MATHÉMATIQUES (Saisie numérique libre)
-      if (typeChoisi === 'maths') {
-        document.getElementById('quizMatiere').innerText = "Mathématiques 📐";
-        let a, b, reponseExacte, enonce;
+    function relancerChrono() {
+      clearInterval(intervalChrono);
+      tempsRestant = 10;
+      mettreAJourAffichageChrono();
 
-        if (quizNiveau === 'facile') {
-          a = Math.floor(Math.random() * 10) + 1;
-          b = Math.floor(Math.random() * 10) + 1;
-          const isMult = Math.random() > 0.5;
-          reponseExacte = isMult ? (a * b) : (a + b);
-          enonce = `${a} ${isMult ? '×' : '+'} ${b} = ?`;
-        } else if (quizNiveau === 'intermédiaire') {
-          a = Math.floor(Math.random() * 40) + 10;
-          b = Math.floor(Math.random() * a) + 1;
-          const isSub = Math.random() > 0.5;
-          reponseExacte = isSub ? (a - b) : (a + b);
-          enonce = `${a} ${isSub ? '-' : '+'} ${b} = ?`;
-        } else {
-          a = Math.floor(Math.random() * 12) + 2;
-          b = Math.floor(Math.random() * 10) + 2;
-          const c = Math.floor(Math.random() * 15) + 1;
-          reponseExacte = (a * b) + c;
-          enonce = `(${a} × ${b}) + ${c} = ?`;
+      intervalChrono = setInterval(() => {
+        tempsRestant--;
+        mettreAJourAffichageChrono();
+
+        if (tempsRestant <= 0) {
+          clearInterval(intervalChrono);
+          traiterTempsEcouleQuiz();
         }
+      }, 1000);
+    }
 
-        document.getElementById('quizEnonce').innerText = enonce;
-        questionActiveCourante = { type: 'input', bonneReponse: reponseExacte.toString() };
-        
-        // Afficher uniquement le champ de texte
-        inputContainer.style.display = "block";
-        optionsContainer.style.display = "none";
-      } 
-      
-      // 2. ANGLAIS (Strictement en QCM)
-      else if (typeChoisi === 'anglais') {
-        document.getElementById('quizMatiere').innerText = "Anglais 🇬🇧 (QCM)";
-        const banque = (quizNiveau === 'expert') ? BANQUE_ANGLAIS_EXPERT : BANQUE_ANGLAIS_FACILE;
-        const itemCorrect = banque[Math.floor(Math.random() * banque.length)];
-        
-        document.getElementById('quizEnonce').innerText = `Que veut dire "${itemCorrect.en}" ?`;
-        questionActiveCourante = { type: 'qcm', bonneReponse: itemCorrect.fr };
-        
-        let options = [itemCorrect.fr];
-        while (options.length < 4 && options.length < banque.length) {
-          let randItem = banque[Math.floor(Math.random() * banque.length)].fr;
-          if (!options.includes(randItem)) options.push(randItem);
-        }
-        
-        afficherQCM(options);
-      } 
-      
-      // 3. FRANÇAIS / CONJUGAISON (Strictement en QCM)
-      else {
-        document.getElementById('quizMatiere').innerText = "Français - Conjugaison 🇫🇷 (QCM)";
-        const sujet = SUJETS_FRANCAIS[Math.floor(Math.random() * SUJETS_FRANCAIS.length)];
-        const verbeData = VERBES_DYNAMIQUES[Math.floor(Math.random() * VERBES_DYNAMIQUES.length)];
-        const bonneForme = verbeData.formes[sujet.index];
-
-        document.getElementById('quizEnonce').innerText = `${sujet.nom} (... ${verbeData.verbe} ...) au présent :`;
-        questionActiveCourante = { type: 'qcm', bonneReponse: bonneForme };
-
-        // Récupérer toutes les formes du verbe pour créer les pièges de conjugaison
-        let fauxChoix = verbeData.formes.filter(f => f !== bonneForme);
-        let options = [bonneForme];
-        
-        // Mélanger et compléter jusqu'à avoir 4 choix uniques
-        fauxChoix.sort(() => Math.random() - 0.5);
-        for (let i = 0; i < fauxChoix.length && options.length < 4; i++) {
-          if (!options.includes(fauxChoix[i])) options.push(fauxChoix[i]);
-        }
-
-        afficherQCM(options);
+    function mettreAJourAffichageChrono() {
+      const box = document.getElementById('quizTimerBox');
+      box.innerText = `⏳ ${tempsRestant}s`;
+      if (tempsRestant <= 3) {
+        box.className = "quiz-timer-box danger";
+      } else {
+        box.className = "quiz-timer-box";
       }
     }
 
-    function afficherQCM(optionsArray) {
-      const inputContainer = document.getElementById('quizInputContainer');
-      const optionsContainer = document.getElementById('quizOptionsContainer');
+    function traiterTempsEcouleQuiz() {
+      erreursConsecutives++;
+      let perte = (erreursConsecutives >= 3) ? 1000 : 500;
+      gainQuizSession -= perte;
 
-      // Masquer totalement le champ texte pour forcer le QCM
-      inputContainer.style.display = "none";
-      optionsContainer.style.display = "grid";
-      optionsContainer.innerHTML = "";
+      jouerSonErreur();
+      if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
 
-      const shuffled = [...optionsArray].sort(() => Math.random() - 0.5);
+      mettreAJourBadgeScore();
+      alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${perte} €`);
+      genererNouvelleQuestionQuiz();
+    }
 
-      shuffled.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = "quiz-option-btn";
-        btn.innerText = opt;
-        btn.onclick = () => verifierReponseDirecte(opt);
-        optionsContainer.appendChild(btn);
-      });
+    function mettreAJourBadgeScore() {
+      const badge = document.getElementById('quizSessionScore');
+      if (gainQuizSession >= 0) {
+        badge.className = "quiz-score-badge";
+        badge.innerText = `Bilan : +${gainQuizSession} €`;
+      } else {
+        badge.className = "quiz-score-badge negative";
+        badge.innerText = `Bilan : ${gainQuizSession} €`;
+      }
+
+      const streakInfo = document.getElementById('quizStreakInfo');
+      if (erreursConsecutives >= 2) {
+        streakInfo.innerText = `⚠️ Attention ! Prochaine erreur = -1000 € !`;
+      } else if (erreursConsecutives === 1) {
+        streakInfo.innerText = `⚠️ 1 erreur commise (-500 €)`;
+      } else {
+        streakInfo.innerText = ``;
+      }
+    }
+
+    function genererNouvelleQuestionQuiz() {
+      const inputField = document.getElementById('quizReponseInput');
+      inputField.value = "";
+      inputField.focus();
+
+      // Tirage aléatoire strict dans les tables de 1 à 10
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      const reponseExacte = a * b;
+
+      document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
+      questionActiveCourante = { bonneReponse: reponseExacte.toString() };
+
+      relancerChrono();
     }
 
     function verifierReponseQuiz() {
-      const val = document.getElementById('quizReponseInput').value.trim().toLowerCase();
+      clearInterval(intervalChrono); // Stopper le chrono
+      const inputField = document.getElementById('quizReponseInput');
+      const val = inputField.value.trim();
       if (!val) return;
-      verifierReponseDirecte(val);
-    }
 
-    function verifierReponseDirecte(reponseDonnee) {
-      const cleanReponse = reponseDonnee.toString().trim().toLowerCase();
-      const cleanBonne = questionActiveCourante.bonneReponse.toString().trim().toLowerCase();
-
-      if (cleanReponse === cleanBonne) {
-        gainQuizSession += gainParReponse;
-        document.getElementById('quizSessionScore').innerText = `Gagné : ${gainQuizSession} €`;
+      if (val === questionActiveCourante.bonneReponse) {
+        erreursConsecutives = 0;
+        gainQuizSession += gainParReponse; // +1000 €
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
-        alert(`Bonne réponse ! +${gainParReponse} € ajoutés 🎉`);
+        mettreAJourBadgeScore();
         genererNouvelleQuestionQuiz();
       } else {
+        erreursConsecutives++;
+        let perte = (erreursConsecutives >= 3) ? 1000 : 500;
+        gainQuizSession -= perte;
+        
         jouerSonErreur();
         if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
-        alert(`Oups ! La bonne réponse était : ${questionActiveCourante.bonneReponse}`);
+        
+        mettreAJourBadgeScore();
+        alert(`Faux ! La bonne réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${perte} €`);
         genererNouvelleQuestionQuiz();
       }
     }
 
+    document.getElementById('quizReponseInput').addEventListener('keyup', function(event) {
+      if (event.key === 'Enter') {
+        verifierReponseQuiz();
+      }
+    });
+
     function fermerQuizEtCrediter() {
       fermerQuiz();
-      if (gainQuizSession > 0) {
+      if (gainQuizSession !== 0) {
         demanderCodePin('quiz_gain');
       }
     }
 
     function crediterGainsQuizFirebase() {
       db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
-        let soldeActuel = snapshot.val() || 2000.00;
+        let soldeActuel = snapshot.val() !== null ? snapshot.val() : 2000.00;
         let nouveauSolde = Math.round((soldeActuel + gainQuizSession) * 100) / 100;
+        
+        if (nouveauSolde < 0) nouveauSolde = 0;
+
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
         const now = new Date();
         const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
+        let nomOp = gainQuizSession >= 0 ? "Gain Quiz Multiplications 🧠" : "Pénalité Quiz Multiplications 🧠";
+
         db.ref('tickets').push({
           codePin: lastPinValide,
           utilisateur: lastUserValide,
-          date: dateFormatee + " " + heureFormatee + " (Quiz 🧠)",
+          date: dateFormatee + " " + heureFormatee + " (Quiz)",
           timestamp: firebase.database.ServerValue.TIMESTAMP,
-          articles: [{ nom: "Gain Quiz & Exercices", prix: gainQuizSession }],
+          articles: [{ nom: nomOp, prix: gainQuizSession }],
           total: gainQuizSession
         });
 
-        alert(`Succès ! ${gainQuizSession} € ont été versés à ${lastUserValide}. Nouveau solde : ${nouveauSolde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`);
+        let msg = gainQuizSession >= 0 ? 
+          `Succès ! +${gainQuizSession} € ont été versés à ${lastUserValide}.` : 
+          `Bilan enregistré. ${gainQuizSession} € retenus sur le compte de ${lastUserValide}.`;
+
+        alert(`${msg}\nNouveau solde : ${nouveauSolde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €`);
         gainQuizSession = 0;
+        erreursConsecutives = 0;
       });
     }
 
@@ -1434,7 +1404,6 @@
             let nouveauSolde = Math.round((soldeDisponible - totalFinal) * 100) / 100;
             db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
             
-            // Enregistrement des acquisitions immobilières le cas échéant
             listeArticles.forEach(item => {
               if (item.immoKey) {
                 ajouterPossessionImmo(lastUserValide, item);
