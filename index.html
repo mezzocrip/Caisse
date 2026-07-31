@@ -36,12 +36,23 @@
     .caisse-container {
       background: white;
       border-radius: 20px;
-      padding: 20px;
+      padding: 20px 20px 35px 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 440px;
       text-align: center;
       position: relative;
+    }
+
+    /* Numéro de version en bas à droite */
+    .version-tag {
+      position: absolute;
+      bottom: 10px;
+      right: 15px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #a0aec0;
+      font-family: monospace;
     }
 
     .header-caisse {
@@ -567,7 +578,7 @@
       .caisse-container {
         max-width: 980px;
         max-height: 94vh;
-        padding: 15px 20px;
+        padding: 15px 20px 30px 20px;
         display: flex;
         flex-direction: column;
       }
@@ -591,7 +602,7 @@
     }
   </style>
 </head>
-<body>
+<body onload="initApp()">
 
   <div class="caisse-container">
     <div class="header-caisse">
@@ -635,6 +646,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Numéro de version du jeu -->
+    <div class="version-tag">v2.0.1</div>
   </div>
 
   <div class="pin-overlay" id="pinOverlay">
@@ -721,7 +735,8 @@
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
         <div id="quizInputContainer">
-          <input type="number" id="quizReponseInput" class="quiz-input" placeholder="Résultat ?" autofocus>
+          <!-- Clavier iOS forcé en numérique avec inputmode="numeric" pattern="[0-9]*" -->
+          <input type="number" inputmode="numeric" pattern="[0-9]*" id="quizReponseInput" class="quiz-input" placeholder="Résultat ?" autofocus>
           <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider</button>
         </div>
       </div>
@@ -802,7 +817,7 @@
           <div class="form-ajout-title">Inscrire un nouveau joueur (Départ: 20 000€)</div>
           <div class="item-editor">
             <input type="text" id="nouveauJoueurNom" class="nom-input" placeholder="Prénom du joueur">
-            <input type="number" id="nouveauJoueurPin" class="prix-input" placeholder="PIN (4 ch.)" maxlength="4">
+            <input type="number" inputmode="numeric" id="nouveauJoueurPin" class="prix-input" placeholder="PIN (4 ch.)" maxlength="4">
           </div>
           <button class="btn-ajouter-article" style="background:#2b6cb0;" onclick="ajouterNouveauJoueurSysteme()">+ Enregistrer le joueur</button>
         </div>
@@ -828,32 +843,15 @@
        MODULE 1 : ANTI-TRICHE ET BLOCAGE DEVTOOLS (CONSOLES)
        ======================================================= */
     (function antiTriche() {
-      // 1. Désactiver le clic droit
-      document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-      }, false);
+      document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
 
-      // 2. Bloquer les raccourcis clavier DevTools (F12, Ctrl+Shift+I, etc.)
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || e.keyCode === 123) {
-          e.preventDefault();
-          return false;
-        }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
-          e.preventDefault();
-          return false;
-        }
-        if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
-          e.preventDefault();
-          return false;
-        }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
-          e.preventDefault();
-          return false;
-        }
+        if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) { e.preventDefault(); return false; }
+        if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) { e.preventDefault(); return false; }
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); return false; }
       }, false);
 
-      // 3. Bloquer l'exécution si la console est ouverte (via debugger)
       setInterval(function() {
         const startTime = performance.now();
         debugger;
@@ -1080,12 +1078,8 @@
         }
       });
 
-      if (Object.keys(updatesBanque).length > 0) {
-        db.ref().update(updatesBanque);
-      }
-      if (Object.keys(updatesImmo).length > 0) {
-        db.ref().update(updatesImmo);
-      }
+      if (Object.keys(updatesBanque).length > 0) { db.ref().update(updatesBanque); }
+      if (Object.keys(updatesImmo).length > 0) { db.ref().update(updatesImmo); }
     }
 
     function ajouterPossessionImmo(user, item) {
@@ -1735,54 +1729,52 @@
       let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       totalFinal = Math.round(totalFinal * 100) / 100;
 
-      const overlay = document.getElementById('applePayOverlay');
-      document.getElementById('apTitleHeader').innerText = "Pay";
+      if (totalFinal <= 0) return;
+
+      const user = lastUserValide;
+      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+
+      if (soldeActuel < totalFinal) {
+        alert(`❌ Fonds insuffisants !\n${user} dispose de ${soldeActuel.toLocaleString('fr-FR')} € alors que le montant requis est de ${totalFinal.toLocaleString('fr-FR')} €.`);
+        return;
+      }
+
       document.getElementById('apAmountDisplay').innerText = totalFinal.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
-      const icon = document.getElementById('faceIdIcon');
-      icon.className = 'face-id-icon';
-      icon.innerText = '😃';
-      document.getElementById('apStatusText').innerText = 'Vérification du solde...';
-      document.getElementById('apUserDisplay').innerText = '';
+      document.getElementById('apUserDisplay').innerText = `Paiement pour : ${user}`;
+      document.getElementById('apUserDisplay').className = "ap-user";
+      document.getElementById('apStatusText').innerText = "Double-cliquez pour payer";
+      document.getElementById('faceIdIcon').innerHTML = "😃";
+      document.getElementById('faceIdIcon').className = "face-id-icon";
+
+      const overlay = document.getElementById('applePayOverlay');
       overlay.classList.add('active');
 
-      db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
-        let soldeDisponible = snapshot.val() !== null ? snapshot.val() : 20000.00;
-
+      setTimeout(() => {
+        document.getElementById('apStatusText').innerText = "Validation du paiement...";
         setTimeout(() => {
-          if (soldeDisponible >= totalFinal) {
-            let nouveauSolde = Math.round((soldeDisponible - totalFinal) * 100) / 100;
-            db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
-            
-            listeArticles.forEach(item => {
-              if (item.immoKey) {
-                ajouterPossessionImmo(lastUserValide, item);
-              }
-            });
+          let nouveauSolde = Math.round((soldeActuel - totalFinal) * 100) / 100;
+          db.ref(`banques/${user}`).set(nouveauSolde);
 
-            enregistrerTicketFirebase(lastPinValide, lastUserValide, [...listeArticles], totalFinal);
+          listeArticles.forEach(item => {
+            if (item.immoKey) {
+              ajouterPossessionImmo(user, item);
+            }
+          });
 
-            icon.className = 'face-id-icon success';
-            icon.innerText = '✓';
-            document.getElementById('apStatusText').innerText = 'Paiement accepté';
-            document.getElementById('apUserDisplay').innerText = 'Payé par ' + lastUserValide;
-            jouerSonValidation();
+          enregistrerTicketFirebase(lastPinValide, user, [...listeArticles], totalFinal);
 
-            setTimeout(() => { overlay.classList.remove('active'); reinitialiser(); }, 1600);
-          } else {
-            icon.className = 'face-id-icon error';
-            icon.innerText = '✕';
-            document.getElementById('apStatusText').innerText = 'Paiement Refusé !';
-            document.getElementById('apUserDisplay').className = 'ap-user error';
-            document.getElementById('apUserDisplay').innerText = `Solde insuffisant (${soldeDisponible.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €)`;
-            jouerSonErreur();
+          document.getElementById('faceIdIcon').innerHTML = "✓";
+          document.getElementById('faceIdIcon').className = "face-id-icon success";
+          document.getElementById('apStatusText').innerText = "Paiement Effectué !";
+          jouerSonValidation();
 
-            setTimeout(() => { overlay.classList.remove('active'); }, 2200);
-          }
-        }, 800);
-      });
+          setTimeout(() => {
+            overlay.classList.remove('active');
+            reinitialiser();
+          }, 1200);
+        }, 1000);
+      }, 800);
     }
-
-    initApp();
   </script>
 </body>
 </html>
