@@ -153,6 +153,7 @@
       padding-bottom: 6px;
       margin-bottom: 8px;
       scrollbar-width: none;
+      align-items: center;
     }
     .categories-tabs::-webkit-scrollbar, .prenoms-tabs::-webkit-scrollbar {
       display: none;
@@ -167,6 +168,7 @@
       font-weight: bold;
       white-space: nowrap;
       cursor: pointer;
+      flex-shrink: 0; /* Évite que les noms de joueurs ne rétrécissent */
     }
     .tab-btn.active {
       background: #3182ce;
@@ -342,7 +344,7 @@
     .solde-valeur { color: #38a169; font-size: 18px; font-family: monospace; }
     .immo-details { font-size: 11px; color: #718096; font-weight: normal; margin-top: 2px; }
 
-    /* MODAL HISTORIQUE DES TICKETS */
+    /* MODAL ACQUISITION DES TICKETS */
     .historique-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
@@ -548,7 +550,7 @@
       <h1>Marseille Monopoly 🎲</h1>
       <div class="header-actions">
         <button class="btn-icon" onclick="ouvrirBanque()" title="Solde des comptes">🏦</button>
-        <button class="btn-icon" onclick="ouvrirHistorique()" title="Historique des tickets">🧾</button>
+        <button class="btn-icon" onclick="ouvrirHistorique()" title="Acquisition">🧾</button>
         <button class="btn-icon" onclick="ouvrirReglagesProteges()" title="Réglages">⚙️</button>
       </div>
     </div>
@@ -659,14 +661,14 @@
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
-        <span class="quiz-title">Multiplications (5 à 20) 🧠</span>
+        <span class="quiz-title">Multiplications (3 à 10) 🧠</span>
         <span class="quiz-user-badge" id="quizUserBadge">Joueur</span>
       </div>
 
       <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
 
       <div class="quiz-question-box">
-        <div class="quiz-matiere">Tables de Multiplication de 5 à 20</div>
+        <div class="quiz-matiere">Tables de Multiplication de 3 à 10</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
@@ -695,7 +697,7 @@
   <div class="historique-overlay" id="historiqueOverlay">
     <div class="historique-card">
       <div class="reglages-header">
-        <span class="reglages-title">Historique 🧾</span>
+        <span class="reglages-title">Acquisition 🧾</span>
         <button class="btn-close" onclick="fermerHistorique()">✕</button>
       </div>
 
@@ -738,7 +740,6 @@
               <option value="Automobiles">Automobiles & Véhicules</option>
               <option value="Écrans & TV">Écrans & TV</option>
               <option value="Immobilier Marseille">Immobilier Marseille</option>
-              <option value="Livres & Divers">Livres & Divers</option>
             </select>
           </div>
           <button class="btn-ajouter-article" onclick="ajouterNouvelArticleSysteme()">+ Ajouter au catalogue</button>
@@ -873,9 +874,7 @@
       { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 Marseille (Piscine & Jardin - 8ème)", prix: 1250000.00 },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
       { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
-      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (+10 000€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 },
-
-      { id: 601, cat: "Livres & Divers", emoji: "📚", nom: "Livre d'Hiver (Roman / Poésie)", prix: 19.90 }
+      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (+10 000€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 }
     ];
 
     let categorieActive = "Smartphones";
@@ -1017,7 +1016,7 @@
     }
 
     function afficherOnglets() {
-      const categories = ["Smartphones", "Consoles & Tech", "Automobiles", "Écrans & TV", "Immobilier Marseille", "Livres & Divers"];
+      const categories = ["Smartphones", "Consoles & Tech", "Automobiles", "Écrans & TV", "Immobilier Marseille"];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
       categories.forEach(cat => {
@@ -1150,7 +1149,7 @@
       }
     }
 
-    /* MODULE QUIZ MULTIPLICATIONS DE 5 A 20 */
+    /* MODULE QUIZ MULTIPLICATIONS DE 3 A 10 */
     function ouvrirSelectionNiveauQuiz() {
       document.getElementById('quizLevelOverlay').classList.add('active');
     }
@@ -1228,14 +1227,14 @@
       genererNouvelleQuestionQuiz();
     }
 
-    /* FIX SPECIFIQUE: TABLES DE 5 A 20 EN RANDOM */
+    /* TABLES DE 3 A 10 EN RANDOM */
     function genererNouvelleQuestionQuiz() {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value = "";
       inputField.focus();
 
-      const a = Math.floor(Math.random() * 16) + 5; // Nombre entre 5 et 20
-      const b = Math.floor(Math.random() * 16) + 5; // Nombre entre 5 et 20
+      const a = Math.floor(Math.random() * 8) + 3; // Nombre entre 3 et 10
+      const b = Math.floor(Math.random() * 8) + 3; // Nombre entre 3 et 10
       const reponseExacte = a * b;
 
       document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
@@ -1336,7 +1335,7 @@
       });
     }
 
-    /* FIX CLARTÉ & LISIBILITÉ NOM JOUEUR DANS TICKETS */
+    /* LISIBILITÉ NOM JOUEUR DANS TICKETS ACQUISITION */
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
       if (!container) return;
@@ -1348,7 +1347,7 @@
       }
 
       if (ticketsAffiches.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color:#a0aec0; margin-top:20px;">Aucun ticket pour ${filtrePrenomActif}.</div>`;
+        container.innerHTML = `<div style="text-align:center; color:#a0aec0; margin-top:20px;">Aucune acquisition enregistrée pour ${filtrePrenomActif}.</div>`;
         return;
       }
 
