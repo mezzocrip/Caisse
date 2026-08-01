@@ -396,7 +396,44 @@
     .btn-pin.btn-cancel { font-size: 14px; color: #ff453a; background: transparent; font-weight: bold; }
     .btn-pin.btn-del { font-size: 20px; color: #8e8e93; background: transparent; }
 
-    /* NOUVEAU DESIGN CLASSEMENT BANQUE ET ACQUISITION */
+    /* DESIGN DU PAVÉ NUMÉRIQUE INTÉGRÉ AU QUIZ */
+    .quiz-numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn-num {
+      background: #202b38;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px 0;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      touch-action: manipulation;
+      transition: background 0.1s;
+    }
+    .btn-num:active {
+      background: #3182ce;
+      color: white;
+    }
+    .btn-num.btn-num-del {
+      background: #2d3748;
+      color: #cbd5e0;
+    }
+    .btn-num.btn-num-quit {
+      background: #450a0a;
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* CLASSEMENT BANQUE ET ACQUISITION */
     .dark-card-item {
       display: flex;
       justify-content: space-between;
@@ -491,18 +528,16 @@
     .level-desc { font-size: 12px; opacity: 0.85; }
 
     .quiz-card { text-align: center; }
-    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .quiz-title { font-size: 17px; font-weight: bold; color: #ffffff; }
     .quiz-user-badge { background: #3182ce; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
-    .quiz-timer-box { font-size: 15px; font-weight: bold; color: #f97316; background: #431407; padding: 6px 14px; border-radius: 18px; display: inline-block; margin-bottom: 10px; }
+    .quiz-timer-box { font-size: 15px; font-weight: bold; color: #f97316; background: #431407; padding: 4px 14px; border-radius: 18px; display: inline-block; margin-bottom: 8px; }
     .quiz-timer-box.danger { color: #ef4444; background: #450a0a; animation: pulse 0.5s infinite alternate; }
-    .quiz-question-box { background: #1a222d; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
-    .quiz-matiere { font-size: 11px; text-transform: uppercase; color: #a0aec0; font-weight: bold; margin-bottom: 4px; }
-    .quiz-enonce { font-size: 32px; font-weight: bold; color: #ffffff; margin-bottom: 10px; }
-    .quiz-reward-info { font-size: 12px; color: #38ef7d; font-weight: bold; margin-bottom: 8px; }
-    .quiz-input { width: 100%; padding: 12px; font-size: 22px; border: 2px solid #4a5568; background: #0d1117; color: white; border-radius: 12px; text-align: center; margin-bottom: 10px; }
-    .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 12px; padding: 12px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; min-height: 48px; }
-    .quiz-quit-btn { background: #1a222d; color: #ef4444; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; min-height: 44px; }
+    .quiz-question-box { background: #1a222d; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; margin-bottom: 8px; }
+    .quiz-matiere { font-size: 11px; text-transform: uppercase; color: #a0aec0; font-weight: bold; margin-bottom: 2px; }
+    .quiz-enonce { font-size: 32px; font-weight: bold; color: #ffffff; margin-bottom: 6px; }
+    .quiz-reward-info { font-size: 12px; color: #38ef7d; font-weight: bold; margin-bottom: 6px; }
+    .quiz-input { width: 100%; padding: 10px; font-size: 24px; font-weight: bold; border: 2px solid #4a5568; background: #0d1117; color: #38ef7d; border-radius: 12px; text-align: center; margin-bottom: 4px; pointer-events: none; }
 
     .apple-pay-card { background: #1c1c1e; width: 100%; max-width: 440px; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; color: white; text-align: center; }
     .ap-amount { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
@@ -563,7 +598,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v2.1.0</div>
+    <div class="version-tag">v2.2.0</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -635,7 +670,7 @@
     </div>
   </div>
 
-  <!-- MODAL QUIZ EN JEU -->
+  <!-- MODAL QUIZ EN JEU AVEC PAVÉ NUMÉRIQUE INTÉGRÉ -->
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
@@ -650,13 +685,23 @@
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
-        <div id="quizInputContainer">
-          <input type="number" inputmode="numeric" pattern="[0-9]*" id="quizReponseInput" class="quiz-input" placeholder="Résultat ?" autofocus>
-          <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider</button>
+        <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" readonly>
+
+        <div class="quiz-numpad">
+          <button class="btn-num" onclick="taperQuizChiffre('1')">1</button>
+          <button class="btn-num" onclick="taperQuizChiffre('2')">2</button>
+          <button class="btn-num" onclick="taperQuizChiffre('3')">3</button>
+          <button class="btn-num" onclick="taperQuizChiffre('4')">4</button>
+          <button class="btn-num" onclick="taperQuizChiffre('5')">5</button>
+          <button class="btn-num" onclick="taperQuizChiffre('6')">6</button>
+          <button class="btn-num" onclick="taperQuizChiffre('7')">7</button>
+          <button class="btn-num" onclick="taperQuizChiffre('8')">8</button>
+          <button class="btn-num" onclick="taperQuizChiffre('9')">9</button>
+          <button class="btn-num btn-num-quit" onclick="quitterQuizManuel()">Quitter</button>
+          <button class="btn-num" onclick="taperQuizChiffre('0')">0</button>
+          <button class="btn-num btn-num-del" onclick="effacerQuizChiffre()">⌫</button>
         </div>
       </div>
-
-      <button class="quiz-quit-btn" onclick="quitterQuizManuel()">Quitter le jeu</button>
     </div>
   </div>
 
@@ -1247,7 +1292,6 @@
     function genererNouvelleQuestionQuiz() {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value = "";
-      inputField.focus();
 
       const a = Math.floor(Math.random() * 8) + 3;
       const b = Math.floor(Math.random() * 8) + 3;
@@ -1258,31 +1302,47 @@
       relancerChrono();
     }
 
-    function verifierReponseQuiz() {
-      clearInterval(intervalChrono);
+    /* GESTION Saisie PAVÉ NUMÉRIQUE & VALIDATION AUTOMATIQUE */
+    function taperQuizChiffre(chiffre) {
+      const inputField = document.getElementById('quizReponseInput');
+      inputField.value += chiffre;
+      verifierReponseAutomatiqueQuiz();
+    }
+
+    function effacerQuizChiffre() {
+      const inputField = document.getElementById('quizReponseInput');
+      inputField.value = inputField.value.slice(0, -1);
+    }
+
+    function verifierReponseAutomatiqueQuiz() {
       const inputField = document.getElementById('quizReponseInput');
       const val = inputField.value.trim();
-      if (!val) { relancerChrono(); return; }
+      const bonne = questionActiveCourante.bonneReponse;
 
-      questionsJoueesDansSession++;
+      if (!val) return;
 
-      if (val === questionActiveCourante.bonneReponse) {
+      // 1. Validation automatique instantanée si la réponse est exacte
+      if (val === bonne) {
+        clearInterval(intervalChrono);
+        questionsJoueesDansSession++;
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
         appliquerMouvementSoldeFirebase(gainParQuestion, `Quiz (${niveauQuizActif}) - Bonne réponse`);
         genererNouvelleQuestionQuiz();
-      } else {
+        return;
+      }
+
+      // 2. Si le nombre de chiffres tape atteint ou dépasse la longueur de la réponse sans matcher => Erreur
+      if (val.length >= bonne.length) {
+        clearInterval(intervalChrono);
+        questionsJoueesDansSession++;
         jouerSonErreur();
         if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
         appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Erreur`);
-        alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
+        alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
         genererNouvelleQuestionQuiz();
       }
     }
-
-    document.getElementById('quizReponseInput').addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') { verifierReponseQuiz(); }
-    });
 
     function appliquerMouvementSoldeFirebase(montant, motif) {
       if (!lastUserValide) return;
