@@ -1393,6 +1393,15 @@
       if (!container) return;
       container.innerHTML = "";
 
+      // Liste des noms exacts du catalogue de base (avec et sans emoji)
+      const nomCatalogueExacts = baseArticles.map(a => a.nom);
+      const nomCatalogueAvecEmoji = baseArticles.map(a => `${a.emoji} ${a.nom}`);
+
+      function estDansCatalogue(nomArticle) {
+        if (!nomArticle) return false;
+        return nomCatalogueExacts.includes(nomArticle) || nomCatalogueAvecEmoji.includes(nomArticle);
+      }
+
       if (!joueurSelectionneVueDetail) {
         if (titleElement) titleElement.innerText = "Classement Général 🧾";
 
@@ -1411,7 +1420,8 @@
           ticketsJoueur.forEach(ticket => {
             if (ticket.articles && Array.isArray(ticket.articles)) {
               ticket.articles.forEach(art => {
-                if (art.prix > 0 && !art.nom.toLowerCase().includes('multiplications') && !art.nom.toLowerCase().includes('pénalité')) {
+                // RÈGLE : Biens achetés uniquement issus du catalogue
+                if (art.prix > 0 && estDansCatalogue(art.nom)) {
                   totalValeurAchats += art.prix;
                 }
               });
@@ -1470,7 +1480,8 @@
         ticketsJoueur.forEach(ticket => {
           if (ticket.articles && Array.isArray(ticket.articles)) {
             ticket.articles.forEach(art => {
-              if (art.prix > 0 && !art.nom.toLowerCase().includes('multiplications') && !art.nom.toLowerCase().includes('pénalité')) {
+              // RÈGLE : Biens achetés uniquement issus du catalogue
+              if (art.prix > 0 && estDansCatalogue(art.nom)) {
                 totalValeurAchats += art.prix;
                 if (!mapPossessions[art.nom]) { mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix }; }
                 mapPossessions[art.nom].quantite += 1;
@@ -1502,7 +1513,7 @@
 
         let keysPossessions = Object.keys(mapPossessions);
         if (keysPossessions.length === 0) {
-          container.innerHTML += '<div style="color:#8b98a5; font-size: 12px; margin-bottom: 15px;">Aucune possession pour le moment.</div>';
+          container.innerHTML += '<div style="color:#8b98a5; font-size: 12px; margin-bottom: 15px;">Aucune possession du catalogue pour le moment.</div>';
         } else {
           keysPossessions.forEach(nomItem => {
             let itemData = mapPossessions[nomItem];
