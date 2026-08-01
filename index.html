@@ -460,18 +460,6 @@
       font-weight: bold; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-family: monospace;
     }
 
-    .ticket-paper {
-      background: #fffdf9; border: 1px solid #cbd5e0; border-radius: 14px;
-      padding: 14px; font-family: 'Courier New', Courier, monospace; color: #000; margin-bottom: 12px;
-    }
-    .ticket-paper-header { text-align: center; border-bottom: 1px dashed #a0aec0; padding-bottom: 8px; margin-bottom: 8px; }
-    .ticket-paper-title { font-weight: 900; font-size: 15px; color: #000; }
-    .ticket-paper-user { font-size: 13px; font-weight: 800; color: #1a202c; background: #edf2f7; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
-    .ticket-paper-meta { font-size: 11px; color: #4a5568; margin-top: 3px; }
-    .ticket-paper-items { font-size: 12px; margin-bottom: 8px; }
-    .ticket-paper-row { display: flex; justify-content: space-between; margin-bottom: 3px; color: #2d3748; }
-    .ticket-paper-total { border-top: 1px dashed #a0aec0; display: flex; justify-content: space-between; font-weight: 900; font-size: 14px; color: #000; margin-top: 6px; padding-top: 6px; }
-
     .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .reglages-title { font-size: 18px; font-weight: 800; color: #ffffff; }
     .btn-close { background: #1a222d; border: none; color: #a0aec0; border-radius: 50%; width: 36px; height: 36px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -1500,7 +1488,7 @@
         fortuneCard.innerHTML = `
           <div>
             <div class="dark-card-name" style="font-size:16px;">Fortune Globale ${estJoueurProtege(nomClient) ? '⭐' : ''}</div>
-            <div class="dark-card-sub">💵 Banque: ${soldeBanque.toLocaleString('fr-FR')} € | 📦 biens: ${totalValeurAchats.toLocaleString('fr-FR')} €</div>
+            <div class="dark-card-sub">💵 Banque: ${soldeBanque.toLocaleString('fr-FR')} € | 📦 Biens: ${totalValeurAchats.toLocaleString('fr-FR')} €</div>
           </div>
           <div class="dark-card-amount" style="font-size:20px;">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
         `;
@@ -1525,36 +1513,6 @@
               <span class="possession-badge-green">${(itemData.quantite * itemData.prixUnitaire).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span>
             `;
             container.appendChild(divPill);
-          });
-        }
-
-        const tickTitle = document.createElement('div');
-        tickTitle.className = 'section-title';
-        tickTitle.style.marginTop = '15px';
-        tickTitle.innerText = "Historique des Transactions";
-        container.appendChild(tickTitle);
-
-        if (ticketsJoueur.length === 0) {
-          container.innerHTML += '<div style="color:#8b98a5; font-size: 12px;">Aucun bon de transaction.</div>';
-        } else {
-          ticketsJoueur.forEach(ticket => {
-            const card = document.createElement('div');
-            card.className = 'ticket-paper';
-            let itemsHtml = "";
-            ticket.articles.forEach(art => {
-              itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>`;
-            });
-
-            card.innerHTML = `
-              <div class="ticket-paper-header">
-                <div class="ticket-paper-title">MARSEILLE MONOPOLY</div>
-                <div class="ticket-paper-user">👤 Joueur : ${nomClient}</div>
-                <div class="ticket-paper-meta">📅 ${ticket.date}</div>
-              </div>
-              <div class="ticket-paper-items">${itemsHtml}</div>
-              <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>
-            `;
-            container.appendChild(card);
           });
         }
       }
