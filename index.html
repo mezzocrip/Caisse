@@ -422,50 +422,6 @@
     .btn-num.btn-num-del { background: #2d3748; color: #cbd5e0; }
     .btn-num.btn-num-quit { background: #450a0a; color: #fca5a5; font-size: 12px; font-weight: bold; }
 
-    /* GRILLE DE QCM POUR CULTURE GÉNÉRALE */
-    .quiz-qcm-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .btn-qcm {
-      background: #202b38;
-      color: #ffffff;
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      touch-action: manipulation;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-qcm:active { background: #3182ce; border-color: #63b3ed; }
-    .qcm-badge {
-      background: rgba(255, 255, 255, 0.1);
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      display: flex; justify-content: center; align-items: center;
-      font-size: 12px; font-weight: bold; flex-shrink: 0;
-    }
-    .btn-qcm-quit {
-      background: #450a0a;
-      color: #fca5a5;
-      border: 1px solid #7f1d1d;
-      border-radius: 14px;
-      padding: 12px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
-      margin-top: 4px;
-    }
-
     /* CLASSEMENT BANQUE ET ACQUISITION */
     .dark-card-item {
       display: flex;
@@ -607,12 +563,12 @@
     <div class="actions-section">
       <div class="actions-grid">
         <button class="btn-validation" onclick="demanderCodePin('paiement')">Payer</button>
-        <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Quiz 🧠</button>
+        <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Multiplications 🧮</button>
       </div>
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v2.4.0 (Bonus Enfants Active)</div>
+    <div class="version-tag">v2.5.0 (Maths Uniquement)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -653,7 +609,7 @@
   <!-- SELECTION NIVEAU QUIZ -->
   <div class="quiz-level-overlay" id="quizLevelOverlay">
     <div class="level-card">
-      <div class="level-title">Niveau de difficulté 🧠</div>
+      <div class="level-title">Niveau de difficulté 🧮</div>
       <div class="level-subtitle">Choisissez votre vitesse et vos gains</div>
 
       <div class="level-btn-group">
@@ -688,19 +644,19 @@
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
-        <span class="quiz-title" id="quizHeaderTitle">Quiz 🧠</span>
+        <span class="quiz-title" id="quizHeaderTitle">Calcul Mental 🧮</span>
         <span class="quiz-user-badge" id="quizUserBadge">Joueur</span>
       </div>
 
       <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
 
       <div class="quiz-question-box">
-        <div class="quiz-matiere" id="quizMatiere">Matière</div>
+        <div class="quiz-matiere" id="quizMatiere">Multiplications (3 à 10)</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
         <!-- VUE PAVÉ NUMÉRIQUE (MATHS) -->
-        <div id="vueQuizMaths" style="display: none;">
+        <div id="vueQuizMaths">
           <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" readonly>
           <div class="quiz-numpad">
             <button class="btn-num" onclick="taperQuizChiffre('1')">1</button>
@@ -716,12 +672,6 @@
             <button class="btn-num" onclick="taperQuizChiffre('0')">0</button>
             <button class="btn-num btn-num-del" onclick="effacerQuizChiffre()">⌫</button>
           </div>
-        </div>
-
-        <!-- VUE QCM (CULTURE GÉNÉRALE) -->
-        <div id="vueQuizQCM" style="display: none;">
-          <div class="quiz-qcm-grid" id="qcmButtonsContainer"></div>
-          <button class="btn-qcm-quit" onclick="quitterQuizManuel()">Quitter le Quiz</button>
         </div>
 
       </div>
@@ -867,7 +817,7 @@
       "1806": "Joyce"
     };
 
-    // VÉRIFICATION DES JOUEURS PROTEGES (TERRANCE ET JOYCE)
+    // VÉRIFICATION DES JOUEURS PROTÉGÉS (TERRANCE ET JOYCE)
     function estJoueurProtege(nom) {
       if (!nom) return false;
       const n = nom.trim().toLowerCase();
@@ -891,20 +841,6 @@
     let comptesComplets = {};
     let possessionsImmo = {};
     let joueurSelectionneVueDetail = null;
-
-    // BANQUE DE QUESTIONS CULTURE GÉNÉRALE POUR LE MODE QCM
-    const QUESTIONS_CULTURE_QCM = [
-      { q: "Quelle est la capitale de la France ?", rep: "Paris", faux: ["Marseille", "Lyon", "Nice"] },
-      { q: "Combien de départements y a-t-il en France métropolitaine ?", rep: "96", faux: ["100", "95", "89"] },
-      { q: "Quel est le plus grand océan du monde ?", rep: "Océan Pacifique", faux: ["Océan Atlantique", "Océan Indien", "Océan Arctique"] },
-      { q: "En quelle année a eu lieu la Révolution française ?", rep: "1789", faux: ["1799", "1815", "1776"] },
-      { q: "Quel fleuve traverse Marseille ?", rep: "Aucun fleuve (l'Huveaune est un fleuve côtière)", faux: ["Le Rhône", "La Seine", "La Garonne"] },
-      { q: "Quel est le surnom de la ville de Marseille ?", rep: "La Cité Phocéenne", faux: ["La Ville Rose", "La Cité des Papes", "La Belle Endormie"] },
-      { q: "Combien de champions du monde compte l'équipe de France de football ?", rep: "2", faux: ["1", "3", "4"] },
-      { q: "Quel monument surplombe la ville de Marseille ?", rep: "Notre-Dame de la Garde", faux: ["Le Sacré-Cœur", "La Tour Eiffel", "Le Mont-Saint-Michel"] },
-      { q: "Quel est le métal précieux dont le symbole chimique est Au ?", rep: "L'Or", faux: ["L'Argent", "Le Cuivre", "Le Fer"] },
-      { q: "Combien de minutes y a-t-il dans une heure ?", rep: "60", faux: ["100", "50", "90"] }
-    ];
 
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
@@ -1167,7 +1103,7 @@
         document.getElementById('pinTitleModal').innerText = "Sécurité Réglages";
         document.getElementById('pinSubtitleModal').innerText = "Code administrateur requis";
       } else if (action === 'quiz_login') {
-        document.getElementById('pinTitleModal').innerText = "Connexion Quiz 🧠";
+        document.getElementById('pinTitleModal').innerText = "Connexion Multiplications 🧮";
         document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour jouer";
       }
 
@@ -1239,7 +1175,6 @@
       let user = lastUserValide;
       let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
 
-      // MODIFICATION : Vérification du solde pour TOUS les joueurs (y compris Terrance et Joyce)
       if (soldeActuel < totalPaye) {
         alert(`Fonds insuffisants pour ${user} ! Solde actuel : ${soldeActuel.toLocaleString('fr-FR')} €`);
         return;
@@ -1296,8 +1231,8 @@
     function quitterQuizManuel() {
       if (questionsJoueesDansSession === 0) {
         if (!estJoueurProtege(lastUserValide)) {
-          appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Quiz Instantané ⚠️");
-          alert(`⚠️ ABANDON IMMÉDIAT !\nVous n'avez répondu à aucune question.\nPénalité de -10 000 € appliquée à ${lastUserValide}.`);
+          appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Instantané ⚠️");
+          alert(`⚠️ ABANDON IMMÉDIAT !\nVous n'avez répondu à aucun calcul.\nPénalité de -10 000 € appliquée à ${lastUserValide}.`);
         } else {
           alert(`👑 ABANDON IMMÉDIAT !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
         }
@@ -1312,6 +1247,15 @@
 
     function relancerChrono() {
       clearInterval(intervalChrono);
+
+      // PAS DE CHRONO NI LIMITE DE TEMPS POUR TERRANCE ET JOYCE
+      if (estJoueurProtege(lastUserValide)) {
+        const box = document.getElementById('quizTimerBox');
+        box.innerText = "♾️ Pas de limite";
+        box.className = "quiz-timer-box";
+        return;
+      }
+
       tempsRestant = chronoMaxParQuestion;
       mettreAJourAffichageChrono();
 
@@ -1339,63 +1283,28 @@
       if (estJoueurProtege(lastUserValide)) {
         alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
       } else {
-        appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Temps écoulé`);
+        appliquerMouvementSoldeFirebase(-gainParQuestion, `Multiplications (${niveauQuizActif}) - Temps écoulé`);
         alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
       }
       genererNouvelleQuestionQuiz();
     }
 
-    /* GESTION ALTERNÉE MATHS (PAVÉ) & CULTURE GÉNÉRALE (QCM) */
+    /* GESTION EXCLUSIVE DU CALCUL MENTAL (MULTIPLICATIONS) */
     function genererNouvelleQuestionQuiz() {
-      const estMaths = Math.random() < 0.5;
+      document.getElementById('quizHeaderTitle').innerText = "Calcul Mental 🧮";
+      document.getElementById('quizMatiere').innerText = "Multiplications (3 à 10)";
 
-      const vueMaths = document.getElementById('vueQuizMaths');
-      const vueQCM = document.getElementById('vueQuizQCM');
+      document.getElementById('quizReponseInput').value = "";
+      const a = Math.floor(Math.random() * 8) + 3;
+      const b = Math.floor(Math.random() * 8) + 3;
 
-      if (estMaths) {
-        vueMaths.style.display = "block";
-        vueQCM.style.display = "none";
-        document.getElementById('quizHeaderTitle').innerText = "Calcul Mental 🧮";
-        document.getElementById('quizMatiere').innerText = "Multiplications (3 à 10)";
-
-        document.getElementById('quizReponseInput').value = "";
-        const a = Math.floor(Math.random() * 8) + 3;
-        const b = Math.floor(Math.random() * 8) + 3;
-
-        document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
-        questionActiveCourante = { type: 'maths', bonneReponse: (a * b).toString() };
-
-      } else {
-        vueMaths.style.display = "none";
-        vueQCM.style.display = "block";
-        document.getElementById('quizHeaderTitle').innerText = "Culture Générale 💡";
-        document.getElementById('quizMatiere').innerText = "QCM - Choisissez la bonne réponse";
-
-        const itemQcm = QUESTIONS_CULTURE_QCM[Math.floor(Math.random() * QUESTIONS_CULTURE_QCM.length)];
-        document.getElementById('quizEnonce').innerText = itemQcm.q;
-
-        let options = [itemQcm.rep, ...itemQcm.faux];
-        options.sort(() => Math.random() - 0.5);
-
-        questionActiveCourante = { type: 'qcm', bonneReponse: itemQcm.rep };
-
-        const containerQCM = document.getElementById('qcmButtonsContainer');
-        containerQCM.innerHTML = "";
-
-        const lettres = ["A", "B", "C", "D"];
-        options.forEach((optText, idx) => {
-          const btn = document.createElement('button');
-          btn.className = "btn-qcm";
-          btn.onclick = () => validerChoixQcm(optText);
-          btn.innerHTML = `<span class="qcm-badge">${lettres[idx]}</span> <span>${optText}</span>`;
-          containerQCM.appendChild(btn);
-        });
-      }
+      document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
+      questionActiveCourante = { type: 'maths', bonneReponse: (a * b).toString() };
 
       relancerChrono();
     }
 
-    /* VÉRIFICATION PAVÉ NUMÉRIQUE (MATHS) */
+    /* VÉRIFICATION PAVÉ NUMÉRIQUE */
     function taperQuizChiffre(chiffre) {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value += chiffre;
@@ -1419,7 +1328,7 @@
         questionsJoueesDansSession++;
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
-        appliquerMouvementSoldeFirebase(gainParQuestion, `Quiz (${niveauQuizActif}) - Bonne réponse`);
+        appliquerMouvementSoldeFirebase(gainParQuestion, `Multiplications (${niveauQuizActif}) - Bonne réponse`);
         genererNouvelleQuestionQuiz();
         return;
       }
@@ -1433,41 +1342,16 @@
         if (estJoueurProtege(lastUserValide)) {
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
         } else {
-          appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Erreur`);
+          appliquerMouvementSoldeFirebase(-gainParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
         }
         genererNouvelleQuestionQuiz();
       }
     }
 
-    /* VÉRIFICATION QCM (CULTURE GÉNÉRALE) */
-    function validerChoixQcm(choixJoueur) {
-      clearInterval(intervalChrono);
-      questionsJoueesDansSession++;
-
-      if (choixJoueur === questionActiveCourante.bonneReponse) {
-        jouerSonValidation();
-        if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
-        appliquerMouvementSoldeFirebase(gainParQuestion, `Quiz (${niveauQuizActif}) - Bonne réponse`);
-      } else {
-        jouerSonErreur();
-        if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
-        
-        if (estJoueurProtege(lastUserValide)) {
-          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
-        } else {
-          appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Erreur QCM`);
-          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
-        }
-      }
-
-      genererNouvelleQuestionQuiz();
-    }
-
     function appliquerMouvementSoldeFirebase(montant, motif) {
       if (!lastUserValide) return;
 
-      // SÉCURITÉ : Ne jamais retirer de l'argent aux enfants (montant négatif bloqué)
       if (montant < 0 && estJoueurProtege(lastUserValide)) {
         return;
       }
@@ -1539,7 +1423,7 @@
           ticketsJoueur.forEach(ticket => {
             if (ticket.articles && Array.isArray(ticket.articles)) {
               ticket.articles.forEach(art => {
-                if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
+                if (art.prix > 0 && !art.nom.toLowerCase().includes('multiplications') && !art.nom.toLowerCase().includes('pénalité')) {
                   totalValeurAchats += art.prix;
                 }
               });
@@ -1598,7 +1482,7 @@
         ticketsJoueur.forEach(ticket => {
           if (ticket.articles && Array.isArray(ticket.articles)) {
             ticket.articles.forEach(art => {
-              if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
+              if (art.prix > 0 && !art.nom.toLowerCase().includes('multiplications') && !art.nom.toLowerCase().includes('pénalité')) {
                 totalValeurAchats += art.prix;
                 if (!mapPossessions[art.nom]) { mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix }; }
                 mapPossessions[art.nom].quantite += 1;
@@ -1686,6 +1570,7 @@
 
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
     function ouvrirEcranReglages() { changerOngletReglages('articles'); document.getElementById('reglagesOverlay').classList.add('active'); }
+    function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
     function changerOngletReglages(type) {
       if (type === 'articles') {
@@ -1712,39 +1597,36 @@
         div.innerHTML = `
           <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticle(${index}, 'emoji', this.value)">
           <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticle(${index}, 'nom', this.value)">
-          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticle(${index}, 'prix', parseFloat(this.value))">
-          <button style="background:#fed7d7; color:#9b2c2c; border:none; border-radius:8px; padding:8px;" onclick="supprimerArticleCatalogue(${index})">🗑️</button>
+          <input type="number" class="prix-input" value="${item.prix}" step="0.01" onchange="modifierArticle(${index}, 'prix', this.value)">
+          <button style="background:#fed7d7; color:#9b2c2c; border:none; border-radius:8px; padding:8px 12px; font-weight:bold; cursor:pointer;" onclick="supprimerArticleSysteme(${index})">✕</button>
         `;
         listContainer.appendChild(div);
       });
     }
 
     function modifierArticle(index, champ, valeur) {
-      baseArticles[index][champ] = valeur;
+      if (champ === 'prix') baseArticles[index][champ] = parseFloat(valeur) || 0;
+      else baseArticles[index][champ] = valeur;
       afficherArticles();
     }
 
-    function supprimerArticleCatalogue(index) {
+    function supprimerArticleSysteme(index) {
       baseArticles.splice(index, 1);
       chargerReglagesArticles();
       afficherArticles();
     }
 
     function ajouterNouvelArticleSysteme() {
-      const emoji = document.getElementById('nouveauEmoji').value || "📦";
+      const emoji = document.getElementById('nouveauEmoji').value || '📦';
       const nom = document.getElementById('nouveauNom').value;
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
 
-      if (!nom || isNaN(prix)) {
-        alert("Veuillez remplir correctement le nom et le prix.");
-        return;
-      }
+      if (!nom || isNaN(prix)) { alert("Veuillez remplir le nom et le prix."); return; }
 
       baseArticles.push({ id: Date.now(), cat: cat, emoji: emoji, nom: nom, prix: prix });
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
-      
       chargerReglagesArticles();
       afficherArticles();
     }
@@ -1757,50 +1639,44 @@
         const div = document.createElement('div');
         div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" class="prix-input" value="${pin}" readonly style="background:#2d3748; color:#a0aec0;">
-          <input type="text" class="nom-input" value="${prenom}" readonly style="background:#2d3748; color:#ffffff;">
+          <input type="text" class="nom-input" value="${prenom}" readonly style="background:#2d3748; color:white;">
+          <input type="text" class="prix-input" value="PIN: ${pin}" readonly style="background:#2d3748; color:#38ef7d; text-align:center;">
         `;
         listContainer.appendChild(div);
       });
     }
 
-    async function ajouterNouveauJoueurSysteme() {
+    function ajouterNouveauJoueurSysteme() {
       const nom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
 
-      if (!nom || pin.length !== 4) {
-        alert("Veuillez saisir un prénom et un code PIN à 4 chiffres.");
+      if (!nom || pin.length !== 4 || isNaN(pin)) {
+        alert("Veuillez saisir un prénom valide et un code PIN à 4 chiffres.");
         return;
       }
 
       USERS_MAP[pin] = nom;
-      await db.ref('utilisateurs').set(USERS_MAP);
-      
-      db.ref(`banques/${nom}`).once('value', (snapshot) => {
-        if (snapshot.val() === null) {
-          db.ref(`banques/${nom}`).set(20000.00);
-        }
-      });
+      db.ref('utilisateurs').set(USERS_MAP);
+      db.ref(`banques/${nom}`).set(20000.00);
 
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
       chargerReglagesJoueurs();
+      alert(`Joueur ${nom} enregistré avec succès !`);
     }
-
-    function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
     function jouerSonValidation() {
       if (!audioCtx) return;
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.3);
       } catch (e) {}
@@ -1811,14 +1687,15 @@
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
+        osc.stop(audioCtx.currentTime + 0.4);
       } catch (e) {}
     }
   </script>
