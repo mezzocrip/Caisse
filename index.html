@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Marseille Monopoly</title>
 
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -20,51 +20,52 @@
       -webkit-user-select: none;
       touch-action: manipulation;
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    html, body {
+      width: 100%;
+      height: 100%;
       margin: 0;
-      padding: 15px;
-      touch-action: manipulation;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0d1117;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Container Standard (Mobile Portrait) */
+    /* Container Plein Écran */
     .caisse-container {
       background: white;
-      border-radius: 20px;
-      padding: 20px 20px 35px 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 440px;
-      text-align: center;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh; /* Adaptatif navigateurs mobiles modernes */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: calc(12px + env(safe-area-inset-top)) calc(15px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(15px + env(safe-area-inset-left));
       position: relative;
     }
 
     /* Numéro de version en bas à droite */
     .version-tag {
       position: absolute;
-      bottom: 10px;
+      bottom: calc(5px + env(safe-area-inset-bottom));
       right: 15px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: #a0aec0;
       font-family: monospace;
+      z-index: 10;
     }
 
     .header-caisse {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
+      flex-shrink: 0;
     }
     h1 {
       color: #1a202c;
       margin: 0;
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
       letter-spacing: -0.5px;
     }
@@ -85,51 +86,66 @@
       align-items: center;
     }
 
+    .layout-ipad {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      overflow: hidden;
+      justify-content: space-between;
+    }
+
+    .col-gauche {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
     .ecran {
       background-color: #1a202c;
       border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 10px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      text-align: center;
     }
     .total-label {
       color: #a0aec0;
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .total-montant {
       color: #38ef7d;
-      font-size: 32px;
+      font-size: 28px;
       font-family: monospace;
       font-weight: bold;
       margin-top: 2px;
     }
 
-    /* Ticket / Fenêtre de détail des prix */
+    /* Ticket / Detail panier */
     .ticket-container {
       background: #f8fafc;
       border: 2px dashed #cbd5e0;
       border-radius: 10px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      max-height: 130px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      max-height: 90px;
       overflow-y: auto;
       text-align: left;
     }
     .ticket-vide {
       color: #a0aec0;
-      font-size: 13px;
+      font-size: 12px;
       text-align: center;
-      margin: 8px 0;
+      margin: 4px 0;
       font-style: italic;
     }
     .ligne-ticket {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 12px;
       color: #2d3748;
-      padding: 3px 0;
+      padding: 2px 0;
       border-bottom: 1px solid #edf2f7;
     }
     .ligne-ticket:last-child {
@@ -140,20 +156,28 @@
       color: #9b2c2c;
       border: none;
       border-radius: 5px;
-      font-size: 11px;
-      padding: 2px 6px;
+      font-size: 10px;
+      padding: 2px 5px;
       cursor: pointer;
-      margin-left: 8px;
+      margin-left: 6px;
     }
 
     .section-title {
-      font-size: 12px;
+      font-size: 11px;
       color: #718096;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-align: left;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+    }
+
+    .col-droite {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      overflow: hidden;
+      margin-bottom: 8px;
     }
 
     /* ONGLETS DE CATÉGORIES ET PRÉNOMS */
@@ -161,10 +185,11 @@
       display: flex;
       gap: 6px;
       overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
       scrollbar-width: none;
       align-items: center;
+      flex-shrink: 0;
     }
     .categories-tabs::-webkit-scrollbar, .prenoms-tabs::-webkit-scrollbar {
       display: none;
@@ -175,7 +200,7 @@
       border: none;
       padding: 6px 12px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
       white-space: nowrap;
       cursor: pointer;
@@ -186,36 +211,36 @@
       color: white;
     }
 
-    /* Zone scrollable pour les articles (4 colonnes) */
+    /* Zone scrollable des articles (S'adapte dynamiquement) */
     .articles-scroll {
-      max-height: 280px;
+      flex-grow: 1;
       overflow-y: auto;
       padding-right: 2px;
-      margin-bottom: 12px;
     }
     .articles-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
     .btn-article {
       background: #edf2f7;
       border: 1px solid #cbd5e0;
       border-radius: 10px;
-      padding: 10px 4px;
+      padding: 8px 4px;
       font-size: 11px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 2px;
       touch-action: manipulation;
     }
     .btn-article:active {
       background-color: #cbd5e0;
     }
     .emoji {
-      font-size: 22px;
+      font-size: 20px;
     }
     .prix-tag {
       font-weight: bold;
@@ -223,19 +248,22 @@
       font-size: 11px;
     }
 
+    .actions-section {
+      flex-shrink: 0;
+    }
     .actions-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .btn-validation {
       background: #000;
       color: #fff;
       border: none;
       border-radius: 12px;
-      padding: 12px;
-      font-size: 16px;
+      padding: 10px;
+      font-size: 15px;
       font-weight: 600;
       width: 100%;
       cursor: pointer;
@@ -251,7 +279,7 @@
       color: #fff;
       border: none;
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px;
       font-size: 15px;
       font-weight: 600;
       width: 100%;
@@ -269,13 +297,15 @@
       color: #e53e3e;
       font-weight: bold;
       cursor: pointer;
-      padding: 4px;
-      font-size: 12px;
+      padding: 2px;
+      font-size: 11px;
+      width: 100%;
+      text-align: center;
       touch-action: manipulation;
     }
 
-    /* MODAL CODE PIN DE PAIEMENT & RÉGLAGES */
-    .pin-overlay {
+    /* MODALS & OVERLAYS */
+    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
@@ -289,30 +319,25 @@
       transition: opacity 0.25s ease;
       z-index: 9998;
     }
-    .pin-overlay.active {
+    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
-    .pin-card {
+    .pin-card, .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card {
       background: #1c1c1e;
       width: 90%;
-      max-width: 360px;
+      max-width: 400px;
       border-radius: 24px;
-      padding: 25px 20px;
+      padding: 20px;
       color: white;
       text-align: center;
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      transition: transform 0.1s ease;
     }
-    .pin-card.shake {
-      animation: shake 0.4s ease-in-out;
+    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card {
+      background: white;
+      color: #1a202c;
+      text-align: left;
     }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-12px); }
-      40%, 80% { transform: translateX(12px); }
-    }
-
     .pin-title { font-size: 20px; font-weight: 600; margin-bottom: 5px; }
     .pin-subtitle { font-size: 13px; color: #8e8e93; margin-bottom: 15px; }
     .pin-dots { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
@@ -322,283 +347,103 @@
     }
     .dot.filled { background: #0a84ff; border-color: #0a84ff; box-shadow: 0 0 10px rgba(10, 132, 255, 0.5); }
     .dot.error { background: #ff453a; border-color: #ff453a; box-shadow: 0 0 10px rgba(255, 69, 58, 0.5); }
-    .error-msg { color: #ff453a; font-size: 13px; font-weight: 500; min-height: 20px; margin-bottom: 15px; }
+    .error-msg { color: #ff453a; font-size: 13px; font-weight: 500; min-height: 20px; margin-bottom: 15px; text-align: center; }
 
     .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 10px; }
     .btn-pin {
       background: #2c2c2e; color: white; border: none; border-radius: 50%;
-      width: 65px; height: 65px; margin: 0 auto; font-size: 24px; font-weight: 500;
+      width: 60px; height: 60px; margin: 0 auto; font-size: 22px; font-weight: 500;
       display: flex; justify-content: center; align-items: center; cursor: pointer; touch-action: manipulation;
     }
     .btn-pin:active { background: #48484a; }
     .btn-pin.btn-cancel { font-size: 13px; color: #ff453a; background: transparent; }
     .btn-pin.btn-del { font-size: 18px; color: #8e8e93; background: transparent; }
 
-    /* MODAL BANQUE & SOLDES */
-    .banque-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
-      display: flex; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9997;
-    }
-    .banque-overlay.active { opacity: 1; pointer-events: auto; }
-    .banque-card {
-      background: #ffffff; border-radius: 20px; width: 90%; max-width: 420px;
-      padding: 20px; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
     .solde-item {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 15px; background: #f7fafc; border: 1px solid #e2e8f0;
+      padding: 10px 12px; background: #f7fafc; border: 1px solid #e2e8f0;
       border-radius: 12px; margin-bottom: 8px; font-weight: bold;
     }
-    .solde-nom { color: #2d3748; font-size: 15px; }
-    .solde-valeur { color: #38a169; font-size: 18px; font-family: monospace; }
-    .immo-details { font-size: 11px; color: #718096; font-weight: normal; margin-top: 2px; }
+    .solde-nom { color: #2d3748; font-size: 14px; }
+    .solde-valeur { color: #38a169; font-size: 16px; font-family: monospace; }
+    .immo-details { font-size: 10px; color: #718096; font-weight: normal; margin-top: 2px; }
 
-    /* MODAL ACQUISITION DES TICKETS ET POSSESSIONS */
-    .historique-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
-      display: flex; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9997;
-    }
-    .historique-overlay.active { opacity: 1; pointer-events: auto; }
-    .historique-card {
-      background: #f1f5f9; border-radius: 20px; width: 90%; max-width: 480px;
-      max-height: 85vh; padding: 20px; display: flex; flex-direction: column; text-align: left;
-    }
-    .historique-list { overflow-y: auto; flex-grow: 1; margin-top: 10px; display: flex; flex-direction: column; gap: 15px; }
+    .historique-list { overflow-y: auto; max-height: 60vh; margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
     
-    /* CARTES DES POSSESSIONS */
     .fortune-box {
       background: linear-gradient(135deg, #2b6cb0, #2c5282);
-      color: white;
-      border-radius: 12px;
-      padding: 12px 15px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(43, 108, 176, 0.2);
+      color: white; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
     }
-    .fortune-total { font-size: 22px; font-weight: bold; font-family: monospace; margin-top: 4px; }
-    .fortune-sub { font-size: 11px; opacity: 0.9; }
+    .fortune-total { font-size: 20px; font-weight: bold; font-family: monospace; margin-top: 2px; }
+    .fortune-sub { font-size: 10px; opacity: 0.9; }
 
-    .possessions-box {
-      background: white;
-      border: 1px solid #cbd5e0;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 15px;
-    }
-    .possessions-title {
-      font-size: 13px;
-      font-weight: bold;
-      color: #2d3748;
-      border-bottom: 2px solid #edf2f7;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .possession-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      color: #4a5568;
-      padding: 5px 0;
-      border-bottom: 1px dashed #edf2f7;
-    }
+    .possessions-box { background: white; border: 1px solid #cbd5e0; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+    .possessions-title { font-size: 12px; font-weight: bold; color: #2d3748; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase; }
+    .possession-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #4a5568; padding: 4px 0; border-bottom: 1px dashed #edf2f7; }
     .possession-item:last-child { border-bottom: none; }
-    .possession-badge {
-      background: #ebf8ff;
-      color: #2b6cb0;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 11px;
-    }
+    .possession-badge { background: #ebf8ff; color: #2b6cb0; font-weight: bold; padding: 2px 6px; border-radius: 6px; font-size: 10px; }
 
-    /* FIX VISIBILITÉ NOMS ET TICKETS DE CAISSE */
-    .ticket-paper {
-      background: #fffdf9;
-      border: 1px solid #cbd5e0;
-      border-radius: 8px;
-      padding: 15px;
-      font-family: 'Courier New', Courier, monospace;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      position: relative;
-    }
-    .ticket-paper::after {
-      content: "";
-      position: absolute;
-      bottom: -6px; left: 0; right: 0;
-      height: 6px;
-      background: linear-gradient(-45deg, transparent 4px, #fffdf9 4px), linear-gradient(45deg, transparent 4px, #fffdf9 4px);
-      background-size: 8px 8px;
-    }
-    .ticket-paper-header { text-align: center; border-bottom: 2px dashed #a0aec0; padding-bottom: 10px; margin-bottom: 10px; }
-    .ticket-paper-title { font-weight: 900; font-size: 16px; color: #000; letter-spacing: 0.5px; }
-    .ticket-paper-user { font-size: 15px; font-weight: 800; color: #1a202c; background: #edf2f7; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-top: 5px; }
-    .ticket-paper-meta { font-size: 12px; color: #4a5568; font-weight: bold; margin-top: 4px; }
-    .ticket-paper-items { font-size: 12px; margin-bottom: 10px; }
-    .ticket-paper-row { display: flex; justify-content: space-between; margin-bottom: 4px; color: #2d3748; }
-    .ticket-paper-total { border-top: 2px dashed #a0aec0; display: flex; justify-content: space-between; font-weight: 900; font-size: 15px; color: #000; margin-top: 8px; padding-top: 6px; }
+    .ticket-paper { background: #fffdf9; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px; font-family: 'Courier New', Courier, monospace; }
+    .ticket-paper-header { text-align: center; border-bottom: 1px dashed #a0aec0; padding-bottom: 8px; margin-bottom: 8px; }
+    .ticket-paper-title { font-weight: 900; font-size: 14px; color: #000; }
+    .ticket-paper-user { font-size: 13px; font-weight: 800; color: #1a202c; background: #edf2f7; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; }
+    .ticket-paper-meta { font-size: 11px; color: #4a5568; margin-top: 2px; }
+    .ticket-paper-items { font-size: 11px; margin-bottom: 8px; }
+    .ticket-paper-row { display: flex; justify-content: space-between; margin-bottom: 2px; color: #2d3748; }
+    .ticket-paper-total { border-top: 1px dashed #a0aec0; display: flex; justify-content: space-between; font-weight: 900; font-size: 14px; color: #000; margin-top: 6px; padding-top: 4px; }
 
-    /* MODAL RÉGLAGES DES ARTICLES & JOUEURS */
-    .reglages-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px);
-      display: flex; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9997;
-    }
-    .reglages-overlay.active { opacity: 1; pointer-events: auto; }
-    .reglages-card {
-      background: white; border-radius: 20px; width: 90%; max-width: 480px;
-      max-height: 85vh; padding: 20px; display: flex; flex-direction: column; text-align: left;
-    }
-    .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .reglages-title { font-size: 18px; font-weight: bold; }
-    .btn-close { background: #edf2f7; border: none; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; }
+    .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .reglages-title { font-size: 16px; font-weight: bold; }
+    .btn-close { background: #edf2f7; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; cursor: pointer; }
     
-    .reglages-list { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; padding-right: 5px; }
-    .item-editor { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .item-editor input { padding: 6px 8px; border-radius: 6px; border: 1px solid #cbd5e0; font-size: 13px; }
-    .item-editor input.emoji-input { width: 45px; text-align: center; }
+    .reglages-list { overflow-y: auto; max-height: 40vh; margin-bottom: 10px; }
+    .item-editor { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .item-editor input { padding: 6px; border-radius: 6px; border: 1px solid #cbd5e0; font-size: 12px; }
+    .item-editor input.emoji-input { width: 40px; text-align: center; }
     .item-editor input.nom-input { flex-grow: 1; }
-    .item-editor input.prix-input { width: 75px; }
+    .item-editor input.prix-input { width: 70px; }
 
-    .form-ajout { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; margin-top: 10px; }
-    .form-ajout-title { font-size: 12px; font-weight: bold; color: #4a5568; margin-bottom: 6px; }
-    .btn-ajouter-article {
-      background: #3182ce; color: white; border: none; border-radius: 8px; padding: 8px 12px;
-      font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 13px;
-    }
+    .form-ajout { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px; }
+    .form-ajout-title { font-size: 11px; font-weight: bold; color: #4a5568; margin-bottom: 4px; }
+    .btn-ajouter-article { background: #3182ce; color: white; border: none; border-radius: 8px; padding: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 12px; }
 
-    /* MODAL SELECTION NIVEAU QUIZ */
-    .quiz-level-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px);
-      display: flex; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9995;
-    }
-    .quiz-level-overlay.active { opacity: 1; pointer-events: auto; }
-    .level-card {
-      background: white; border-radius: 24px; width: 90%; max-width: 400px;
-      padding: 24px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-    }
-    .level-title { font-size: 20px; font-weight: bold; color: #2d3748; margin-bottom: 6px; }
-    .level-subtitle { font-size: 13px; color: #718096; margin-bottom: 20px; }
-    .level-btn-group { display: flex; flex-direction: column; gap: 12px; }
-    .btn-level {
-      border: none; border-radius: 14px; padding: 14px; text-align: left;
-      cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-      transition: transform 0.1s ease;
-    }
-    .btn-level:active { transform: scale(0.98); }
-    .btn-level-facile { background: #e6fffa; border: 2px solid #319795; color: #234e52; }
-    .btn-level-moyen { background: #feebc8; border: 2px solid #dd6b20; color: #7b341e; }
-    .btn-level-difficile { background: #fed7d7; border: 2px solid #e53e3e; color: #742a2a; }
-    .level-name { font-size: 16px; font-weight: bold; }
-    .level-desc { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+    .level-title { font-size: 18px; font-weight: bold; color: #2d3748; margin-bottom: 4px; text-align: center; }
+    .level-subtitle { font-size: 12px; color: #718096; margin-bottom: 15px; text-align: center; }
+    .level-btn-group { display: flex; flex-direction: column; gap: 8px; }
+    .btn-level { border: none; border-radius: 12px; padding: 12px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .btn-level-facile { background: #e6fffa; border: 1px solid #319795; color: #234e52; }
+    .btn-level-moyen { background: #feebc8; border: 1px solid #dd6b20; color: #7b341e; }
+    .btn-level-difficile { background: #fed7d7; border: 1px solid #e53e3e; color: #742a2a; }
+    .level-name { font-size: 14px; font-weight: bold; }
+    .level-desc { font-size: 11px; opacity: 0.85; }
 
-    /* MODAL QUIZ 🧠 */
-    .quiz-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px);
-      display: flex; justify-content: center; align-items: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9996;
-    }
-    .quiz-overlay.active { opacity: 1; pointer-events: auto; }
-    .quiz-card {
-      background: #ffffff; border-radius: 24px; width: 92%; max-width: 440px;
-      padding: 22px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-    }
-    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .quiz-title { font-size: 18px; font-weight: bold; color: #2d3748; }
-    .quiz-user-badge { background: #3182ce; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+    .quiz-card { text-align: center; }
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .quiz-title { font-size: 16px; font-weight: bold; color: #2d3748; }
+    .quiz-user-badge { background: #3182ce; color: white; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+    .quiz-timer-box { font-size: 14px; font-weight: bold; color: #dd6b20; background: #feebc8; padding: 4px 12px; border-radius: 15px; display: inline-block; margin-bottom: 8px; }
+    .quiz-timer-box.danger { color: #e53e3e; background: #fed7d7; animation: pulse 0.5s infinite alternate; }
+    .quiz-question-box { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .quiz-matiere { font-size: 10px; text-transform: uppercase; color: #718096; font-weight: bold; margin-bottom: 2px; }
+    .quiz-enonce { font-size: 28px; font-weight: bold; color: #1a202c; margin-bottom: 8px; }
+    .quiz-reward-info { font-size: 11px; color: #38a169; font-weight: bold; margin-bottom: 6px; }
+    .quiz-input { width: 100%; padding: 8px; font-size: 20px; border: 2px solid #cbd5e0; border-radius: 8px; text-align: center; margin-bottom: 8px; }
+    .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; }
+    .quiz-quit-btn { background: #edf2f7; color: #e53e3e; border: 1px solid #cbd5e0; border-radius: 8px; padding: 8px; font-size: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 6px; }
 
-    .quiz-timer-box {
-      font-size: 16px;
-      font-weight: bold;
-      color: #dd6b20;
-      background: #feebc8;
-      padding: 6px 14px;
-      border-radius: 20px;
-      display: inline-block;
-      margin-bottom: 12px;
+    .apple-pay-card { background: #1c1c1e; width: 100%; max-width: 440px; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; color: white; text-align: center; }
+    .ap-amount { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+    .face-id-icon { width: 50px; height: 50px; margin: 10px auto; border: 3px solid #30d158; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; }
+    .face-id-icon.success { background: #30d158; color: white; }
+
+    /* TABLETTES / PAYSAGE (>= 600px) */
+    @media (min-width: 600px) {
+      .articles-grid { grid-template-columns: repeat(3, 1fr); }
     }
-    .quiz-timer-box.danger {
-      color: #e53e3e;
-      background: #fed7d7;
-      animation: pulse 0.5s infinite alternate;
-    }
-
-    .quiz-question-box { background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px; margin-bottom: 15px; }
-    .quiz-matiere { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #718096; font-weight: bold; margin-bottom: 5px; }
-    .quiz-enonce { font-size: 32px; font-weight: bold; color: #1a202c; margin-bottom: 12px; }
-    .quiz-reward-info { font-size: 12px; color: #38a169; font-weight: bold; margin-bottom: 8px; }
-
-    .quiz-input { width: 100%; padding: 10px; font-size: 24px; border: 2px solid #cbd5e0; border-radius: 10px; text-align: center; margin-bottom: 12px; }
-
-    .quiz-submit-btn { background: #38a169; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 16px; font-weight: bold; width: 100%; cursor: pointer; }
-    .quiz-quit-btn { background: #edf2f7; color: #e53e3e; border: 1px solid #cbd5e0; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
-
-    /* SIMULATION APPLE PAY MODAL */
-    .apple-pay-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px); display: flex; flex-direction: column;
-      justify-content: flex-end; align-items: center; opacity: 0; pointer-events: none;
-      transition: opacity 0.3s ease; z-index: 9999;
-    }
-    .apple-pay-overlay.active { opacity: 1; pointer-events: auto; }
-    .apple-pay-card {
-      background: #1c1c1e; width: 100%; max-width: 440px; border-top-left-radius: 25px;
-      border-top-right-radius: 25px; padding: 25px 20px 40px 20px; color: white;
-      text-align: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); transform: translateY(100%); transition: transform 0.3s ease-out;
-    }
-    .apple-pay-overlay.active .apple-pay-card { transform: translateY(0); }
-    .ap-header { font-size: 18px; font-weight: 600; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; gap: 6px; }
-    .ap-amount { font-size: 36px; font-weight: 700; margin-bottom: 15px; letter-spacing: -0.5px; }
-    
-    .face-id-icon {
-      width: 60px; height: 60px; margin: 10px auto 15px auto; border: 3px solid #30d158;
-      border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; animation: pulse 1.2s infinite alternate;
-    }
-    .face-id-icon.success { border-color: #30d158; background: #30d158; color: white; animation: none; }
-    .face-id-icon.error { border-color: #ff453a; background: #ff453a; color: white; animation: shake 0.4s ease-in-out; }
-
-    @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 100% { transform: scale(1.05); opacity: 1; } }
-    .ap-status { font-size: 15px; color: #8e8e93; font-weight: 500; }
-    .ap-user { font-size: 20px; color: #30d158; font-weight: bold; margin-top: 5px; }
-    .ap-user.error { color: #ff453a; }
-
-    /* FIX RECADRAGE IPAD PAYSAGE & ÉCRANS LARGES (>= 768px) */
     @media (min-width: 768px) and (orientation: landscape) {
-      body { padding: 10px; align-items: center; }
-      .caisse-container {
-        max-width: 980px;
-        max-height: 94vh;
-        padding: 15px 20px 30px 20px;
-        display: flex;
-        flex-direction: column;
-      }
-      .layout-ipad {
-        display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: 20px;
-        align-items: stretch;
-        flex-grow: 1;
-        overflow: hidden;
-      }
-      .col-gauche { display: flex; flex-direction: column; justify-content: space-between; }
-      .col-droite { display: flex; flex-direction: column; overflow-y: auto; padding-right: 4px; }
-      .ecran { padding: 8px 12px; margin-bottom: 8px; }
-      .total-montant { font-size: 30px; }
-      .ticket-container { flex-grow: 1; max-height: 190px; min-height: 100px; margin-bottom: 8px; }
-      .articles-scroll { max-height: 320px; margin-bottom: 10px; }
-      .articles-grid { grid-template-columns: repeat(5, 1fr); gap: 8px; }
-      .btn-article { padding: 8px 4px; font-size: 11px; }
-      .emoji { font-size: 22px; }
+      .layout-ipad { display: grid; grid-template-columns: 320px 1fr; gap: 15px; }
+      .ticket-container { max-height: 140px; }
+      .articles-grid { grid-template-columns: repeat(4, 1fr); }
     }
   </style>
 </head>
@@ -616,24 +461,14 @@
     
     <div class="layout-ipad">
       <div class="col-gauche">
-        <div>
-          <div class="ecran">
-            <div class="total-label">Total à payer</div>
-            <div class="total-montant" id="totalDisplay">0,00 €</div>
-          </div>
-
-          <div class="section-title">Détail du panier</div>
-          <div class="ticket-container" id="ticketList">
-            <div class="ticket-vide">Aucun article ajouté</div>
-          </div>
+        <div class="ecran">
+          <div class="total-label">Total à payer</div>
+          <div class="total-montant" id="totalDisplay">0,00 €</div>
         </div>
 
-        <div>
-          <div class="actions-grid">
-            <button class="btn-validation" onclick="demanderCodePin('paiement')">Payer</button>
-            <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Quiz 🧠</button>
-          </div>
-          <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
+        <div class="section-title">Détail du panier</div>
+        <div class="ticket-container" id="ticketList">
+          <div class="ticket-vide">Aucun article ajouté</div>
         </div>
       </div>
 
@@ -647,10 +482,19 @@
       </div>
     </div>
 
+    <div class="actions-section">
+      <div class="actions-grid">
+        <button class="btn-validation" onclick="demanderCodePin('paiement')">Payer</button>
+        <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Quiz 🧠</button>
+      </div>
+      <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
+    </div>
+
     <!-- Numéro de version du jeu -->
-    <div class="version-tag">v2.0.1</div>
+    <div class="version-tag">v2.0.2</div>
   </div>
 
+  <!-- MODAL CODE PIN -->
   <div class="pin-overlay" id="pinOverlay">
     <div class="pin-card" id="pinCard">
       <div class="pin-title" id="pinTitleModal">Code PIN requis</div>
@@ -695,7 +539,7 @@
         <button class="btn-level btn-level-facile" onclick="demarrerQuizAvecNiveau('facile')">
           <div>
             <div class="level-name">🟢 Facile</div>
-            <div class="level-desc">10 secondes par réponse</div>
+            <div class="level-desc">10 sec / réponse</div>
           </div>
           <div class="level-name">+1 000 €</div>
         </button>
@@ -703,7 +547,7 @@
         <button class="btn-level btn-level-moyen" onclick="demarrerQuizAvecNiveau('intermediaire')">
           <div>
             <div class="level-name">🟠 Intermédiaire</div>
-            <div class="level-desc">6 secondes par réponse</div>
+            <div class="level-desc">6 sec / réponse</div>
           </div>
           <div class="level-name">+3 000 €</div>
         </button>
@@ -711,7 +555,7 @@
         <button class="btn-level btn-level-difficile" onclick="demarrerQuizAvecNiveau('difficile')">
           <div>
             <div class="level-name">🔴 Difficile</div>
-            <div class="level-desc">3 secondes par réponse</div>
+            <div class="level-desc">3 sec / réponse</div>
           </div>
           <div class="level-name">+6 000 €</div>
         </button>
@@ -723,19 +567,18 @@
   <div class="quiz-overlay" id="quizOverlay">
     <div class="quiz-card">
       <div class="quiz-header">
-        <span class="quiz-title">Multiplications (3 à 10) 🧠</span>
+        <span class="quiz-title">Multiplications 🧠</span>
         <span class="quiz-user-badge" id="quizUserBadge">Joueur</span>
       </div>
 
       <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
 
       <div class="quiz-question-box">
-        <div class="quiz-matiere">Tables de Multiplication de 3 à 10</div>
+        <div class="quiz-matiere">Tables de 3 à 10</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
         <div id="quizInputContainer">
-          <!-- Clavier iOS forcé en numérique avec inputmode="numeric" pattern="[0-9]*" -->
           <input type="number" inputmode="numeric" pattern="[0-9]*" id="quizReponseInput" class="quiz-input" placeholder="Résultat ?" autofocus>
           <button class="quiz-submit-btn" onclick="verifierReponseQuiz()">Valider</button>
         </div>
@@ -745,6 +588,7 @@
     </div>
   </div>
 
+  <!-- MODAL BANQUE -->
   <div class="banque-overlay" id="banqueOverlay">
     <div class="banque-card">
       <div class="reglages-header">
@@ -757,6 +601,7 @@
     </div>
   </div>
 
+  <!-- MODAL HISTORIQUE -->
   <div class="historique-overlay" id="historiqueOverlay">
     <div class="historique-card">
       <div class="reglages-header">
@@ -772,6 +617,7 @@
     </div>
   </div>
 
+  <!-- MODAL REGLAGES -->
   <div class="reglages-overlay" id="reglagesOverlay">
     <div class="reglages-card">
       <div class="reglages-header">
@@ -779,18 +625,16 @@
         <button class="btn-close" onclick="fermerReglages()">✕</button>
       </div>
 
-      <!-- ONGLETS DE PARAMÈTRES -->
-      <div class="categories-tabs" style="margin-bottom: 12px;">
+      <div class="categories-tabs" style="margin-bottom: 10px;">
         <button class="tab-btn active" id="btnTabArticles" onclick="changerOngletReglages('articles')">📦 Articles</button>
         <button class="tab-btn" id="btnTabJoueurs" onclick="changerOngletReglages('joueurs')">👤 Joueurs</button>
       </div>
 
-      <!-- VUE ARTICLES -->
       <div id="vueReglagesArticles" style="display: flex; flex-direction: column; flex-grow: 1; overflow: hidden;">
         <div class="reglages-list" id="reglagesList"></div>
 
         <div class="form-ajout">
-          <div class="form-ajout-title">Ajouter un nouvel article</div>
+          <div class="form-ajout-title">Ajouter un article</div>
           <div class="item-editor">
             <input type="text" id="nouveauEmoji" class="emoji-input" placeholder="Emoji" value="🍕">
             <input type="text" id="nouveauNom" class="nom-input" placeholder="Nom de l'article">
@@ -809,14 +653,13 @@
         </div>
       </div>
 
-      <!-- VUE JOUEURS (GESTION PIN) -->
       <div id="vueReglagesJoueurs" style="display: none; flex-direction: column; flex-grow: 1; overflow: hidden;">
         <div class="reglages-list" id="joueursList"></div>
 
         <div class="form-ajout">
-          <div class="form-ajout-title">Inscrire un nouveau joueur (Départ: 20 000€)</div>
+          <div class="form-ajout-title">Inscrire un joueur (20 000€)</div>
           <div class="item-editor">
-            <input type="text" id="nouveauJoueurNom" class="nom-input" placeholder="Prénom du joueur">
+            <input type="text" id="nouveauJoueurNom" class="nom-input" placeholder="Prénom">
             <input type="number" inputmode="numeric" id="nouveauJoueurPin" class="prix-input" placeholder="PIN (4 ch.)" maxlength="4">
           </div>
           <button class="btn-ajouter-article" style="background:#2b6cb0;" onclick="ajouterNouveauJoueurSysteme()">+ Enregistrer le joueur</button>
@@ -826,11 +669,10 @@
     </div>
   </div>
 
+  <!-- SIMULATION APPLE PAY -->
   <div class="apple-pay-overlay" id="applePayOverlay">
     <div class="apple-pay-card">
-      <div class="ap-header">
-        <span id="apTitleHeader">Pay</span>
-      </div>
+      <div class="ap-header"><span id="apTitleHeader">Pay</span></div>
       <div class="ap-amount" id="apAmountDisplay">0,00 €</div>
       <div class="face-id-icon" id="faceIdIcon">😃</div>
       <div class="ap-status" id="apStatusText">Vérification...</div>
@@ -839,27 +681,14 @@
   </div>
 
   <script>
-    /* =======================================================
-       MODULE 1 : ANTI-TRICHE ET BLOCAGE DEVTOOLS (CONSOLES)
-       ======================================================= */
+    /* ANTI-TRICHE ET BLOCAGE DEVTOOLS */
     (function antiTriche() {
       document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
-
       document.addEventListener('keydown', function(e) {
         if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
-        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) { e.preventDefault(); return false; }
-        if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) { e.preventDefault(); return false; }
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); return false; }
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
+        if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
       }, false);
-
-      setInterval(function() {
-        const startTime = performance.now();
-        debugger;
-        const endTime = performance.now();
-        if (endTime - startTime > 100) {
-          document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;color:red;font-family:sans-serif;'>Accès refusé.<br>Inspection du code détectée.</h1>";
-        }
-      }, 1000);
     })();
 
     // CONFIGURATION FIREBASE
@@ -884,15 +713,12 @@
       lastTouchEnd = now;
     }, false);
 
-    /* =======================================================
-       MODULE 2 : HACHAGE SHA-256 DES CODES PIN
-       ======================================================= */
     const PIN_HASH_MAP = {
-      "0b82b3d681d6aa0274291c98db182245b058eb7b830d93708453ae66a9876798": "Yves",     // PIN: 0712
-      "c67160ad3df65d4b4a1c5d4fb17502755f190c1f4e1f7c32b509ebed8a018247": "Terrance", // PIN: 2807
-      "7bf41e065bf639ddbe2a281ff9281a629b3ee33b1e754fb7128edfa58a74e5ea": "Lamar",    // PIN: 2006
-      "56f108f972049e3776b23b4f6274474936d07e68fa707efd25718dfb8416d6ff": "Marjo",    // PIN: 2410
-      "f1807d96a7ee007d4b4fb24e4d5804aa1f79f40076a084bcbb53158cfa40a7cf": "Joyce"     // PIN: 1806
+      "0b82b3d681d6aa0274291c98db182245b058eb7b830d93708453ae66a9876798": "Yves",
+      "c67160ad3df65d4b4a1c5d4fb17502755f190c1f4e1f7c32b509ebed8a018247": "Terrance",
+      "7bf41e065bf639ddbe2a281ff9281a629b3ee33b1e754fb7128edfa58a74e5ea": "Lamar",
+      "56f108f972049e3776b23b4f6274474936d07e68fa707efd25718dfb8416d6ff": "Marjo",
+      "f1807d96a7ee007d4b4fb24e4d5804aa1f79f40076a084bcbb53158cfa40a7cf": "Joyce"
     };
 
     let USERS_MAP = {
@@ -921,7 +747,6 @@
     let possessionsImmo = {};
     let filtrePrenomActif = "";
 
-    // VARIABLES NIVEAUX & QUIZ MULTIPLICATIONS
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
     let gainParQuestion = 1000;
@@ -939,12 +764,12 @@
       { id: 206, cat: "Smartphones", emoji: "📱", nom: "Samsung Galaxy S24 Ultra", prix: 1469.00 },
 
       { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5 (PS5)", prix: 549.99 },
-      { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PlayStation 5 (DualSense)", prix: 69.99 },
+      { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PS5 DualSense", prix: 69.99 },
       { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Xbox Series X", prix: 499.99 },
       { id: 304, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette Xbox Series", prix: 59.99 },
       { id: 305, cat: "Consoles & Tech", emoji: "💻", nom: "iPad mini 6", prix: 559.00 },
       { id: 306, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 14\"", prix: 1999.00 },
-      { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 15/16 pouces", prix: 2899.00 },
+      { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 16\"", prix: 2899.00 },
       { id: 308, cat: "Consoles & Tech", emoji: "🖥️", nom: "Mac mini", prix: 699.00 },
 
       { id: 801, cat: "Automobiles", emoji: "🚗", nom: "Audi A3 Sportback", prix: 36790.00 },
@@ -966,19 +791,19 @@
       { id: 817, cat: "Automobiles", emoji: "⚡", nom: "BYD Han", prix: 70800.00 },
       { id: 818, cat: "Automobiles", emoji: "👑", nom: "Range Rover Autograph", prix: 144900.00 },
 
-      { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65 pouces", prix: 799.00 },
-      { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75 pouces", prix: 1199.00 },
+      { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65\"", prix: 799.00 },
+      { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75\"", prix: 1199.00 },
 
-      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T1 Marseille (Centre)", prix: 115000.00 },
-      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T2 Marseille (Sans piscine)", prix: 185000.00 },
-      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T3 Marseille (Vue mer)", prix: 280000.00 },
-      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appartement T4 Marseille (Résidence standing)", prix: 395000.00 },
-      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 Marseille (Avec piscine)", prix: 620000.00 },
-      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 Marseille (Avec piscine - 13012)", prix: 780000.00 },
-      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 Marseille (Piscine & Jardin - 8ème)", prix: 1250000.00 },
+      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T1 Marseille", prix: 115000.00 },
+      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T2 Marseille", prix: 185000.00 },
+      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T3 Vue mer", prix: 280000.00 },
+      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T4 Standing", prix: 395000.00 },
+      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00 },
+      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00 },
+      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00 },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
       { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
-      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (+10 000€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 }
+      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Com. (+10k€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 }
     ];
 
     let categorieActive = "Smartphones";
@@ -996,20 +821,14 @@
       setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
-    /* SYNCHRONISATION DYNAMIQUE DES JOUEURS DANS FIREBASE */
     function ecouterJoueursFirebase() {
       db.ref('utilisateurs').on('value', (snapshot) => {
         const data = snapshot.val();
-        if (!data) {
-          db.ref('utilisateurs').set(USERS_MAP);
-        } else {
-          USERS_MAP = data;
-          afficherOngletsPrenoms();
-        }
+        if (!data) { db.ref('utilisateurs').set(USERS_MAP); } 
+        else { USERS_MAP = data; afficherOngletsPrenoms(); }
       });
     }
 
-    /* GESTION COMPTES BANCAIRES ET IMMOBILIER */
     function initialiserEtEcouterComptes() {
       const banquesRef = db.ref('banques');
       banquesRef.on('value', (snapshot) => {
@@ -1048,7 +867,6 @@
         if (!biens) return;
 
         let gainTotalARecup = 0;
-
         const typesBiens = [
           { key: 'snack', tauXHeure: 1000 },
           { key: 'hotel', tauXHeure: 3500 },
@@ -1064,9 +882,7 @@
 
             if (qte > 0 && secondesEcoulees > 0) {
               const gainParSeconde = (type.tauXHeure / 3600) * qte;
-              const gainBiens = secondesEcoulees * gainParSeconde;
-              gainTotalARecup += gainBiens;
-
+              gainTotalARecup += secondesEcoulees * gainParSeconde;
               updatesImmo[`immobilier/${user}/${type.key}/dernierPaiement`] = maintenant;
             }
           }
@@ -1087,10 +903,7 @@
       const ref = db.ref(`immobilier/${user}/${item.immoKey}`);
       ref.once('value', (snapshot) => {
         const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now() };
-        ref.set({
-          quantite: currentData.quantite + 1,
-          dernierPaiement: Date.now()
-        });
+        ref.set({ quantite: currentData.quantite + 1, dernierPaiement: Date.now() });
       });
     }
 
@@ -1173,7 +986,6 @@
     function supprimerArticle(index) { listeArticles.splice(index, 1); MettreAJourEcran(); }
     function reinitialiser() { listeArticles = []; MettreAJourEcran(); }
 
-    /* GESTION CODE PIN AVEC VÉRIFICATION HACHÉE */
     function demanderCodePin(action) {
       if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
@@ -1230,7 +1042,6 @@
       }
     }
 
-    /* VÉRIFICATION DE L'EMPREINTE HASH SHA-256 */
     async function verifierCodePin() {
       const hashSaisi = await hashPin(pinSaisi);
       const userTrouve = PIN_HASH_MAP[hashSaisi] || USERS_MAP[pinSaisi];
@@ -1246,10 +1057,8 @@
         document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
         mettreAJourPointsPin(true);
         const pinCard = document.getElementById('pinCard');
-        pinCard.classList.add('shake');
         if (navigator.vibrate) { navigator.vibrate([80, 50, 80]); }
         setTimeout(() => {
-          pinCard.classList.remove('shake');
           pinSaisi = "";
           mettreAJourPointsPin();
           blocageSaisie = false;
@@ -1257,7 +1066,6 @@
       }
     }
 
-    /* VALIDER LE PAIEMENT */
     function validerPaiement() {
       let totalPaye = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       let user = lastUserValide;
@@ -1268,21 +1076,12 @@
         return;
       }
 
-      // Déduire le solde bancaire
       let nouveauSolde = Math.round((soldeActuel - totalPaye) * 100) / 100;
       db.ref(`banques/${user}`).set(nouveauSolde);
 
-      // Ajouter les possessions immobilières le cas échéant
-      listeArticles.forEach(item => {
-        if (item.immoKey) {
-          ajouterPossessionImmo(user, item);
-        }
-      });
-
-      // Enregistrer le ticket
+      listeArticles.forEach(item => { if (item.immoKey) { ajouterPossessionImmo(user, item); } });
       enregistrerTicketFirebase(lastPinValide, user, listeArticles, totalPaye);
 
-      // Animation Pay & reset
       const apOverlay = document.getElementById('applePayOverlay');
       document.getElementById('apAmountDisplay').innerText = totalPaye.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
       document.getElementById('apUserDisplay').innerText = user;
@@ -1303,27 +1102,17 @@
       }, 1000);
     }
 
-    /* MODULE QUIZ MULTIPLICATIONS DE 3 A 10 */
-    function ouvrirSelectionNiveauQuiz() {
-      document.getElementById('quizLevelOverlay').classList.add('active');
-    }
+    function ouvrirSelectionNiveauQuiz() { document.getElementById('quizLevelOverlay').classList.add('active'); }
 
     function demarrerQuizAvecNiveau(niveau) {
       niveauQuizActif = niveau;
       questionsJoueesDansSession = 0;
 
-      if (niveau === 'facile') {
-        chronoMaxParQuestion = 10;
-        gainParQuestion = 1000;
-      } else if (niveau === 'intermediaire') {
-        chronoMaxParQuestion = 6;
-        gainParQuestion = 3000;
-      } else if (niveau === 'difficile') {
-        chronoMaxParQuestion = 3;
-        gainParQuestion = 6000;
-      }
+      if (niveau === 'facile') { chronoMaxParQuestion = 10; gainParQuestion = 1000; }
+      else if (niveau === 'intermediaire') { chronoMaxParQuestion = 6; gainParQuestion = 3000; }
+      else if (niveau === 'difficile') { chronoMaxParQuestion = 3; gainParQuestion = 6000; }
 
-      document.getElementById('quizRewardInfo').innerText = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} € | Erreur / Temps : -${gainParQuestion.toLocaleString('fr-FR')} €`;
+      document.getElementById('quizRewardInfo').innerText = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} € | Erreur : -${gainParQuestion.toLocaleString('fr-FR')} €`;
       document.getElementById('quizUserBadge').innerText = lastUserValide;
 
       document.getElementById('quizLevelOverlay').classList.remove('active');
@@ -1353,7 +1142,6 @@
       intervalChrono = setInterval(() => {
         tempsRestant--;
         mettreAJourAffichageChrono();
-
         if (tempsRestant <= 0) {
           clearInterval(intervalChrono);
           traiterTempsEcouleQuiz();
@@ -1364,24 +1152,18 @@
     function mettreAJourAffichageChrono() {
       const box = document.getElementById('quizTimerBox');
       box.innerText = `⏳ ${tempsRestant}s`;
-      if (tempsRestant <= Math.ceil(chronoMaxParQuestion / 3)) {
-        box.className = "quiz-timer-box danger";
-      } else {
-        box.className = "quiz-timer-box";
-      }
+      box.className = tempsRestant <= Math.ceil(chronoMaxParQuestion / 3) ? "quiz-timer-box danger" : "quiz-timer-box";
     }
 
     function traiterTempsEcouleQuiz() {
       questionsJoueesDansSession++;
       jouerSonErreur();
       if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
-
       appliquerMouvementSoldeFirebase(-gainParQuestion, `Quiz (${niveauQuizActif}) - Temps écoulé`);
       alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
       genererNouvelleQuestionQuiz();
     }
 
-    /* TABLES DE 3 A 10 EN RANDOM */
     function genererNouvelleQuestionQuiz() {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value = "";
@@ -1389,10 +1171,9 @@
 
       const a = Math.floor(Math.random() * 8) + 3;
       const b = Math.floor(Math.random() * 8) + 3;
-      const reponseExacte = a * b;
 
       document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
-      questionActiveCourante = { bonneReponse: reponseExacte.toString() };
+      questionActiveCourante = { bonneReponse: (a * b).toString() };
 
       relancerChrono();
     }
@@ -1420,9 +1201,7 @@
     }
 
     document.getElementById('quizReponseInput').addEventListener('keyup', function(event) {
-      if (event.key === 'Enter') {
-        verifierReponseQuiz();
-      }
+      if (event.key === 'Enter') { verifierReponseQuiz(); }
     });
 
     function appliquerMouvementSoldeFirebase(montant, motif) {
@@ -1430,7 +1209,6 @@
       db.ref(`banques/${lastUserValide}`).once('value', (snapshot) => {
         let soldeActuel = snapshot.val() !== null ? snapshot.val() : 20000.00;
         let nouveauSolde = Math.round((soldeActuel + montant) * 100) / 100;
-
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
         const now = new Date();
@@ -1448,7 +1226,6 @@
       });
     }
 
-    /* HISTORIQUE ET SAUVEGARDE FIREBASE */
     function enregistrerTicketFirebase(codePin, utilisateur, articles, total) {
       const now = new Date();
       const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -1467,31 +1244,24 @@
     function ecouterHistoriqueFirebase() {
       db.ref('tickets').on('value', (snapshot) => {
         const data = snapshot.val();
-        if (!data) { tousLesTickets = []; }
-        else {
-          tousLesTickets = Object.values(data).sort((a, b) => { return (b.timestamp || 0) - (a.timestamp || 0); });
-        }
+        tousLesTickets = !data ? [] : Object.values(data).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         afficherOngletsPrenoms();
         afficherTicketsHistorique();
       });
     }
 
-    // CALCUL DE LA FORTUNE PAR JOUEUR (BANQUE + ACHATS HORS QUIZ)
     function calculerFortuneJoueur(prenom) {
       let soldeBanque = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
       let totalAchats = 0;
 
       tousLesTickets.forEach(ticket => {
         let userTicket = ticket.utilisateur || USERS_MAP[ticket.codePin];
-        if (userTicket === prenom) {
-          if (ticket.articles && Array.isArray(ticket.articles)) {
-            ticket.articles.forEach(art => {
-              // Exclure les entrées du Quiz et ne garder que les vrais articles achetés
-              if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
-                totalAchats += art.prix;
-              }
-            });
-          }
+        if (userTicket === prenom && ticket.articles && Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(art => {
+            if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
+              totalAchats += art.prix;
+            }
+          });
         }
       });
 
@@ -1503,18 +1273,12 @@
       if (!container) return;
       container.innerHTML = "";
 
-      let joueursFortunes = Object.values(USERS_MAP).map(prenom => {
-        return {
-          prenom: prenom,
-          fortune: calculerFortuneJoueur(prenom)
-        };
-      });
+      let joueursFortunes = Object.values(USERS_MAP).map(prenom => ({
+        prenom: prenom,
+        fortune: calculerFortuneJoueur(prenom)
+      })).sort((a, b) => b.fortune - a.fortune);
 
-      joueursFortunes.sort((a, b) => b.fortune - a.fortune);
-
-      if (!filtrePrenomActif && joueursFortunes.length > 0) {
-        filtrePrenomActif = joueursFortunes[0].prenom;
-      }
+      if (!filtrePrenomActif && joueursFortunes.length > 0) { filtrePrenomActif = joueursFortunes[0].prenom; }
 
       joueursFortunes.forEach(j => {
         const btn = document.createElement('button');
@@ -1525,13 +1289,10 @@
       });
     }
 
-    /* AFFICHAGE DES ACQUISITIONS, FORTUNE ET POSSESSIONS DU JOUEUR (SEULEMENT ACHATS + CAGNOTTE) */
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
-      if (!container) return;
+      if (!container || !filtrePrenomActif) return;
       container.innerHTML = "";
-
-      if (!filtrePrenomActif) return;
 
       let nomClient = filtrePrenomActif;
       let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
@@ -1543,12 +1304,9 @@
       ticketsJoueur.forEach(ticket => {
         if (ticket.articles && Array.isArray(ticket.articles)) {
           ticket.articles.forEach(art => {
-            // Exclure les gains / pénalités du quiz dans les possessions
             if (art.prix > 0 && !art.nom.toLowerCase().includes('quiz') && !art.nom.toLowerCase().includes('pénalité')) {
               totalValeurAchats += art.prix;
-              if (!mapPossessions[art.nom]) {
-                mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix };
-              }
+              if (!mapPossessions[art.nom]) { mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix }; }
               mapPossessions[art.nom].quantite += 1;
             }
           });
@@ -1557,66 +1315,40 @@
 
       let fortuneTotale = Math.round((soldeBanque + totalValeurAchats) * 100) / 100;
 
-      // 1. BLOC RESUMÉ FORTUNE
       const fortuneCard = document.createElement('div');
       fortuneCard.className = 'fortune-box';
       fortuneCard.innerHTML = `
-        <div style="font-weight:bold; font-size: 14px;">👑 Fortune de ${nomClient}</div>
-        <div class="fortune-total">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
-        <div class="fortune-sub">💵 Cagnotte (Banque) : ${soldeBanque.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} € | 📦 Achats : ${totalValeurAchats.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+        <div style="font-weight:bold; font-size: 13px;">👑 Fortune de ${nomClient}</div>
+        <div class="fortune-total">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
+        <div class="fortune-sub">💵 Cagnotte : ${soldeBanque.toLocaleString('fr-FR', {minimumFractionDigits: 2})} € | 📦 Achats : ${totalValeurAchats.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
       `;
       container.appendChild(fortuneCard);
 
-      // 2. BLOC LISTE DES POSSESSIONS
       const possessionsCard = document.createElement('div');
       possessionsCard.className = 'possessions-box';
-
       let itemsPossessionsHtml = "";
       Object.keys(mapPossessions).forEach(nomItem => {
         let itemData = mapPossessions[nomItem];
-        let totalItem = itemData.quantite * itemData.prixUnitaire;
         itemsPossessionsHtml += `
           <div class="possession-item">
             <span><strong>${nomItem}</strong> (x${itemData.quantite})</span>
-            <span class="possession-badge">${totalItem.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
+            <span class="possession-badge">${(itemData.quantite * itemData.prixUnitaire).toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span>
           </div>
         `;
       });
 
-      if (itemsPossessionsHtml === "") {
-        itemsPossessionsHtml = `<div style="text-align:center; color:#a0aec0; font-size: 12px; font-style: italic; padding: 5px 0;">Aucune possession ou bien acheté pour le moment.</div>`;
-      }
-
       possessionsCard.innerHTML = `
-        <div class="possessions-title">📦 Possessions & Biens Acquis</div>
-        <div>${itemsPossessionsHtml}</div>
+        <div class="possessions-title">📦 Possessions</div>
+        <div>${itemsPossessionsHtml || '<div style="text-align:center; color:#a0aec0; font-size: 11px;">Aucun bien acquis</div>'}</div>
       `;
       container.appendChild(possessionsCard);
-
-      // 3. BLOC HISTORIQUE DES TICKETS DE CAISSE
-      const titreTickets = document.createElement('div');
-      titreTickets.className = 'section-title';
-      titreTickets.style.margin = "10px 0 5px 0";
-      titreTickets.innerText = "🧾 Historique des Tickets de Caisse";
-      container.appendChild(titreTickets);
-
-      if (ticketsJoueur.length === 0) {
-        const videDiv = document.createElement('div');
-        videDiv.style.textAlign = 'center';
-        videDiv.style.color = '#a0aec0';
-        videDiv.style.marginTop = '10px';
-        videDiv.innerText = `Aucun ticket de caisse enregistré pour ${nomClient}.`;
-        container.appendChild(videDiv);
-        return;
-      }
 
       ticketsJoueur.forEach(ticket => {
         const card = document.createElement('div');
         card.className = 'ticket-paper';
-
         let itemsHtml = "";
         ticket.articles.forEach(art => {
-          itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>`;
+          itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>`;
         });
 
         card.innerHTML = `
@@ -1626,7 +1358,7 @@
             <div class="ticket-paper-meta">📅 ${ticket.date}</div>
           </div>
           <div class="ticket-paper-items">${itemsHtml}</div>
-          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span></div>
+          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>
         `;
         container.appendChild(card);
       });
@@ -1635,12 +1367,8 @@
     function ouvrirHistorique() { afficherOngletsPrenoms(); afficherTicketsHistorique(); document.getElementById('historiqueOverlay').classList.add('active'); }
     function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
-    /* RÉGLAGES UNIFIÉS (ARTICLES & JOUEURS) */
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
-    function ouvrirEcranReglages() {
-      changerOngletReglages('articles');
-      document.getElementById('reglagesOverlay').classList.add('active');
-    }
+    function ouvrirEcranReglages() { changerOngletReglages('articles'); document.getElementById('reglagesOverlay').classList.add('active'); }
 
     function changerOngletReglages(type) {
       if (type === 'articles') {
@@ -1691,12 +1419,9 @@
     }
 
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); afficherArticles(); }
-    function modifierArticle(index, champ, valeur) {
-      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
-      else { baseArticles[index][champ] = valeur; }
-    }
+    function modifierArticle(index, champ, valeur) { baseArticles[index][champ] = champ === 'prix' ? (parseFloat(valeur) || 0) : valeur; }
     function supprimerArticleSysteme(index) { baseArticles.splice(index, 1); chargerReglagesArticles(); }
-    
+
     function ajouterNouvelArticleSysteme() {
       const emoji = document.getElementById('nouveauEmoji').value || "📦";
       const nom = document.getElementById('nouveauNom').value;
@@ -1709,51 +1434,40 @@
       chargerReglagesArticles();
     }
 
-    /* AJOUT DYNAMIQUE DE JOUEURS AVEC MOT DE PASSE ENREGISTRÉ DANS FIREBASE */
     function ajouterNouveauJoueurSysteme() {
       const nom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
 
-      if (!nom || pin.length !== 4 || isNaN(pin)) {
-        alert("Veuillez saisir un prénom valide et un code PIN à 4 chiffres.");
-        return;
-      }
-
-      if (USERS_MAP[pin]) {
-        alert("Ce code PIN est déjà utilisé par un autre joueur.");
-        return;
-      }
+      if (!nom || pin.length !== 4 || isNaN(pin)) { alert("Prénom valide et code PIN à 4 chiffres requis."); return; }
+      if (USERS_MAP[pin]) { alert("Ce code PIN existe déjà."); return; }
 
       db.ref(`utilisateurs/${pin}`).set(nom);
       db.ref(`banques/${nom}`).set(20000.00);
 
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
-      alert(`✅ Joueur ${nom} enregistré avec succès !\nCode PIN : ${pin}\nSolde initial : 20 000 €`);
       chargerReglagesJoueurs();
     }
 
     function supprimerJoueurSysteme(pin) {
-      const nom = USERS_MAP[pin];
-      if (confirm(`Voulez-vous supprimer le joueur ${nom} ?`)) {
+      if (confirm(`Voulez-vous supprimer le joueur ${USERS_MAP[pin]} ?`)) {
         db.ref(`utilisateurs/${pin}`).remove();
         chargerReglagesJoueurs();
       }
     }
 
-    /* AUDIO */
     function jouerSonValidation() {
       try {
         if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         const now = audioCtx.currentTime;
-        const osc1 = audioCtx.createOscillator();
-        const gain1 = audioCtx.createGain();
-        osc1.frequency.setValueAtTime(880, now);
-        gain1.gain.setValueAtTime(0.15, now);
-        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-        osc1.connect(gain1); gain1.connect(audioCtx.destination);
-        osc1.start(now); osc1.stop(now + 0.15);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(880, now);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.15);
       } catch (e) {}
     }
 
