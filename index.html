@@ -35,7 +35,7 @@
       background: white;
       width: 100vw;
       height: 100vh;
-      height: 100dvh; /* Adaptatif navigateurs mobiles modernes */
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -43,7 +43,6 @@
       position: relative;
     }
 
-    /* Numéro de version en bas à droite */
     .version-tag {
       position: absolute;
       bottom: calc(5px + env(safe-area-inset-bottom));
@@ -121,7 +120,6 @@
       margin-top: 2px;
     }
 
-    /* Ticket / Detail panier */
     .ticket-container {
       background: #f8fafc;
       border: 2px dashed #cbd5e0;
@@ -180,7 +178,6 @@
       margin-bottom: 8px;
     }
 
-    /* ONGLETS DE CATÉGORIES ET PRÉNOMS */
     .categories-tabs, .prenoms-tabs {
       display: flex;
       gap: 6px;
@@ -211,7 +208,6 @@
       color: white;
     }
 
-    /* Zone scrollable des articles (S'adapte dynamiquement) */
     .articles-scroll {
       flex-grow: 1;
       overflow-y: auto;
@@ -368,20 +364,29 @@
     .solde-valeur { color: #38a169; font-size: 16px; font-family: monospace; }
     .immo-details { font-size: 10px; color: #718096; font-weight: normal; margin-top: 2px; }
 
-    .historique-list { overflow-y: auto; max-height: 60vh; margin-top: 10px; display: flex; flex-direction: column; gap: 12px; }
+    .historique-list { overflow-y: auto; max-height: 60vh; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
     
     .fortune-box {
       background: linear-gradient(135deg, #2b6cb0, #2c5282);
-      color: white; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+      color: white; border-radius: 12px; padding: 10px 12px; margin-bottom: 2px;
     }
     .fortune-total { font-size: 20px; font-weight: bold; font-family: monospace; margin-top: 2px; }
     .fortune-sub { font-size: 10px; opacity: 0.9; }
 
-    .possessions-box { background: white; border: 1px solid #cbd5e0; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+    .possessions-box { background: white; border: 1px solid #cbd5e0; border-radius: 12px; padding: 10px; margin-bottom: 4px; }
     .possessions-title { font-size: 12px; font-weight: bold; color: #2d3748; border-bottom: 1px solid #edf2f7; padding-bottom: 4px; margin-bottom: 6px; text-transform: uppercase; }
     .possession-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #4a5568; padding: 4px 0; border-bottom: 1px dashed #edf2f7; }
     .possession-item:last-child { border-bottom: none; }
     .possession-badge { background: #ebf8ff; color: #2b6cb0; font-weight: bold; padding: 2px 6px; border-radius: 6px; font-size: 10px; }
+
+    /* Bouton Accordéon Détail */
+    .btn-toggle-detail {
+      background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0;
+      border-radius: 10px; padding: 8px; font-size: 12px; font-weight: bold;
+      width: 100%; cursor: pointer; text-align: center; margin-bottom: 6px;
+    }
+
+    .detail-tickets-wrapper { display: flex; flex-direction: column; gap: 10px; }
 
     .ticket-paper { background: #fffdf9; border: 1px solid #cbd5e0; border-radius: 8px; padding: 12px; font-family: 'Courier New', Courier, monospace; }
     .ticket-paper-header { text-align: center; border-bottom: 1px dashed #a0aec0; padding-bottom: 8px; margin-bottom: 8px; }
@@ -490,8 +495,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <!-- Numéro de version du jeu -->
-    <div class="version-tag">v2.0.2</div>
+    <div class="version-tag">v2.0.3</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -601,7 +605,7 @@
     </div>
   </div>
 
-  <!-- MODAL HISTORIQUE -->
+  <!-- MODAL HISTORIQUE / ACQUISITION -->
   <div class="historique-overlay" id="historiqueOverlay">
     <div class="historique-card">
       <div class="reglages-header">
@@ -746,6 +750,7 @@
     let comptesComplets = {};
     let possessionsImmo = {};
     let filtrePrenomActif = "";
+    let afficherDetailActif = false; // Variable pour afficher/masquer le détail
 
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
@@ -1268,27 +1273,31 @@
       return Math.round((soldeBanque + totalAchats) * 100) / 100;
     }
 
+    /* PRÉSENTATION UNIFORME DES PRÉNOMS (COMME LA BANQUE) */
     function afficherOngletsPrenoms() {
       const container = document.getElementById('prenomsTabs');
       if (!container) return;
       container.innerHTML = "";
 
-      let joueursFortunes = Object.values(USERS_MAP).map(prenom => ({
-        prenom: prenom,
-        fortune: calculerFortuneJoueur(prenom)
-      })).sort((a, b) => b.fortune - a.fortune);
+      let prenomsListe = Object.values(USERS_MAP);
 
-      if (!filtrePrenomActif && joueursFortunes.length > 0) { filtrePrenomActif = joueursFortunes[0].prenom; }
+      if (!filtrePrenomActif && prenomsListe.length > 0) { filtrePrenomActif = prenomsListe[0]; }
 
-      joueursFortunes.forEach(j => {
+      prenomsListe.forEach(prenom => {
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${j.prenom === filtrePrenomActif ? 'active' : ''}`;
-        btn.innerText = `${j.prenom} (${j.fortune.toLocaleString('fr-FR')} €)`;
-        btn.onclick = () => { filtrePrenomActif = j.prenom; afficherOngletsPrenoms(); afficherTicketsHistorique(); };
+        btn.className = `tab-btn ${prenom === filtrePrenomActif ? 'active' : ''}`;
+        btn.innerText = prenom; // Affichage unique du prénom (style Banque)
+        btn.onclick = () => { 
+          filtrePrenomActif = prenom; 
+          afficherDetailActif = false; // Réinitialise l'affichage accordéon lors du changement de joueur
+          afficherOngletsPrenoms(); 
+          afficherTicketsHistorique(); 
+        };
         container.appendChild(btn);
       });
     }
 
+    /* AFFICHAGE COMPACT + ACCORDÉON POUR LE DÉTAIL DES BONS / TICKETS */
     function afficherTicketsHistorique() {
       const container = document.getElementById('historiqueList');
       if (!container || !filtrePrenomActif) return;
@@ -1315,6 +1324,7 @@
 
       let fortuneTotale = Math.round((soldeBanque + totalValeurAchats) * 100) / 100;
 
+      // CARTE RECAPITULATIVE
       const fortuneCard = document.createElement('div');
       fortuneCard.className = 'fortune-box';
       fortuneCard.innerHTML = `
@@ -1324,6 +1334,7 @@
       `;
       container.appendChild(fortuneCard);
 
+      // RESUMÉ DES POSSESSIONS
       const possessionsCard = document.createElement('div');
       possessionsCard.className = 'possessions-box';
       let itemsPossessionsHtml = "";
@@ -1343,28 +1354,55 @@
       `;
       container.appendChild(possessionsCard);
 
-      ticketsJoueur.forEach(ticket => {
-        const card = document.createElement('div');
-        card.className = 'ticket-paper';
-        let itemsHtml = "";
-        ticket.articles.forEach(art => {
-          itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>`;
-        });
+      // BOUTON TOGGLE DÉTAIL DES TICKETS
+      const btnToggle = document.createElement('button');
+      btnToggle.className = 'btn-toggle-detail';
+      btnToggle.innerText = afficherDetailActif ? "▲ Masquer le détail des achats" : "▼ 🧾 Voir le détail des achats";
+      btnToggle.onclick = () => {
+        afficherDetailActif = !afficherDetailActif;
+        afficherTicketsHistorique();
+      };
+      container.appendChild(btnToggle);
 
-        card.innerHTML = `
-          <div class="ticket-paper-header">
-            <div class="ticket-paper-title">MARSEILLE MONOPOLY</div>
-            <div class="ticket-paper-user">👤 Joueur : ${nomClient}</div>
-            <div class="ticket-paper-meta">📅 ${ticket.date}</div>
-          </div>
-          <div class="ticket-paper-items">${itemsHtml}</div>
-          <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>
-        `;
-        container.appendChild(card);
-      });
+      // DÉTAIL DES TICKETS (ACCORDÉON SUR CLIC)
+      if (afficherDetailActif) {
+        const detailWrapper = document.createElement('div');
+        detailWrapper.className = 'detail-tickets-wrapper';
+
+        if (ticketsJoueur.length === 0) {
+          detailWrapper.innerHTML = '<div style="text-align:center; color:#a0aec0; font-size: 12px; margin: 10px 0;">Aucun bon de transaction.</div>';
+        } else {
+          ticketsJoueur.forEach(ticket => {
+            const card = document.createElement('div');
+            card.className = 'ticket-paper';
+            let itemsHtml = "";
+            ticket.articles.forEach(art => {
+              itemsHtml += `<div class="ticket-paper-row"><span>${art.nom}</span><span>${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>`;
+            });
+
+            card.innerHTML = `
+              <div class="ticket-paper-header">
+                <div class="ticket-paper-title">MARSEILLE MONOPOLY</div>
+                <div class="ticket-paper-user">👤 Joueur : ${nomClient}</div>
+                <div class="ticket-paper-meta">📅 ${ticket.date}</div>
+              </div>
+              <div class="ticket-paper-items">${itemsHtml}</div>
+              <div class="ticket-paper-total"><span>TOTAL</span><span>${ticket.total.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</span></div>
+            `;
+            detailWrapper.appendChild(card);
+          });
+        }
+        container.appendChild(detailWrapper);
+      }
     }
 
-    function ouvrirHistorique() { afficherOngletsPrenoms(); afficherTicketsHistorique(); document.getElementById('historiqueOverlay').classList.add('active'); }
+    function ouvrirHistorique() { 
+      afficherDetailActif = false; 
+      afficherOngletsPrenoms(); 
+      afficherTicketsHistorique(); 
+      document.getElementById('historiqueOverlay').classList.add('active'); 
+    }
+    
     function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
