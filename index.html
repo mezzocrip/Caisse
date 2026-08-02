@@ -937,6 +937,7 @@
       });
     }
 
+    /* REVENUS PAR HEURE PLEINE (VERSEMENT D'UN BLOC DE 1000€ APRES 1h) */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -961,10 +962,12 @@
             const dernierPaiement = dataBien.dernierPaiement || maintenant;
             const secondesEcoulees = (maintenant - dernierPaiement) / 1000;
 
-            if (qte > 0 && secondesEcoulees > 0) {
-              const gainParSeconde = (type.tauXHeure / 3600) * qte;
-              gainTotalARecup += secondesEcoulees * gainParSeconde;
-              updatesImmo[`immobilier/${user}/${type.key}/dernierPaiement`] = maintenant;
+            const heuresCompletes = Math.floor(secondesEcoulees / 3600);
+
+            if (qte > 0 && heuresCompletes >= 1) {
+              gainTotalARecup += heuresCompletes * type.tauXHeure * qte;
+              const nouveauTempsPaiement = dernierPaiement + (heuresCompletes * 3600 * 1000);
+              updatesImmo[`immobilier/${user}/${type.key}/dernierPaiement`] = nouveauTempsPaiement;
             }
           }
         });
