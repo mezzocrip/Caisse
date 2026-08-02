@@ -330,7 +330,7 @@
     }
 
     /* MODALS & OVERLAYS DARK / MODERN UI */
-    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay {
+    .pin-overlay, .banque-overlay, .historique-overlay, .vente-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
@@ -344,12 +344,12 @@
       transition: opacity 0.25s ease;
       z-index: 9998;
     }
-    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active {
+    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .vente-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
     
-    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card {
+    .banque-card, .historique-card, .vente-card, .reglages-card, .level-card, .quiz-card {
       background: #121820;
       width: 92%;
       max-width: 440px;
@@ -469,21 +469,24 @@
 
     .historique-list { overflow-y: auto; flex-grow: 1; margin-top: 6px; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
 
+    .btn-vendre {
+      background: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .btn-vendre:active { opacity: 0.8; }
+
     .btn-back {
       background: #1a222d; color: #38bdf8; border: 1px solid rgba(255,255,255,0.1);
       border-radius: 12px; padding: 10px 16px; font-size: 13px; font-weight: bold;
       cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; width: fit-content;
       min-height: 42px;
-    }
-
-    .possession-pill {
-      background: #202b38; border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 12px; margin-bottom: 8px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #e2e8f0;
-    }
-    .possession-badge-green {
-      background: rgba(56, 239, 125, 0.15); color: #38ef7d;
-      font-weight: bold; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-family: monospace;
     }
 
     .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -546,6 +549,7 @@
     <div class="header-caisse">
       <h1>Marseille Monopoly 🎲</h1>
       <div class="header-actions">
+        <button class="btn-icon" onclick="demanderCodePin('vente')" title="Vente Immobilier">🏷️</button>
         <button class="btn-icon" onclick="ouvrirBanque()" title="Comptes Bancaires">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Acquisitions">🧾</button>
         <button class="btn-icon" onclick="ouvrirReglagesProteges()" title="Réglages">⚙️</button>
@@ -583,7 +587,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v4.0 (Renews)</div>
+    <div class="version-tag">v4.0.0 (Prise de valeur Immo +30%/jour & Vente)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -730,6 +734,20 @@
 
       <div class="historique-list" id="historiqueList">
         <div style="text-align:center; color:#a0aec0; margin-top:20px;">Chargement du classement...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VENTE IMMOBILIÈRE -->
+  <div class="vente-overlay" id="venteOverlay">
+    <div class="vente-card">
+      <div class="reglages-header">
+        <span class="reglages-title" id="venteTitle">Mes Logements 🏷️</span>
+        <button class="btn-close" onclick="fermerVente()">✕</button>
+      </div>
+
+      <div class="historique-list" id="venteList">
+        <div style="text-align:center; color:#a0aec0; margin-top:20px;">Chargement de vos propriétés...</div>
       </div>
     </div>
   </div>
@@ -1170,6 +1188,9 @@
       } else if (action === 'quiz_login') {
         document.getElementById('pinTitleModal').innerText = "Connexion Multiplications 🧮";
         document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour jouer";
+      } else if (action === 'vente') {
+        document.getElementById('pinTitleModal').innerText = "Espace Vente 🏷️";
+        document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour gérer vos logements";
       }
 
       actionApresPin = action;
@@ -1223,6 +1244,7 @@
         if (actionApresPin === 'paiement') { validerPaiement(); }
         else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
         else if (actionApresPin === 'quiz_login') { ouvrirSelectionNiveauQuiz(); }
+        else if (actionApresPin === 'vente') { ouvrirVente(); }
       } else {
         document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
         mettreAJourPointsPin(true);
@@ -1590,6 +1612,102 @@
       });
     }
 
+    /* CALCUL PRISE DE VALEUR DE 30% PAR JOUR */
+    function calculerValeurImmoActuelle(prixOrigine, timestampAcquisition) {
+      if (!timestampAcquisition) return prixOrigine;
+      const msParJour = 24 * 60 * 60 * 1000;
+      const joursEcoules = (Date.now() - timestampAcquisition) / msParJour;
+      if (joursEcoules <= 0) return prixOrigine;
+      
+      const valeurActualisee = prixOrigine * Math.pow(1.30, joursEcoules);
+      return Math.round(valeurActualisee * 100) / 100;
+    }
+
+    function ouvrirVente() {
+      afficherMesBiensAVendre();
+      document.getElementById('venteOverlay').classList.add('active');
+    }
+    function fermerVente() { document.getElementById('venteOverlay').classList.remove('active'); }
+
+    function afficherMesBiensAVendre() {
+      const container = document.getElementById('venteList');
+      const titleElement = document.getElementById('venteTitle');
+      if (!container) return;
+      container.innerHTML = "";
+
+      const nomClient = lastUserValide;
+      titleElement.innerText = `Logements de ${nomClient} 🏷️`;
+
+      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === nomClient);
+      let biensAchetes = [];
+
+      ticketsJoueur.forEach(ticket => {
+        if (ticket.articles && Array.isArray(ticket.articles)) {
+          ticket.articles.forEach(art => {
+            const articleImmo = baseArticles.find(a => a.cat === "Immobilier Marseille" && (a.nom === art.nom || `${a.emoji} ${a.nom}` === art.nom));
+            if (articleImmo && art.prix > 0) {
+              biensAchetes.push({
+                nom: art.nom,
+                prixOrigine: art.prix,
+                timestamp: ticket.timestamp || Date.now(),
+                immoKey: articleImmo.immoKey || null
+              });
+            }
+          });
+        }
+      });
+
+      if (biensAchetes.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#a0aec0; margin-top:20px;">Vous ne possédez aucun bien immobilier à vendre.</div>';
+        return;
+      }
+
+      biensAchetes.forEach((bien, idx) => {
+        let valeurActuelle = calculerValeurImmoActuelle(bien.prixOrigine, bien.timestamp);
+        let plusValue = Math.round((valeurActuelle - bien.prixOrigine) * 100) / 100;
+
+        let div = document.createElement('div');
+        div.className = 'dark-card-item';
+        div.style.cursor = 'default';
+        div.innerHTML = `
+          <div>
+            <div class="dark-card-name">${bien.nom}</div>
+            <div class="dark-card-sub">Acheté: ${bien.prixOrigine.toLocaleString('fr-FR')} € | Plus-value: +${plusValue.toLocaleString('fr-FR')} € (+30%/j)</div>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <div class="dark-card-amount">${valeurActuelle.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+            <button class="btn-vendre" onclick="vendreBiensImmo('${bien.nom}', ${bien.prixOrigine}, ${valeurActuelle}, '${bien.immoKey || ''}')">Vendre</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function vendreBiensImmo(nomBien, prixOrigine, valeurVente, immoKey) {
+      if (!confirm(`Voulez-vous vendre ${nomBien} pour ${valeurVente.toLocaleString('fr-FR')} € ?`)) return;
+
+      const user = lastUserValide;
+      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+      let nouveauSolde = Math.round((soldeActuel + valeurVente) * 100) / 100;
+      db.ref(`banques/${user}`).set(nouveauSolde);
+
+      // Si c'est un bien avec revenu spécial (Snack, Hôtel, etc.), décrémenter sa quantité
+      if (immoKey && possessionsImmo[user] && possessionsImmo[user][immoKey]) {
+        let qte = possessionsImmo[user][immoKey].quantite || 0;
+        if (qte > 1) {
+          db.ref(`immobilier/${user}/${immoKey}/quantite`).set(qte - 1);
+        } else {
+          db.ref(`immobilier/${user}/${immoKey}`).remove();
+        }
+      }
+
+      // Enregistrer une transaction négative/de revente pour retirer la valeur initiale
+      enregistrerTicketFirebase(lastPinValide, user, [{ nom: `Revente : ${nomBien}`, prix: -prixOrigine }], -valeurVente);
+
+      alert(`✅ Revente effectuée !\nVotre compte a été crédité de ${valeurVente.toLocaleString('fr-FR')} €.`);
+      afficherMesBiensAVendre();
+    }
+
     function afficherClassementEtPossessions() {
       const container = document.getElementById('historiqueList');
       const titleElement = document.getElementById('historiqueTitle');
@@ -1627,7 +1745,12 @@
             if (ticket.articles && Array.isArray(ticket.articles)) {
               ticket.articles.forEach(art => {
                 if (art.prix > 0 && estDansCatalogue(art.nom)) {
-                  totalValeurAchats += art.prix;
+                  const articleImmo = baseArticles.find(a => a.cat === "Immobilier Marseille" && (a.nom === art.nom || `${a.emoji} ${a.nom}` === art.nom));
+                  if (articleImmo) {
+                    totalValeurAchats += calculerValeurImmoActuelle(art.prix, ticket.timestamp);
+                  } else {
+                    totalValeurAchats += art.prix;
+                  }
                 }
               });
             }
@@ -1686,8 +1809,16 @@
           if (ticket.articles && Array.isArray(ticket.articles)) {
             ticket.articles.forEach(art => {
               if (art.prix > 0 && estDansCatalogue(art.nom)) {
-                totalValeurAchats += art.prix;
-                if (!mapPossessions[art.nom]) { mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix }; }
+                const articleImmo = baseArticles.find(a => a.cat === "Immobilier Marseille" && (a.nom === art.nom || `${a.emoji} ${a.nom}` === art.nom));
+                let val = art.prix;
+                if (articleImmo) {
+                  val = calculerValeurImmoActuelle(art.prix, ticket.timestamp);
+                }
+                totalValeurAchats += val;
+
+                if (!mapPossessions[art.nom]) { 
+                  mapPossessions[art.nom] = { quantite: 0, prixUnitaire: val }; 
+                }
                 mapPossessions[art.nom].quantite += 1;
               }
             });
@@ -1695,114 +1826,90 @@
         });
 
         let fortuneTotale = Math.round((soldeBanque + totalValeurAchats) * 100) / 100;
-        let statsGar = calculerCapaciteEtVoitures(nomClient);
 
-        const fortuneCard = document.createElement('div');
-        fortuneCard.className = 'dark-card-item';
-        fortuneCard.style.cursor = 'default';
-        fortuneCard.style.background = '#202b38';
-        fortuneCard.innerHTML = `
+        let totalCard = document.createElement('div');
+        totalCard.className = 'dark-card-item';
+        totalCard.style.marginBottom = '14px';
+        totalCard.style.background = '#0d1117';
+        totalCard.innerHTML = `
           <div>
-            <div class="dark-card-name" style="font-size:16px;">Fortune Globale ${estJoueurProtege(nomClient) ? '⭐' : ''}</div>
-            <div class="dark-card-sub">💵 Banque: ${soldeBanque.toLocaleString('fr-FR')} € | 📦 Biens: ${totalValeurAchats.toLocaleString('fr-FR')} €</div>
-            <div class="dark-card-sub" style="color: #38bdf8; margin-top: 4px;">🚘 Garage: ${statsGar.voituresPossedees} / ${statsGar.capaciteTotale} places occupées</div>
+            <div class="dark-card-name">Fortune Totale</div>
+            <div class="dark-card-sub">Solde banque + valeur actuelle biens (+30%/j)</div>
           </div>
-          <div class="dark-card-amount ${fortuneTotale < 0 ? 'deficit' : ''}" style="font-size:20px;">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
+          <div class="dark-card-amount ${fortuneTotale < 0 ? 'deficit' : ''}">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
         `;
-        container.appendChild(fortuneCard);
+        container.appendChild(totalCard);
 
-        const sectionTitle = document.createElement('div');
-        sectionTitle.className = 'section-title';
-        sectionTitle.style.marginTop = '12px';
-        sectionTitle.style.marginBottom = '8px';
-        sectionTitle.innerText = "Articles & Biens Possédés";
-        container.appendChild(sectionTitle);
-
-        let clesPossessions = Object.keys(mapPossessions);
-        if (clesPossessions.length === 0) {
-          let emptyDiv = document.createElement('div');
-          emptyDiv.style.textAlign = 'center';
-          emptyDiv.style.color = '#a0aec0';
-          emptyDiv.style.fontSize = '13px';
-          emptyDiv.style.marginTop = '10px';
-          emptyDiv.innerText = "Aucun bien ni article acheté pour le moment.";
-          container.appendChild(emptyDiv);
-        } else {
-          clesPossessions.forEach(nomArt => {
-            let itemData = mapPossessions[nomArt];
-            let valTotaleItem = itemData.quantite * itemData.prixUnitaire;
-
-            let pill = document.createElement('div');
-            pill.className = 'possession-pill';
-            pill.innerHTML = `
-              <div>
-                <strong style="color:#ffffff;">${nomArt}</strong>
-                <div style="font-size:11px; color:#8b98a5; margin-top:2px;">
-                  Unité: ${itemData.prixUnitaire.toLocaleString('fr-FR')} €
-                </div>
-              </div>
-              <div style="text-align:right;">
-                <span class="possession-badge-green">x${itemData.quantite}</span>
-                <div style="font-size:12px; font-family:monospace; font-weight:bold; color:#cbd5e0; margin-top:4px;">
-                  ${valTotaleItem.toLocaleString('fr-FR')} €
-                </div>
-              </div>
-            `;
-            container.appendChild(pill);
-          });
-        }
+        Object.keys(mapPossessions).forEach(nomArt => {
+          let item = mapPossessions[nomArt];
+          let div = document.createElement('div');
+          div.className = 'dark-card-item';
+          div.innerHTML = `
+            <div>
+              <div class="dark-card-name">${nomArt}</div>
+              <div class="dark-card-sub">Quantité : ${item.quantite}</div>
+            </div>
+            <div class="dark-card-amount">${(item.prixUnitaire * item.quantite).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+          `;
+          container.appendChild(div);
+        });
       }
     }
 
-    function ouvrirHistorique() {
-      joueurSelectionneVueDetail = null;
-      afficherClassementEtPossessions();
-      document.getElementById('historiqueOverlay').classList.add('active');
-    }
+    function ouvrirHistorique() { joueurSelectionneVueDetail = null; afficherClassementEtPossessions(); document.getElementById('historiqueOverlay').classList.add('active'); }
     function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
-    function ouvrirEcranReglages() {
-      afficherListeArticlesReglages();
-      afficherListeJoueursReglages();
-      document.getElementById('reglagesOverlay').classList.add('active');
-    }
+    function ouvrirEcranReglages() { afficherListesReglages(); document.getElementById('reglagesOverlay').classList.add('active'); }
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
     function changerOngletReglages(onglet) {
-      document.getElementById('btnTabArticles').classList.toggle('active', onglet === 'articles');
-      document.getElementById('btnTabJoueurs').classList.toggle('active', onglet === 'joueurs');
-      document.getElementById('vueReglagesArticles').style.display = onglet === 'articles' ? 'flex' : 'none';
-      document.getElementById('vueReglagesJoueurs').style.display = onglet === 'joueurs' ? 'flex' : 'none';
+      if (onglet === 'articles') {
+        document.getElementById('btnTabArticles').classList.add('active');
+        document.getElementById('btnTabJoueurs').classList.remove('active');
+        document.getElementById('vueReglagesArticles').style.display = 'flex';
+        document.getElementById('vueReglagesJoueurs').style.display = 'none';
+      } else {
+        document.getElementById('btnTabJoueurs').classList.add('active');
+        document.getElementById('btnTabArticles').classList.remove('active');
+        document.getElementById('vueReglagesJoueurs').style.display = 'flex';
+        document.getElementById('vueReglagesArticles').style.display = 'none';
+      }
     }
 
-    function afficherListeArticlesReglages() {
-      const container = document.getElementById('reglagesList');
-      container.innerHTML = "";
+    function afficherListesReglages() {
+      const containerArt = document.getElementById('reglagesList');
+      containerArt.innerHTML = "";
       baseArticles.forEach((item, index) => {
-        const div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleReglages(${index}, 'emoji', this.value)">
-          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleReglages(${index}, 'nom', this.value)">
-          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticleReglages(${index}, 'prix', this.value)">
-          <button class="btn-suppr-ligne" onclick="supprimerArticleReglages(${index})">✕</button>
+          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleSysteme(${index}, 'emoji', this.value)">
+          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleSysteme(${index}, 'nom', this.value)">
+          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticleSysteme(${index}, 'prix', parseFloat(this.value))">
+          <button style="background:#fed7d7; color:#9b2c2c; border:none; border-radius:8px; padding:6px 10px; font-weight:bold; cursor:pointer;" onclick="supprimerArticleSysteme(${index})">✕</button>
         `;
-        container.appendChild(div);
+        containerArt.appendChild(div);
+      });
+
+      const containerJoueurs = document.getElementById('joueursList');
+      containerJoueurs.innerHTML = "";
+      Object.keys(USERS_MAP).forEach(pin => {
+        let prenom = USERS_MAP[pin];
+        let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
+        let div = document.createElement('div');
+        div.className = 'item-editor';
+        div.innerHTML = `
+          <span style="font-size:13px; font-weight:bold; width:60px; color:#a0aec0;">PIN ${pin}</span>
+          <input type="text" class="nom-input" value="${prenom}" readonly>
+          <input type="number" step="0.01" class="prix-input" value="${solde}" onchange="modifierSoldeJoueurSysteme('${prenom}', parseFloat(this.value))">
+        `;
+        containerJoueurs.appendChild(div);
       });
     }
 
-    function modifierArticleReglages(index, champ, valeur) {
-      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
-      else { baseArticles[index][champ] = valeur; }
-      afficherArticles();
-    }
-
-    function supprimerArticleReglages(index) {
-      baseArticles.splice(index, 1);
-      afficherListeArticlesReglages();
-      afficherArticles();
-    }
+    function modifierArticleSysteme(index, champ, valeur) { baseArticles[index][champ] = valeur; afficherArticles(); }
+    function supprimerArticleSysteme(index) { baseArticles.splice(index, 1); afficherListesReglages(); afficherArticles(); }
 
     function ajouterNouvelArticleSysteme() {
       const emoji = document.getElementById('nouveauEmoji').value || '🍕';
@@ -1810,89 +1917,67 @@
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
 
-      if (!nom || isNaN(prix)) { alert("Veuillez saisir un nom et un prix valides."); return; }
-
-      const newId = Date.now();
-      baseArticles.push({ id: newId, cat: cat, emoji: emoji, nom: nom, prix: prix });
-
+      if (!nom || isNaN(prix)) { alert("Veuillez saisir un nom et un prix valides !"); return; }
+      baseArticles.push({ id: Date.now(), cat: cat, emoji: emoji, nom: nom, prix: prix });
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
-
-      afficherListeArticlesReglages();
+      afficherListesReglages();
       afficherArticles();
     }
 
-    function afficherListeJoueursReglages() {
-      const container = document.getElementById('joueursList');
-      container.innerHTML = "";
-      Object.keys(USERS_MAP).forEach(pin => {
-        const nom = USERS_MAP[pin];
-        const div = document.createElement('div');
-        div.className = 'item-editor';
-        div.innerHTML = `
-          <input type="text" class="emoji-input" value="${pin}" readonly style="background:#2d3748; color:#a0aec0;">
-          <input type="text" class="nom-input" value="${nom}" onchange="modifierJoueurReglages('${pin}', this.value)">
-          <button class="btn-suppr-ligne" onclick="supprimerJoueurReglages('${pin}')">✕</button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function modifierJoueurReglages(pin, nouveauNom) {
-      if (!nouveauNom.trim()) return;
-      USERS_MAP[pin] = nouveauNom.trim();
-      db.ref('utilisateurs').set(USERS_MAP);
-    }
-
-    function supprimerJoueurReglages(pin) {
-      delete USERS_MAP[pin];
-      db.ref('utilisateurs').set(USERS_MAP);
-      afficherListeJoueursReglages();
+    function modifierSoldeJoueurSysteme(prenom, nouveauSolde) {
+      if (isNaN(nouveauSolde)) return;
+      db.ref(`banques/${prenom}`).set(nouveauSolde);
     }
 
     function ajouterNouveauJoueurSysteme() {
       const nom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
 
-      if (!nom || pin.length !== 4) { alert("Saisissez un nom et un PIN exact à 4 chiffres."); return; }
-
+      if (!nom || pin.length !== 4 || isNaN(pin)) { alert("Entrez un prénom valide et un code PIN à 4 chiffres !"); return; }
+      
       USERS_MAP[pin] = nom;
       db.ref('utilisateurs').set(USERS_MAP);
       db.ref(`banques/${nom}`).set(20000.00);
 
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
-
-      afficherListeJoueursReglages();
+      afficherListesReglages();
+      alert(`Joueur ${nom} inscrit avec 20 000,00 € !`);
     }
 
     function jouerSonValidation() {
       if (!audioCtx) return;
       try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-      } catch (e) {}
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08); // A5
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      } catch(e) {}
     }
 
     function jouerSonErreur() {
       if (!audioCtx) return;
       try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.25);
-      } catch (e) {}
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch(e) {}
     }
   </script>
 </body>
