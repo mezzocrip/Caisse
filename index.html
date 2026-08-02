@@ -330,7 +330,7 @@
     }
 
     /* MODALS & OVERLAYS DARK / MODERN UI */
-    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay, .vente-overlay {
+    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.85);
@@ -344,12 +344,12 @@
       transition: opacity 0.25s ease;
       z-index: 9998;
     }
-    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active, .vente-overlay.active {
+    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active {
       opacity: 1;
       pointer-events: auto;
     }
     
-    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card, .vente-card {
+    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card {
       background: #121820;
       width: 92%;
       max-width: 440px;
@@ -529,13 +529,7 @@
     .face-id-icon { width: 56px; height: 56px; margin: 12px auto; border: 3px solid #30d158; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; }
     .face-id-icon.success { background: #30d158; color: white; }
 
-    /* BOUTON VENTE IMMO */
-    .btn-vente-immo {
-      background: #e53e3e; color: white; border: none; border-radius: 10px;
-      padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer;
-    }
-    .btn-vente-immo:active { opacity: 0.8; }
-
+    /* TABLETTES / PAYSAGE (>= 600px) */
     @media (min-width: 600px) {
       .articles-grid { grid-template-columns: repeat(3, 1fr); }
     }
@@ -552,7 +546,6 @@
     <div class="header-caisse">
       <h1>Marseille Monopoly 🎲</h1>
       <div class="header-actions">
-        <button class="btn-icon" onclick="ouvrirVenteImmo()" title="Vendre un bien">🏷️</button>
         <button class="btn-icon" onclick="ouvrirBanque()" title="Comptes Bancaires">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Acquisitions">🧾</button>
         <button class="btn-icon" onclick="ouvrirReglagesProteges()" title="Réglages">⚙️</button>
@@ -590,7 +583,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v3.0.0 (Règles 12h Inactivité & Revente Immo +10%)</div>
+    <div class="version-tag">v4.0 (Renews)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -741,19 +734,6 @@
     </div>
   </div>
 
-  <!-- MODAL VENTE / PLUS-VALUE IMMOBILIÈRE -->
-  <div class="vente-overlay" id="venteOverlay">
-    <div class="vente-card">
-      <div class="reglages-header">
-        <span class="reglages-title">Revente Immobilier 🏷️</span>
-        <button class="btn-close" onclick="fermerVenteImmo()">✕</button>
-      </div>
-      <div class="historique-list" id="venteList">
-        <div style="text-align:center; color:#a0aec0; margin-top:20px;">Chargement des propriétés...</div>
-      </div>
-    </div>
-  </div>
-
   <!-- MODAL REGLAGES -->
   <div class="reglages-overlay" id="reglagesOverlay">
     <div class="reglages-card">
@@ -866,6 +846,7 @@
       "1806": "Joyce"
     };
 
+    // VÉRIFICATION DES JOUEURS PROTÉGÉS (TERRANCE ET JOYCE)
     function estJoueurProtege(nom) {
       if (!nom) return false;
       const n = nom.trim().toLowerCase();
@@ -939,18 +920,18 @@
       { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65\"", prix: 799.00 },
       { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75\"", prix: 1199.00 },
 
-      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T1 Marseille", prix: 115000.00, immoKey: "t1", estHabitation: true },
-      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T2 Marseille", prix: 185000.00, immoKey: "t2", estHabitation: true },
-      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T3 Vue mer", prix: 280000.00, immoKey: "t3", estHabitation: true },
-      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T4 Standing", prix: 395000.00, immoKey: "t4", estHabitation: true },
-      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00, immoKey: "m4", estHabitation: true },
-      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00, immoKey: "m5", estHabitation: true },
-      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00, immoKey: "v6", estHabitation: true },
+      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T1 Marseille", prix: 115000.00 },
+      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T2 Marseille", prix: 185000.00 },
+      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T3 Vue mer", prix: 280000.00 },
+      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T4 Standing", prix: 395000.00 },
+      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00 },
+      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00 },
+      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00 },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
       { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
       { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Com. (+10k€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 },
-      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (+50k€/h)", prix: 50000000.00, immoKey: "dubaiMall", revenuHeure: 50000.00 },
-      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (+500k€/h)", prix: 100000000.00, immoKey: "abuDhabiMall", revenuHeure: 500000.00 },
+      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (+50k€/h)", prix: 50000000.00, immoKey: "dubaiMall", revenuHeure: 50000.00, estMall: true },
+      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (+500k€/h)", prix: 100000000.00, immoKey: "abuDhabiMall", revenuHeure: 500000.00, estMall: true },
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
       { id: 514, cat: "Immobilier Marseille", emoji: "🏎️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 }
     ];
@@ -1003,12 +984,7 @@
       });
     }
 
-    /* RÈGLE DES 12H D'INACTIVITÉ (APPLIQUÉE À TOUS LES JOUEURS, TERRANCE ET JOYCE INCLUS) */
-    function enregistrerActiviteJoueur(user) {
-      if (!user) return;
-      db.ref(`immobilier/${user}/derniereActivite`).set(Date.now());
-    }
-
+    /* REVENUS PAR HEURE PLEINE ET PÉNALITÉ DE MALLS SI INACTIF (> 4h) */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1021,15 +997,12 @@
 
         let deltaTotalARecup = 0;
         const typesBiens = [
-          { key: 'snack', tauXHeure: 1000 },
-          { key: 'hotel', tauXHeure: 3500 },
-          { key: 'centreCommercial', tauXHeure: 10000 },
-          { key: 'dubaiMall', tauXHeure: 50000 },
-          { key: 'abuDhabiMall', tauXHeure: 500000 }
+          { key: 'snack', tauXHeure: 1000, estMall: false },
+          { key: 'hotel', tauXHeure: 3500, estMall: false },
+          { key: 'centreCommercial', tauXHeure: 10000, estMall: false },
+          { key: 'dubaiMall', tauXHeure: 50000, estMall: true },
+          { key: 'abuDhabiMall', tauXHeure: 500000, estMall: true }
         ];
-
-        const derniereActivite = biens.derniereActivite || (maintenant - 3600000); // 1h par défaut si inexistant
-        const inactifPlus12h = (maintenant - derniereActivite) >= (12 * 3600 * 1000);
 
         typesBiens.forEach(type => {
           if (biens[type.key]) {
@@ -1040,11 +1013,20 @@
             const heuresCompletes = Math.floor(secondesEcoulees / 3600);
 
             if (qte > 0 && heuresCompletes >= 1) {
-              if (inactifPlus12h) {
-                // Inactif > 12h => PERTE ÉGALE AUX GAINS PAR HEURE
-                deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
+              if (type.estMall) {
+                // Vérification du dernier quiz gagné avec au moins 30000€
+                const dernierePartieQuiz = biens.dernierePartie30k || 0;
+                const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
+
+                if (tempsSansJouer > 4) {
+                  // Inactif depuis +4h -> PERTE de la même somme par heure
+                  deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
+                } else {
+                  // Actif -> Gain normal
+                  deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
+                }
               } else {
-                // Actif < 12h => GAIN NORMAL
+                // Biens standards (sans condition de jeu)
                 deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
               }
 
@@ -1064,117 +1046,19 @@
       if (Object.keys(updatesImmo).length > 0) { db.ref().update(updatesImmo); }
     }
 
+    function enregistrerActiviteMallSiGagne30k(user, montantGagne) {
+      if (montantGagne >= 30000) {
+        db.ref(`immobilier/${user}/dernierePartie30k`).set(Date.now());
+      }
+    }
+
     function ajouterPossessionImmo(user, item) {
       if (!item.immoKey) return;
       const ref = db.ref(`immobilier/${user}/${item.immoKey}`);
       ref.once('value', (snapshot) => {
         const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now() };
-        let payload = { quantite: currentData.quantite + 1, dernierPaiement: Date.now() };
-        
-        // Si c'est une maison/appartement, on stocke sa valeur d'achat et la date d'achat
-        if (item.estHabitation) {
-          let listeAchats = currentData.achats || [];
-          listeAchats.push({ prixInitial: item.prix, dateAchat: Date.now() });
-          payload.achats = listeAchats;
-        }
-
-        ref.set(payload);
+        ref.set({ quantite: currentData.quantite + 1, dernierPaiement: Date.now() });
       });
-    }
-
-    /* REVENTE IMMOBILIÈRE ET CALCUL PLUS-VALUE (+10% PAR JOUR / STOP APRÈS 12H INACTIVITÉ) */
-    function calculerValeurImmoAvecPlusValue(achatObj, derniereActiviteUser) {
-      const maintenant = Date.now();
-      const tempsActifFin = (derniereActiviteUser + (12 * 3600 * 1000));
-      // Date de fin d'accumulation (stoppe si +12h sans jeu)
-      const dateFinGain = Math.min(maintenant, tempsActifFin);
-
-      if (dateFinGain <= achatObj.dateAchat) return achatObj.prixInitial;
-
-      const joursEcoules = (dateFinGain - achatObj.dateAchat) / (86400 * 1000);
-      const tauxCroissanceTotal = 1 + (0.10 * joursEcoules); // +10% par tranche de 24h proratisé
-
-      return Math.round(achatObj.prixInitial * tauxCroissanceTotal * 100) / 100;
-    }
-
-    function ouvrirVenteImmo() {
-      demanderCodePin('vente_immo');
-    }
-
-    function afficherEcranVenteImmo() {
-      const user = lastUserValide;
-      const container = document.getElementById('venteList');
-      container.innerHTML = "";
-      document.getElementById('venteOverlay').classList.add('active');
-
-      const userBiens = possessionsImmo[user] || {};
-      const derniereActiviteUser = userBiens.derniereActivite || Date.now();
-      let aDesBiens = false;
-
-      baseArticles.filter(a => a.estHabitation).forEach(habitation => {
-        const dataKey = habitation.immoKey;
-        if (userBiens[dataKey] && userBiens[dataKey].quantite > 0) {
-          aDesBiens = true;
-          const qte = userBiens[dataKey].quantite;
-          const achats = userBiens[dataKey].achats || [];
-
-          achats.forEach((achat, index) => {
-            const valeurActuelle = calculerValeurImmoAvecPlusValue(achat, derniereActiviteUser);
-            const plusValue = Math.round((valeurActuelle - achat.prixInitial) * 100) / 100;
-
-            let div = document.createElement('div');
-            div.className = 'dark-card-item';
-            div.innerHTML = `
-              <div>
-                <div class="dark-card-name">${habitation.emoji} ${habitation.nom}</div>
-                <div class="dark-card-sub">Acheté: ${achat.prixInitial.toLocaleString('fr-FR')} € • <span style="color:#38ef7d;">+${plusValue.toLocaleString('fr-FR')} €</span></div>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <div class="dark-card-amount">${valeurActuelle.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
-                <button class="btn-vente-immo" onclick="revendreBienImmo('${user}', '${dataKey}', ${index}, ${valeurActuelle})">Vendre</button>
-              </div>
-            `;
-            container.appendChild(div);
-          });
-        }
-      });
-
-      if (!aDesBiens) {
-        container.innerHTML = '<div style="text-align:center; color:#a0aec0; margin-top:20px;">Vous n\'avez aucune maison ou appartement à revendre.</div>';
-      }
-    }
-
-    function revendreBienImmo(user, dataKey, indexAchat, prixRevente) {
-      if (!confirm(`Voulez-vous revendre ce bien pour ${prixRevente.toLocaleString('fr-FR')} € ?`)) return;
-
-      const ref = db.ref(`immobilier/${user}/${dataKey}`);
-      ref.once('value', (snapshot) => {
-        const currentData = snapshot.val();
-        if (!currentData || !currentData.achats) return;
-
-        let achats = currentData.achats;
-        achats.splice(indexAchat, 1);
-        let nouvelleQte = currentData.quantite - 1;
-
-        if (nouvelleQte <= 0) {
-          ref.remove();
-        } else {
-          ref.update({ quantite: nouvelleQte, achats: achats });
-        }
-
-        // Créditer la banque du joueur
-        let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
-        let nouveauSolde = Math.round((soldeActuel + prixRevente) * 100) / 100;
-        db.ref(`banques/${user}`).set(nouveauSolde);
-
-        enregistrerActiviteJoueur(user);
-        alert(`✅ Bien vendu avec succès pour ${prixRevente.toLocaleString('fr-FR')} € !`);
-        afficherEcranVenteImmo();
-      });
-    }
-
-    function fermerVenteImmo() {
-      document.getElementById('venteOverlay').classList.remove('active');
     }
 
     function ouvrirBanque() { afficherSoldesBanque(); document.getElementById('banqueOverlay').classList.add('active'); }
@@ -1265,7 +1149,7 @@
     }
 
     function ajouterArticle(nom, prix, fullItem) {
-      listeArticles.push({ nom: nom, prix: prix, immoKey: fullItem ? fullItem.immoKey : null, cat: fullItem ? fullItem.cat : null, estHabitation: fullItem ? fullItem.estHabitation : false });
+      listeArticles.push({ nom: nom, prix: prix, immoKey: fullItem ? fullItem.immoKey : null, cat: fullItem ? fullItem.cat : null });
       MettreAJourEcran();
     }
 
@@ -1286,9 +1170,6 @@
       } else if (action === 'quiz_login') {
         document.getElementById('pinTitleModal').innerText = "Connexion Multiplications 🧮";
         document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour jouer";
-      } else if (action === 'vente_immo') {
-        document.getElementById('pinTitleModal').innerText = "Revente Immobilier 🏷️";
-        document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour gérer vos biens";
       }
 
       actionApresPin = action;
@@ -1338,12 +1219,10 @@
       if (userTrouve) {
         lastPinValide = pinSaisi;
         lastUserValide = userTrouve;
-        enregistrerActiviteJoueur(userTrouve); // Réinitialise l'activité 12h
         fermerCodePin();
         if (actionApresPin === 'paiement') { validerPaiement(); }
         else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
         else if (actionApresPin === 'quiz_login') { ouvrirSelectionNiveauQuiz(); }
-        else if (actionApresPin === 'vente_immo') { afficherEcranVenteImmo(); }
       } else {
         document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
         mettreAJourPointsPin(true);
@@ -1356,6 +1235,7 @@
       }
     }
 
+    // CALCULE LA CAPACITÉ TOTALE DE GARAGE ET LES VOITURES POSSÉDÉES
     function calculerCapaciteEtVoitures(user) {
       const userBiens = possessionsImmo[user] || {};
       let capaciteTotale = 0;
@@ -1366,6 +1246,7 @@
         capaciteTotale += userBiens.garage20.quantite * 20;
       }
 
+      // Nombre de voitures déjà possédées depuis l'historique
       let voituresPossedees = 0;
       const nomCatalogueExactsAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => a.nom);
       const nomCatalogueAvecEmojiAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => `${a.emoji} ${a.nom}`);
@@ -1389,6 +1270,7 @@
       let user = lastUserValide;
       let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
 
+      // Vérification des conditions d'achat d'automobiles (Garage requis & Capacité)
       let voituresDansPanier = listeArticles.filter(i => i.cat === "Automobiles").length;
       if (voituresDansPanier > 0) {
         let statsGarage = calculerCapaciteEtVoitures(user);
@@ -1456,9 +1338,11 @@
       if (niveauQuizActif === 'extreme') {
         if (questionsJoueesDansSession < 10) {
           if (!estJoueurProtege(lastUserValide)) {
+            // Annulation des gains accumulés pendant la session si positifs
             if (gainsSessionQuiz > 0) {
               appliquerMouvementSoldeFirebase(-gainsSessionQuiz, "Annulation gains Extrême (Abandon < 10 quest.)");
             }
+            // Application de la pénalité de 50 000€
             appliquerMouvementSoldeFirebase(-50000, "Pénalité Abandon Extrême ⚠️ (<10 quest.)");
             alert(`⚠️ ABANDON EN MODE EXTRÊME !\nVous n'avez fait que ${questionsJoueesDansSession}/10 questions.\n- Gains de la session annulés.\n- Pénalité forfaitaire de -50 000 € appliquée à ${lastUserValide}.`);
           } else {
@@ -1486,6 +1370,7 @@
     function relancerChrono() {
       clearInterval(intervalChrono);
 
+      // PAS DE CHRONO NI LIMITE DE TEMPS POUR TERRANCE ET JOYCE
       if (estJoueurProtege(lastUserValide)) {
         const box = document.getElementById('quizTimerBox');
         box.innerText = "♾️ Pas de limite";
@@ -1527,6 +1412,7 @@
       genererNouvelleQuestionQuiz();
     }
 
+    /* GESTION EXCLUSIVE DU CALCUL MENTAL (MULTIPLICATIONS) */
     function genererNouvelleQuestionQuiz() {
       let titreMatiere = "Multiplications (3 à 10)";
       if (niveauQuizActif === 'extreme') {
@@ -1552,6 +1438,7 @@
             choix.push(faux);
           }
         }
+        // Mélanger les 3 choix
         choix.sort(() => Math.random() - 0.5);
 
         const container = document.getElementById('qcmContainer');
@@ -1576,6 +1463,7 @@
       relancerChrono();
     }
 
+    /* VÉRIFICATION CHOIX QCM (EXTRÊME) */
     function validerChoixQCM(valSaisie) {
       clearInterval(intervalChrono);
       questionsJoueesDansSession++;
@@ -1600,6 +1488,7 @@
       genererNouvelleQuestionQuiz();
     }
 
+    /* VÉRIFICATION PAVÉ NUMÉRIQUE */
     function taperQuizChiffre(chiffre) {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value += chiffre;
@@ -1657,6 +1546,11 @@
         let soldeActuel = snapshot.val() !== null ? snapshot.val() : 20000.00;
         let nouveauSolde = Math.round((soldeActuel + montant) * 100) / 100;
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
+
+        // Si le gain de la transaction est au moins de 30 000€, réinitialiser la sécurité des Malls
+        if (montant >= 30000) {
+          enregistrerActiviteMallSiGagne30k(lastUserValide, montant);
+        }
 
         const now = new Date();
         const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -1785,97 +1679,150 @@
         let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
         let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === nomClient);
 
+        let mapPossessions = {};
+        let totalValeurAchats = 0;
+
         ticketsJoueur.forEach(ticket => {
           if (ticket.articles && Array.isArray(ticket.articles)) {
             ticket.articles.forEach(art => {
-              let div = document.createElement('div');
-              div.className = 'dark-card-item';
-              div.innerHTML = `
-                <div>
-                  <div class="dark-card-name">${art.nom}</div>
-                  <div class="dark-card-sub">${ticket.date}</div>
-                </div>
-                <div class="dark-card-amount">${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
-              `;
-              container.appendChild(div);
+              if (art.prix > 0 && estDansCatalogue(art.nom)) {
+                totalValeurAchats += art.prix;
+                if (!mapPossessions[art.nom]) { mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix }; }
+                mapPossessions[art.nom].quantite += 1;
+              }
             });
           }
         });
+
+        let fortuneTotale = Math.round((soldeBanque + totalValeurAchats) * 100) / 100;
+        let statsGar = calculerCapaciteEtVoitures(nomClient);
+
+        const fortuneCard = document.createElement('div');
+        fortuneCard.className = 'dark-card-item';
+        fortuneCard.style.cursor = 'default';
+        fortuneCard.style.background = '#202b38';
+        fortuneCard.innerHTML = `
+          <div>
+            <div class="dark-card-name" style="font-size:16px;">Fortune Globale ${estJoueurProtege(nomClient) ? '⭐' : ''}</div>
+            <div class="dark-card-sub">💵 Banque: ${soldeBanque.toLocaleString('fr-FR')} € | 📦 Biens: ${totalValeurAchats.toLocaleString('fr-FR')} €</div>
+            <div class="dark-card-sub" style="color: #38bdf8; margin-top: 4px;">🚘 Garage: ${statsGar.voituresPossedees} / ${statsGar.capaciteTotale} places occupées</div>
+          </div>
+          <div class="dark-card-amount ${fortuneTotale < 0 ? 'deficit' : ''}" style="font-size:20px;">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
+        `;
+        container.appendChild(fortuneCard);
+
+        const sectionTitle = document.createElement('div');
+        sectionTitle.className = 'section-title';
+        sectionTitle.style.marginTop = '12px';
+        sectionTitle.style.marginBottom = '8px';
+        sectionTitle.innerText = "Articles & Biens Possédés";
+        container.appendChild(sectionTitle);
+
+        let clesPossessions = Object.keys(mapPossessions);
+        if (clesPossessions.length === 0) {
+          let emptyDiv = document.createElement('div');
+          emptyDiv.style.textAlign = 'center';
+          emptyDiv.style.color = '#a0aec0';
+          emptyDiv.style.fontSize = '13px';
+          emptyDiv.style.marginTop = '10px';
+          emptyDiv.innerText = "Aucun bien ni article acheté pour le moment.";
+          container.appendChild(emptyDiv);
+        } else {
+          clesPossessions.forEach(nomArt => {
+            let itemData = mapPossessions[nomArt];
+            let valTotaleItem = itemData.quantite * itemData.prixUnitaire;
+
+            let pill = document.createElement('div');
+            pill.className = 'possession-pill';
+            pill.innerHTML = `
+              <div>
+                <strong style="color:#ffffff;">${nomArt}</strong>
+                <div style="font-size:11px; color:#8b98a5; margin-top:2px;">
+                  Unité: ${itemData.prixUnitaire.toLocaleString('fr-FR')} €
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <span class="possession-badge-green">x${itemData.quantite}</span>
+                <div style="font-size:12px; font-family:monospace; font-weight:bold; color:#cbd5e0; margin-top:4px;">
+                  ${valTotaleItem.toLocaleString('fr-FR')} €
+                </div>
+              </div>
+            `;
+            container.appendChild(pill);
+          });
+        }
       }
     }
 
-    function ouvrirHistorique() { joueurSelectionneVueDetail = null; afficherClassementEtPossessions(); document.getElementById('historiqueOverlay').classList.add('active'); }
+    function ouvrirHistorique() {
+      joueurSelectionneVueDetail = null;
+      afficherClassementEtPossessions();
+      document.getElementById('historiqueOverlay').classList.add('active');
+    }
     function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
-    function ouvrirEcranReglages() { changerOngletReglages('articles'); document.getElementById('reglagesOverlay').classList.add('active'); }
+    function ouvrirEcranReglages() {
+      afficherListeArticlesReglages();
+      afficherListeJoueursReglages();
+      document.getElementById('reglagesOverlay').classList.add('active');
+    }
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
     function changerOngletReglages(onglet) {
-      const btnArticles = document.getElementById('btnTabArticles');
-      const btnJoueurs = document.getElementById('btnTabJoueurs');
-      const vueArticles = document.getElementById('vueReglagesArticles');
-      const vueJoueurs = document.getElementById('vueReglagesJoueurs');
-
-      if (onglet === 'articles') {
-        btnArticles.classList.add('active'); btnJoueurs.classList.remove('active');
-        vueArticles.style.display = 'flex'; vueJoueurs.style.display = 'none';
-        afficherListeEditeurArticles();
-      } else {
-        btnJoueurs.classList.add('active'); btnArticles.classList.remove('active');
-        vueJoueurs.style.display = 'flex'; vueArticles.style.display = 'none';
-        afficherListeEditeurJoueurs();
-      }
+      document.getElementById('btnTabArticles').classList.toggle('active', onglet === 'articles');
+      document.getElementById('btnTabJoueurs').classList.toggle('active', onglet === 'joueurs');
+      document.getElementById('vueReglagesArticles').style.display = onglet === 'articles' ? 'flex' : 'none';
+      document.getElementById('vueReglagesJoueurs').style.display = onglet === 'joueurs' ? 'flex' : 'none';
     }
 
-    function afficherListeEditeurArticles() {
+    function afficherListeArticlesReglages() {
       const container = document.getElementById('reglagesList');
       container.innerHTML = "";
       baseArticles.forEach((item, index) => {
         const div = document.createElement('div');
         div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleSysteme(${index}, 'emoji', this.value)">
-          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleSysteme(${index}, 'nom', this.value)">
-          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticleSysteme(${index}, 'prix', this.value)">
-          <button class="btn-suppr-ligne" onclick="supprimerArticleSysteme(${index})">✕</button>
+          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleReglages(${index}, 'emoji', this.value)">
+          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleReglages(${index}, 'nom', this.value)">
+          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticleReglages(${index}, 'prix', this.value)">
+          <button class="btn-suppr-ligne" onclick="supprimerArticleReglages(${index})">✕</button>
         `;
         container.appendChild(div);
       });
     }
 
-    function modifierArticleSysteme(index, champ, valeur) {
-      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; } 
+    function modifierArticleReglages(index, champ, valeur) {
+      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
       else { baseArticles[index][champ] = valeur; }
       afficherArticles();
     }
 
-    function supprimerArticleSysteme(index) {
+    function supprimerArticleReglages(index) {
       baseArticles.splice(index, 1);
-      afficherListeEditeurArticles();
+      afficherListeArticlesReglages();
       afficherArticles();
     }
 
     function ajouterNouvelArticleSysteme() {
-      const emoji = document.getElementById('nouveauEmoji').value.trim() || "📦";
-      const nom = document.getElementById('nouveauNom').value.trim();
+      const emoji = document.getElementById('nouveauEmoji').value || '🍕';
+      const nom = document.getElementById('nouveauNom').value;
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
 
       if (!nom || isNaN(prix)) { alert("Veuillez saisir un nom et un prix valides."); return; }
 
-      let keyGen = nom.toLowerCase().replace(/\s+/g, '');
-      let estHab = cat === "Immobilier Marseille" && (nom.toLowerCase().includes("appart") || nom.toLowerCase().includes("maison") || nom.toLowerCase().includes("villa"));
+      const newId = Date.now();
+      baseArticles.push({ id: newId, cat: cat, emoji: emoji, nom: nom, prix: prix });
 
-      baseArticles.push({ id: Date.now(), cat: cat, emoji: emoji, nom: nom, prix: prix, immoKey: keyGen, estHabitation: estHab });
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
 
-      afficherListeEditeurArticles();
+      afficherListeArticlesReglages();
       afficherArticles();
     }
 
-    function afficherListeEditeurJoueurs() {
+    function afficherListeJoueursReglages() {
       const container = document.getElementById('joueursList');
       container.innerHTML = "";
       Object.keys(USERS_MAP).forEach(pin => {
@@ -1883,38 +1830,40 @@
         const div = document.createElement('div');
         div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" class="emoji-input" value="🔑" readonly>
-          <input type="text" class="nom-input" value="${nom} (${pin})" readonly>
-          <button class="btn-suppr-ligne" onclick="supprimerJoueurSysteme('${pin}')">✕</button>
+          <input type="text" class="emoji-input" value="${pin}" readonly style="background:#2d3748; color:#a0aec0;">
+          <input type="text" class="nom-input" value="${nom}" onchange="modifierJoueurReglages('${pin}', this.value)">
+          <button class="btn-suppr-ligne" onclick="supprimerJoueurReglages('${pin}')">✕</button>
         `;
         container.appendChild(div);
       });
+    }
+
+    function modifierJoueurReglages(pin, nouveauNom) {
+      if (!nouveauNom.trim()) return;
+      USERS_MAP[pin] = nouveauNom.trim();
+      db.ref('utilisateurs').set(USERS_MAP);
+    }
+
+    function supprimerJoueurReglages(pin) {
+      delete USERS_MAP[pin];
+      db.ref('utilisateurs').set(USERS_MAP);
+      afficherListeJoueursReglages();
     }
 
     function ajouterNouveauJoueurSysteme() {
       const nom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
 
-      if (!nom || pin.length !== 4 || isNaN(pin)) { alert("Entrez un prénom valide et un code PIN à 4 chiffres."); return; }
+      if (!nom || pin.length !== 4) { alert("Saisissez un nom et un PIN exact à 4 chiffres."); return; }
 
       USERS_MAP[pin] = nom;
-      db.ref(`utilisateurs/${pin}`).set(nom);
+      db.ref('utilisateurs').set(USERS_MAP);
       db.ref(`banques/${nom}`).set(20000.00);
 
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
 
-      afficherListeEditeurJoueurs();
-    }
-
-    function supprimerJoueurSysteme(pin) {
-      const nom = USERS_MAP[pin];
-      if (confirm(`Voulez-vous vraiment supprimer ${nom} ?`)) {
-        delete USERS_MAP[pin];
-        db.ref(`utilisateurs/${pin}`).remove();
-        db.ref(`banques/${nom}`).remove();
-        afficherListeEditeurJoueurs();
-      }
+      afficherListeJoueursReglages();
     }
 
     function jouerSonValidation() {
@@ -1922,16 +1871,14 @@
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      } catch(e) {}
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {}
     }
 
     function jouerSonErreur() {
@@ -1939,15 +1886,13 @@
       try {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
         gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      } catch(e) {}
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+      } catch (e) {}
     }
   </script>
 </body>
