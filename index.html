@@ -476,16 +476,6 @@
       min-height: 42px;
     }
 
-    .possession-pill {
-      background: #202b38; border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 12px; margin-bottom: 8px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #e2e8f0;
-    }
-    .possession-badge-green {
-      background: rgba(56, 239, 125, 0.15); color: #38ef7d;
-      font-weight: bold; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-family: monospace;
-    }
-
     .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .reglages-title { font-size: 18px; font-weight: 800; color: #ffffff; }
     .btn-close { background: #1a222d; border: none; color: #a0aec0; border-radius: 50%; width: 36px; height: 36px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -529,7 +519,6 @@
     .face-id-icon { width: 56px; height: 56px; margin: 12px auto; border: 3px solid #30d158; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; }
     .face-id-icon.success { background: #30d158; color: white; }
 
-    /* BOUTON VENTE IMMO */
     .btn-vente-immo {
       background: #e53e3e; color: white; border: none; border-radius: 10px;
       padding: 6px 12px; font-size: 12px; font-weight: bold; cursor: pointer;
@@ -1003,7 +992,6 @@
       });
     }
 
-    /* RÈGLE DES 12H D'INACTIVITÉ (APPLIQUÉE À TOUS LES JOUEURS, TERRANCE ET JOYCE INCLUS) */
     function enregistrerActiviteJoueur(user) {
       if (!user) return;
       db.ref(`immobilier/${user}/derniereActivite`).set(Date.now());
@@ -1028,7 +1016,7 @@
           { key: 'abuDhabiMall', tauXHeure: 500000 }
         ];
 
-        const derniereActivite = biens.derniereActivite || (maintenant - 3600000); // 1h par défaut si inexistant
+        const derniereActivite = biens.derniereActivite || (maintenant - 3600000);
         const inactifPlus12h = (maintenant - derniereActivite) >= (12 * 3600 * 1000);
 
         typesBiens.forEach(type => {
@@ -1041,10 +1029,8 @@
 
             if (qte > 0 && heuresCompletes >= 1) {
               if (inactifPlus12h) {
-                // Inactif > 12h => PERTE ÉGALE AUX GAINS PAR HEURE
                 deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
               } else {
-                // Actif < 12h => GAIN NORMAL
                 deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
               }
 
@@ -1071,7 +1057,6 @@
         const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now() };
         let payload = { quantite: currentData.quantite + 1, dernierPaiement: Date.now() };
         
-        // Si c'est une maison/appartement, on stocke sa valeur d'achat et la date d'achat
         if (item.estHabitation) {
           let listeAchats = currentData.achats || [];
           listeAchats.push({ prixInitial: item.prix, dateAchat: Date.now() });
@@ -1082,17 +1067,15 @@
       });
     }
 
-    /* REVENTE IMMOBILIÈRE ET CALCUL PLUS-VALUE (+10% PAR JOUR / STOP APRÈS 12H INACTIVITÉ) */
     function calculerValeurImmoAvecPlusValue(achatObj, derniereActiviteUser) {
       const maintenant = Date.now();
       const tempsActifFin = (derniereActiviteUser + (12 * 3600 * 1000));
-      // Date de fin d'accumulation (stoppe si +12h sans jeu)
       const dateFinGain = Math.min(maintenant, tempsActifFin);
 
       if (dateFinGain <= achatObj.dateAchat) return achatObj.prixInitial;
 
       const joursEcoules = (dateFinGain - achatObj.dateAchat) / (86400 * 1000);
-      const tauxCroissanceTotal = 1 + (0.10 * joursEcoules); // +10% par tranche de 24h proratisé
+      const tauxCroissanceTotal = 1 + (0.10 * joursEcoules);
 
       return Math.round(achatObj.prixInitial * tauxCroissanceTotal * 100) / 100;
     }
@@ -1115,7 +1098,6 @@
         const dataKey = habitation.immoKey;
         if (userBiens[dataKey] && userBiens[dataKey].quantite > 0) {
           aDesBiens = true;
-          const qte = userBiens[dataKey].quantite;
           const achats = userBiens[dataKey].achats || [];
 
           achats.forEach((achat, index) => {
@@ -1162,7 +1144,6 @@
           ref.update({ quantite: nouvelleQte, achats: achats });
         }
 
-        // Créditer la banque du joueur
         let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
         let nouveauSolde = Math.round((soldeActuel + prixRevente) * 100) / 100;
         db.ref(`banques/${user}`).set(nouveauSolde);
@@ -1338,7 +1319,7 @@
       if (userTrouve) {
         lastPinValide = pinSaisi;
         lastUserValide = userTrouve;
-        enregistrerActiviteJoueur(userTrouve); // Réinitialise l'activité 12h
+        enregistrerActiviteJoueur(userTrouve);
         fermerCodePin();
         if (actionApresPin === 'paiement') { validerPaiement(); }
         else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
@@ -1782,7 +1763,6 @@
         };
         container.appendChild(btnBack);
 
-        let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
         let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === nomClient);
 
         ticketsJoueur.forEach(ticket => {
