@@ -582,7 +582,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v2.6.0 (Mode Extrême QCM)</div>
+    <div class="version-tag">v2.7.0 (Mode Extrême Strict)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -654,7 +654,7 @@
         <button class="btn-level btn-level-extreme" onclick="demarrerQuizAvecNiveau('extreme')">
           <div>
             <div class="level-name">💀 Extrême (QCM 3 Choix)</div>
-            <div class="level-desc">2 sec / réponse</div>
+            <div class="level-desc">2s / réps. Min 10 questions. Err: -50k€</div>
           </div>
           <div class="level-name">+15 000 €</div>
         </button>
@@ -873,7 +873,9 @@
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
     let gainParQuestion = 1000;
+    let perteParQuestion = 1000;
     let questionsJoueesDansSession = 0;
+    let gainsSessionQuiz = 0;
     let questionActiveCourante = null;
     let tempsRestant = 10;
     let intervalChrono = null;
@@ -977,7 +979,7 @@
       });
     }
 
-    /* REVENUS PAR HEURE PLEINE (VERSEMENT D'UN BLOC DE 1000€ APRES 1h) */
+    /* REVENUS PAR HEURE PLEINE */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1242,14 +1244,15 @@
     function demarrerQuizAvecNiveau(niveau) {
       niveauQuizActif = niveau;
       questionsJoueesDansSession = 0;
+      gainsSessionQuiz = 0;
 
-      if (niveau === 'facile') { chronoMaxParQuestion = 10; gainParQuestion = 1000; }
-      else if (niveau === 'intermediaire') { chronoMaxParQuestion = 6; gainParQuestion = 3000; }
-      else if (niveau === 'difficile') { chronoMaxParQuestion = 3; gainParQuestion = 6000; }
-      else if (niveau === 'extreme') { chronoMaxParQuestion = 2; gainParQuestion = 15000; }
+      if (niveau === 'facile') { chronoMaxParQuestion = 10; gainParQuestion = 1000; perteParQuestion = 1000; }
+      else if (niveau === 'intermediaire') { chronoMaxParQuestion = 6; gainParQuestion = 3000; perteParQuestion = 3000; }
+      else if (niveau === 'difficile') { chronoMaxParQuestion = 3; gainParQuestion = 6000; perteParQuestion = 6000; }
+      else if (niveau === 'extreme') { chronoMaxParQuestion = 2; gainParQuestion = 15000; perteParQuestion = 50000; }
 
       let infoGain = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} €`;
-      infoGain += estJoueurProtege(lastUserValide) ? ` | Erreur : 0 € (Bonus ⭐)` : ` | Erreur : -${gainParQuestion.toLocaleString('fr-FR')} €`;
+      infoGain += estJoueurProtege(lastUserValide) ? ` | Erreur : 0 € (Bonus ⭐)` : ` | Erreur : -${perteParQuestion.toLocaleString('fr-FR')} €`;
       
       document.getElementById('quizRewardInfo').innerText = infoGain;
       document.getElementById('quizUserBadge').innerText = lastUserValide + (estJoueurProtege(lastUserValide) ? " ⭐" : "");
@@ -1261,12 +1264,28 @@
     }
 
     function quitterQuizManuel() {
-      if (questionsJoueesDansSession === 0) {
-        if (!estJoueurProtege(lastUserValide)) {
-          appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Instantané ⚠️");
-          alert(`⚠️ ABANDON IMMÉDIAT !\nVous n'avez répondu à aucun calcul.\nPénalité de -10 000 € appliquée à ${lastUserValide}.`);
-        } else {
-          alert(`👑 ABANDON IMMÉDIAT !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
+      if (niveauQuizActif === 'extreme') {
+        if (questionsJoueesDansSession < 10) {
+          if (!estJoueurProtege(lastUserValide)) {
+            // Annulation des gains accumulés pendant la session si positifs
+            if (gainsSessionQuiz > 0) {
+              appliquerMouvementSoldeFirebase(-gainsSessionQuiz, "Annulation gains Extrême (Abandon < 10 quest.)");
+            }
+            // Application de la pénalité de 50 000€
+            appliquerMouvementSoldeFirebase(-50000, "Pénalité Abandon Extrême ⚠️ (<10 quest.)");
+            alert(`⚠️ ABANDON EN MODE EXTRÊME !\nVous n'avez fait que ${questionsJoueesDansSession}/10 questions.\n- Gains de la session annulés.\n- Pénalité forfaitaire de -50 000 € appliquée à ${lastUserValide}.`);
+          } else {
+            alert(`👑 ABANDON EXTRÊME !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
+          }
+        }
+      } else {
+        if (questionsJoueesDansSession === 0) {
+          if (!estJoueurProtege(lastUserValide)) {
+            appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Instantané ⚠️");
+            alert(`⚠️ ABANDON IMMÉDIAT !\nVous n'avez répondu à aucun calcul.\nPénalité de -10 000 € appliquée à ${lastUserValide}.`);
+          } else {
+            alert(`👑 ABANDON IMMÉDIAT !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
+          }
         }
       }
       fermerQuiz();
@@ -1315,16 +1334,21 @@
       if (estJoueurProtege(lastUserValide)) {
         alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
       } else {
-        appliquerMouvementSoldeFirebase(-gainParQuestion, `Multiplications (${niveauQuizActif}) - Temps écoulé`);
-        alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
+        gainsSessionQuiz -= perteParQuestion;
+        appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Temps écoulé`);
+        alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
       }
       genererNouvelleQuestionQuiz();
     }
 
     /* GESTION EXCLUSIVE DU CALCUL MENTAL (MULTIPLICATIONS) */
     function genererNouvelleQuestionQuiz() {
+      let titreMatiere = "Multiplications (3 à 10)";
+      if (niveauQuizActif === 'extreme') {
+        titreMatiere += ` • Prog: ${questionsJoueesDansSession}/10 min`;
+      }
       document.getElementById('quizHeaderTitle').innerText = "Calcul Mental 🧮";
-      document.getElementById('quizMatiere').innerText = "Multiplications (3 à 10)";
+      document.getElementById('quizMatiere').innerText = titreMatiere;
 
       const a = Math.floor(Math.random() * 8) + 3;
       const b = Math.floor(Math.random() * 8) + 3;
@@ -1377,6 +1401,7 @@
       if (valSaisie === bonne) {
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
+        gainsSessionQuiz += gainParQuestion;
         appliquerMouvementSoldeFirebase(gainParQuestion, `Multiplications (${niveauQuizActif}) - Bonne réponse`);
       } else {
         jouerSonErreur();
@@ -1384,8 +1409,9 @@
         if (estJoueurProtege(lastUserValide)) {
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
         } else {
-          appliquerMouvementSoldeFirebase(-gainParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
-          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
+          gainsSessionQuiz -= perteParQuestion;
+          appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
+          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
         }
       }
       genererNouvelleQuestionQuiz();
@@ -1415,6 +1441,7 @@
         questionsJoueesDansSession++;
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
+        gainsSessionQuiz += gainParQuestion;
         appliquerMouvementSoldeFirebase(gainParQuestion, `Multiplications (${niveauQuizActif}) - Bonne réponse`);
         genererNouvelleQuestionQuiz();
         return;
@@ -1429,8 +1456,9 @@
         if (estJoueurProtege(lastUserValide)) {
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
         } else {
-          appliquerMouvementSoldeFirebase(-gainParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
-          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
+          gainsSessionQuiz -= perteParQuestion;
+          appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
+          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
         }
         genererNouvelleQuestionQuiz();
       }
@@ -1492,7 +1520,6 @@
       if (!container) return;
       container.innerHTML = "";
 
-      // Liste des noms exacts du catalogue de base (avec et sans emoji)
       const nomCatalogueExacts = baseArticles.map(a => a.nom);
       const nomCatalogueAvecEmoji = baseArticles.map(a => `${a.emoji} ${a.nom}`);
 
@@ -1519,7 +1546,6 @@
           ticketsJoueur.forEach(ticket => {
             if (ticket.articles && Array.isArray(ticket.articles)) {
               ticket.articles.forEach(art => {
-                // RÈGLE : Biens achetés uniquement issus du catalogue
                 if (art.prix > 0 && estDansCatalogue(art.nom)) {
                   totalValeurAchats += art.prix;
                 }
@@ -1579,7 +1605,6 @@
         ticketsJoueur.forEach(ticket => {
           if (ticket.articles && Array.isArray(ticket.articles)) {
             ticket.articles.forEach(art => {
-              // RÈGLE : Biens achetés uniquement issus du catalogue
               if (art.prix > 0 && estDansCatalogue(art.nom)) {
                 totalValeurAchats += art.prix;
                 if (!mapPossessions[art.nom]) { mapPossessions[art.nom] = { quantite: 0, prixUnitaire: art.prix }; }
@@ -1757,13 +1782,13 @@
         const gain = audioCtx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(220, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(140, audioCtx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(140, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
+        osc.stop(audioCtx.currentTime + 0.3);
       } catch (e) {}
     }
   </script>
