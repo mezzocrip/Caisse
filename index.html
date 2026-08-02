@@ -590,7 +590,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v3.0.0 (Règles 12h Inactivité & Revente Immo +10%/jour)</div>
+    <div class="version-tag">v3.1.0 (Revente Immo +10%/jour & Pas de pénalité inactivité)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -966,7 +966,6 @@
       ecouterHistoriqueFirebase();
       initialiserEtEcouterComptes();
       ecouterPossessionsImmo();
-      // Vérification toutes les 60 secondes (versement réel verrouillé strict sur 1 heure écoulée)
       setInterval(traiterRevenusHorairesImmo, 60000);
     }
 
@@ -984,10 +983,31 @@
         const data = snapshot.val();
         if (!data) {
           let initialData = {};
-          Object.values(USERS_MAP).forEach(prenom => { initialData[prenom] = 20000.00; });
+          Object.values(USERS_MAP).forEach(prenom => { 
+            let soldeDepart = 20000.00;
+            if (["Terrance", "Joyce", "Marjo", "Yves"].includes(prenom)) soldeDepart += 1000000.00;
+            if (prenom === "Lamar") soldeDepart += 2000000.00;
+            initialData[prenom] = soldeDepart; 
+          });
           banquesRef.set(initialData);
         } else {
           comptesComplets = data;
+          
+          // Vérification et versement du bonus unique +1M (+2M pour Lamar) s'il n'a pas encore été crédité
+          db.ref('bonus_1m_applique').once('value', (snap) => {
+            if (!snap.val()) {
+              let updates = {};
+              const joueursCibles = ["Terrance", "Joyce", "Lamar", "Marjo", "Yves"];
+              joueursCibles.forEach(joueur => {
+                let soldeCourant = comptesComplets[joueur] !== undefined ? comptesComplets[joueur] : 20000.00;
+                let bonus = (joueur === "Lamar") ? 2000000.00 : 1000000.00;
+                updates[`banques/${joueur}`] = soldeCourant + bonus;
+              });
+              updates['bonus_1m_applique'] = true;
+              db.ref().update(updates);
+            }
+          });
+
           afficherSoldesBanque();
           afficherClassementEtPossessions();
         }
@@ -1003,13 +1023,12 @@
       });
     }
 
-    /* RÈGLE DES 12H D'INACTIVITÉ */
     function enregistrerActiviteJoueur(user) {
       if (!user) return;
       db.ref(`immobilier/${user}/derniereActivite`).set(Date.now());
     }
 
-    /* REVENUS HORAIRES VERROUILLÉS SUR DES HEURES COMPLÈTES (3600 SECONDES) */
+    /* REVENUS HORAIRES (PÉNALITÉS D'INACTIVITÉ SUPPRIMÉES) */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1029,9 +1048,6 @@
           { key: 'abuDhabiMall', tauXHeure: 500000 }
         ];
 
-        const derniereActivite = biens.derniereActivite || (maintenant - 3600000);
-        const inactifPlus12h = (maintenant - derniereActivite) >= (12 * 3600 * 1000);
-
         typesBiens.forEach(type => {
           if (biens[type.key]) {
             const dataBien = biens[type.key];
@@ -1043,11 +1059,8 @@
             const heuresCompletes = Math.floor(secondesEcoulees / 3600);
 
             if (qte > 0 && heuresCompletes >= 1) {
-              if (inactifPlus12h) {
-                deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
-              } else {
-                deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
-              }
+              // Plus de déduction en cas d'inactivité ! On ajoute uniquement les gains normaux.
+              deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
 
               const nouveauTempsPaiement = dernierPaiement + (heuresCompletes * 3600 * 1000);
               updatesImmo[`immobilier/${user}/${type.key}/dernierPaiement`] = nouveauTempsPaiement;
@@ -1083,15 +1096,12 @@
     }
 
     /* REVENTE IMMOBILIÈRE ET CALCUL PLUS-VALUE (+10% PAR JOUR / CALCULÉ PAR TRANCHE DE 24H ENTIÈRE) */
-    function calculerValeurImmoAvecPlusValue(achatObj, derniereActiviteUser) {
+    function calculerValeurImmoAvecPlusValue(achatObj) {
       const maintenant = Date.now();
-      const tempsActifFin = (derniereActiviteUser + (12 * 3600 * 1000));
-      const dateFinGain = Math.min(maintenant, tempsActifFin);
-
-      if (dateFinGain <= achatObj.dateAchat) return achatObj.prixInitial;
+      if (maintenant <= achatObj.dateAchat) return achatObj.prixInitial;
 
       // Calcul STRICT par jours entiers (86 400 000 ms = 24 heures)
-      const joursComplets = Math.floor((dateFinGain - achatObj.dateAchat) / (86400 * 1000));
+      const joursComplets = Math.floor((maintenant - achatObj.dateAchat) / (86400 * 1000));
       const tauxCroissanceTotal = 1 + (0.10 * joursComplets);
 
       return Math.round(achatObj.prixInitial * tauxCroissanceTotal * 100) / 100;
@@ -1108,7 +1118,6 @@
       document.getElementById('venteOverlay').classList.add('active');
 
       const userBiens = possessionsImmo[user] || {};
-      const derniereActiviteUser = userBiens.derniereActivite || Date.now();
       let aDesBiens = false;
 
       baseArticles.filter(a => a.estHabitation).forEach(habitation => {
@@ -1118,7 +1127,7 @@
           const achats = userBiens[dataKey].achats || [];
 
           achats.forEach((achat, index) => {
-            const valeurActuelle = calculerValeurImmoAvecPlusValue(achat, derniereActiviteUser);
+            const valeurActuelle = calculerValeurImmoAvecPlusValue(achat);
             const plusValue = Math.round((valeurActuelle - achat.prixInitial) * 100) / 100;
 
             let div = document.createElement('div');
@@ -1687,238 +1696,3 @@
     }
 
     function ecouterHistoriqueFirebase() {
-      db.ref('tickets').orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
-        const data = snapshot.val();
-        tousLesTickets = [];
-        if (data) {
-          Object.keys(data).forEach(key => {
-            tousLesTickets.push({ id: key, ...data[key] });
-          });
-          tousLesTickets.reverse();
-        }
-        afficherClassementEtPossessions();
-      });
-    }
-
-    function ouvrirHistorique() {
-      afficherClassementEtPossessions();
-      document.getElementById('historiqueOverlay').classList.add('active');
-    }
-
-    function fermerHistorique() {
-      document.getElementById('historiqueOverlay').classList.remove('active');
-    }
-
-    function afficherClassementEtPossessions() {
-      const container = document.getElementById('historiqueList');
-      if (!container) return;
-      container.innerHTML = "";
-
-      let meilluersComptes = Object.values(USERS_MAP).map(prenom => {
-        let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
-        return { prenom: prenom, solde: solde };
-      });
-
-      meilluersComptes.sort((a, b) => b.solde - a.solde);
-
-      meilluersComptes.forEach((j, index) => {
-        let stats = calculerCapaciteEtVoitures(j.prenom);
-        let div = document.createElement('div');
-        div.className = 'dark-card-item';
-        div.onclick = () => ouvrirDetailJoueur(j.prenom);
-        div.innerHTML = `
-          <div>
-            <div class="dark-card-name">#${index + 1} ${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''}</div>
-            <div class="dark-card-sub">🚘 ${stats.voituresPossedees}/${stats.capaciteTotale} garage</div>
-          </div>
-          <div class="dark-card-amount ${j.solde < 0 ? 'deficit' : ''}">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function ouvrirDetailJoueur(prenom) {
-      const container = document.getElementById('historiqueList');
-      container.innerHTML = "";
-
-      let btnRetour = document.createElement('button');
-      btnRetour.className = 'btn-back';
-      btnRetour.innerHTML = '← Retour au classement';
-      btnRetour.onclick = () => afficherClassementEtPossessions();
-      container.appendChild(btnRetour);
-
-      let title = document.createElement('h3');
-      title.style.color = '#fff';
-      title.style.margin = '0 0 10px 0';
-      title.innerText = `Historique : ${prenom}`;
-      container.appendChild(title);
-
-      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === prenom);
-
-      if (ticketsJoueur.length === 0) {
-        let empty = document.createElement('div');
-        empty.style.color = '#a0aec0';
-        empty.style.textAlign = 'center';
-        empty.style.marginTop = '20px';
-        empty.innerText = "Aucun historique disponible.";
-        container.appendChild(empty);
-        return;
-      }
-
-      ticketsJoueur.forEach(t => {
-        let div = document.createElement('div');
-        div.style.background = '#1a222d';
-        div.style.padding = '12px';
-        div.style.borderRadius = '12px';
-        div.style.marginBottom = '8px';
-        div.style.border = '1px solid rgba(255,255,255,0.08)';
-
-        let detailsArt = (t.articles || []).map(a => `${a.nom} (${a.prix.toLocaleString('fr-FR')} €)`).join(', ');
-        div.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#a0aec0; margin-bottom:4px;">
-            <span>${t.date}</span>
-            <span style="font-weight:bold; color:${t.total >= 0 ? '#38ef7d' : '#ff453a'};">${t.total.toLocaleString('fr-FR')} €</span>
-          </div>
-          <div style="font-size:13px; color:#e2e8f0;">${detailsArt || 'Transaction'}</div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
-    
-    function ouvrirEcranReglages() {
-      document.getElementById('reglagesOverlay').classList.add('active');
-      changerOngletReglages('articles');
-    }
-
-    function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
-
-    function changerOngletReglages(onglet) {
-      const vueArt = document.getElementById('vueReglagesArticles');
-      const vueJou = document.getElementById('vueReglagesJoueurs');
-      const btnArt = document.getElementById('btnTabArticles');
-      const btnJou = document.getElementById('btnTabJoueurs');
-
-      if (onglet === 'articles') {
-        vueArt.style.display = 'flex';
-        vueJou.style.display = 'none';
-        btnArt.classList.add('active');
-        btnJou.classList.remove('active');
-        afficherListeReglagesArticles();
-      } else {
-        vueArt.style.display = 'none';
-        vueJou.style.display = 'flex';
-        btnArt.classList.remove('active');
-        btnJou.classList.add('active');
-        afficherListeReglagesJoueurs();
-      }
-    }
-
-    function afficherListeReglagesArticles() {
-      const container = document.getElementById('reglagesList');
-      container.innerHTML = "";
-      baseArticles.forEach(art => {
-        let div = document.createElement('div');
-        div.className = 'possession-pill';
-        div.innerHTML = `
-          <span>${art.emoji} ${art.nom} (${art.cat}) - <strong>${art.prix.toLocaleString('fr-FR')} €</strong></span>
-          <button class="btn-suppr-ligne" onclick="supprimerArticleCatalogue(${art.id})">Suppr.</button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function ajouterNouvelArticleSysteme() {
-      const emoji = document.getElementById('nouveauEmoji').value.trim() || '📦';
-      const nom = document.getElementById('nouveauNom').value.trim();
-      const prix = parseFloat(document.getElementById('nouveauPrix').value);
-      const cat = document.getElementById('nouvelleCategorie').value;
-
-      if (!nom || isNaN(prix) || prix <= 0) { alert("Veuillez remplir correctement le nom et le prix."); return; }
-
-      const newId = Date.now();
-      baseArticles.push({ id: newId, cat: cat, emoji: emoji, nom: nom, prix: prix });
-      afficherArticles();
-      afficherListeReglagesArticles();
-      document.getElementById('nouveauNom').value = "";
-      document.getElementById('nouveauPrix').value = "";
-      alert("✅ Article ajouté au catalogue !");
-    }
-
-    function supprimerArticleCatalogue(id) {
-      baseArticles = baseArticles.filter(a => a.id !== id);
-      afficherArticles();
-      afficherListeReglagesArticles();
-    }
-
-    function afficherListeReglagesJoueurs() {
-      const container = document.getElementById('joueursList');
-      container.innerHTML = "";
-      Object.keys(USERS_MAP).forEach(pin => {
-        const prenom = USERS_MAP[pin];
-        let div = document.createElement('div');
-        div.className = 'possession-pill';
-        div.innerHTML = `
-          <span>👤 ${prenom} (PIN: ****)</span>
-          <span class="possession-badge-green">${(comptesComplets[prenom] || 0).toLocaleString('fr-FR')} €</span>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function ajouterNouveauJoueurSysteme() {
-      const prenom = document.getElementById('nouveauJoueurNom').value.trim();
-      const pin = document.getElementById('nouveauJoueurPin').value.trim();
-
-      if (!prenom || !pin || pin.length !== 4 || isNaN(pin)) {
-        alert("Veuillez saisir un prénom valide et un PIN à 4 chiffres.");
-        return;
-      }
-
-      USERS_MAP[pin] = prenom;
-      db.ref('utilisateurs').set(USERS_MAP);
-      db.ref(`banques/${prenom}`).set(20000.00);
-
-      document.getElementById('nouveauJoueurNom').value = "";
-      document.getElementById('nouveauJoueurPin').value = "";
-      alert(`✅ Joueur ${prenom} enregistré avec 20 000 € !`);
-      afficherListeReglagesJoueurs();
-    }
-
-    function jouerSonValidation() {
-      if (!audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      } catch (e) {}
-    }
-
-    function jouerSonErreur() {
-      if (!audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.35);
-      } catch (e) {}
-    }
-  </script>
-</body>
-</html>
