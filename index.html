@@ -422,6 +422,31 @@
     .btn-num.btn-num-del { background: #2d3748; color: #cbd5e0; }
     .btn-num.btn-num-quit { background: #450a0a; color: #fca5a5; font-size: 12px; font-weight: bold; }
 
+    /* VUE QCM 3 CHOIX (NIVEAU EXTRÊME) */
+    .qcm-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn-qcm {
+      background: #1e293b;
+      border: 2px solid #334155;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 16px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      touch-action: manipulation;
+    }
+    .btn-qcm:active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      transform: scale(0.98);
+    }
+
     /* CLASSEMENT BANQUE ET ACQUISITION */
     .dark-card-item {
       display: flex;
@@ -482,6 +507,7 @@
     .btn-level-facile { background: #164e63; border: 1px solid #06b6d4; color: #cffaff; }
     .btn-level-moyen { background: #7c2d12; border: 1px solid #f97316; color: #ffedd5; }
     .btn-level-difficile { background: #7f1d1d; border: 1px solid #ef4444; color: #fee2e2; }
+    .btn-level-extreme { background: #4c1d95; border: 1px solid #a855f7; color: #f3e8ff; }
     .level-name { font-size: 15px; font-weight: bold; }
     .level-desc { font-size: 12px; opacity: 0.85; }
 
@@ -556,7 +582,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v2.5.0 (Maths Uniquement)</div>
+    <div class="version-tag">v2.6.0 (Mode Extrême QCM)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -624,6 +650,14 @@
           </div>
           <div class="level-name">+6 000 €</div>
         </button>
+
+        <button class="btn-level btn-level-extreme" onclick="demarrerQuizAvecNiveau('extreme')">
+          <div>
+            <div class="level-name">💀 Extrême (QCM 3 Choix)</div>
+            <div class="level-desc">2 sec / réponse</div>
+          </div>
+          <div class="level-name">+15 000 €</div>
+        </button>
       </div>
     </div>
   </div>
@@ -643,7 +677,7 @@
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
-        <!-- VUE PAVÉ NUMÉRIQUE (MATHS) -->
+        <!-- VUE PAVÉ NUMÉRIQUE (MATHS NIVEAUX CLASSIQUES) -->
         <div id="vueQuizMaths">
           <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" readonly>
           <div class="quiz-numpad">
@@ -660,6 +694,12 @@
             <button class="btn-num" onclick="taperQuizChiffre('0')">0</button>
             <button class="btn-num btn-num-del" onclick="effacerQuizChiffre()">⌫</button>
           </div>
+        </div>
+
+        <!-- VUE QCM (NIVEAU EXTRÊME) -->
+        <div id="vueQuizQCM" style="display: none;">
+          <div class="qcm-container" id="qcmContainer"></div>
+          <button class="btn-num btn-num-quit" style="width: 100%; margin-top: 10px; padding: 10px;" onclick="quitterQuizManuel()">Quitter</button>
         </div>
 
       </div>
@@ -1206,6 +1246,7 @@
       if (niveau === 'facile') { chronoMaxParQuestion = 10; gainParQuestion = 1000; }
       else if (niveau === 'intermediaire') { chronoMaxParQuestion = 6; gainParQuestion = 3000; }
       else if (niveau === 'difficile') { chronoMaxParQuestion = 3; gainParQuestion = 6000; }
+      else if (niveau === 'extreme') { chronoMaxParQuestion = 2; gainParQuestion = 15000; }
 
       let infoGain = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} €`;
       infoGain += estJoueurProtege(lastUserValide) ? ` | Erreur : 0 € (Bonus ⭐)` : ` | Erreur : -${gainParQuestion.toLocaleString('fr-FR')} €`;
@@ -1285,14 +1326,69 @@
       document.getElementById('quizHeaderTitle').innerText = "Calcul Mental 🧮";
       document.getElementById('quizMatiere').innerText = "Multiplications (3 à 10)";
 
-      document.getElementById('quizReponseInput').value = "";
       const a = Math.floor(Math.random() * 8) + 3;
       const b = Math.floor(Math.random() * 8) + 3;
+      const reponseCorrecte = a * b;
 
       document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
-      questionActiveCourante = { type: 'maths', bonneReponse: (a * b).toString() };
+
+      if (niveauQuizActif === 'extreme') {
+        document.getElementById('vueQuizMaths').style.display = "none";
+        document.getElementById('vueQuizQCM').style.display = "block";
+
+        let choix = [reponseCorrecte];
+        while (choix.length < 3) {
+          let faux = reponseCorrecte + (Math.floor(Math.random() * 7) - 3) * 2 + (Math.random() < 0.5 ? 1 : -1);
+          if (faux > 0 && !choix.includes(faux)) {
+            choix.push(faux);
+          }
+        }
+        // Mélanger les 3 choix
+        choix.sort(() => Math.random() - 0.5);
+
+        const container = document.getElementById('qcmContainer');
+        container.innerHTML = "";
+        choix.forEach(val => {
+          const btn = document.createElement('button');
+          btn.className = "btn-qcm";
+          btn.innerText = val;
+          btn.onclick = () => validerChoixQCM(val.toString());
+          container.appendChild(btn);
+        });
+
+        questionActiveCourante = { type: 'qcm', bonneReponse: reponseCorrecte.toString() };
+      } else {
+        document.getElementById('vueQuizMaths').style.display = "block";
+        document.getElementById('vueQuizQCM').style.display = "none";
+        document.getElementById('quizReponseInput').value = "";
+
+        questionActiveCourante = { type: 'maths', bonneReponse: reponseCorrecte.toString() };
+      }
 
       relancerChrono();
+    }
+
+    /* VÉRIFICATION CHOIX QCM (EXTRÊME) */
+    function validerChoixQCM(valSaisie) {
+      clearInterval(intervalChrono);
+      questionsJoueesDansSession++;
+      const bonne = questionActiveCourante.bonneReponse;
+
+      if (valSaisie === bonne) {
+        jouerSonValidation();
+        if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
+        appliquerMouvementSoldeFirebase(gainParQuestion, `Multiplications (${niveauQuizActif}) - Bonne réponse`);
+      } else {
+        jouerSonErreur();
+        if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
+        if (estJoueurProtege(lastUserValide)) {
+          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
+        } else {
+          appliquerMouvementSoldeFirebase(-gainParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
+          alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${gainParQuestion.toLocaleString('fr-FR')} €`);
+        }
+      }
+      genererNouvelleQuestionQuiz();
     }
 
     /* VÉRIFICATION PAVÉ NUMÉRIQUE */
