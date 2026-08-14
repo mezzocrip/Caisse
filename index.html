@@ -583,7 +583,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v2.9.0 (Règles Malls & Déficit)</div>
+    <div class="version-tag">v2.9.1 (Signal Établissements Banque)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -1014,19 +1014,15 @@
 
             if (qte > 0 && heuresCompletes >= 1) {
               if (type.estMall) {
-                // Vérification du dernier quiz gagné avec au moins 30000€
                 const dernierePartieQuiz = biens.dernierePartie30k || 0;
                 const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
 
                 if (tempsSansJouer > 4) {
-                  // Inactif depuis +4h -> PERTE de la même somme par heure
                   deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
                 } else {
-                  // Actif -> Gain normal
                   deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
                 }
               } else {
-                // Biens standards (sans condition de jeu)
                 deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
               }
 
@@ -1076,18 +1072,56 @@
 
       listeJoueurs.sort((a, b) => b.solde - a.solde);
 
+      const maintenant = Date.now();
+
       listeJoueurs.forEach(j => {
         let userBiens = possessionsImmo[j.prenom] || {};
         let immoTextes = [];
-        if (userBiens.snack && userBiens.snack.quantite > 0) immoTextes.push(`🏠 ${userBiens.snack.quantite} Snack(s)`);
-        if (userBiens.hotel && userBiens.hotel.quantite > 0) immoTextes.push(`🏨 ${userBiens.hotel.quantite} Hôtel(s)`);
-        if (userBiens.centreCommercial && userBiens.centreCommercial.quantite > 0) immoTextes.push(`🏬 ${userBiens.centreCommercial.quantite} Centre(s) Com.`);
-        if (userBiens.dubaiMall && userBiens.dubaiMall.quantite > 0) immoTextes.push(`🏬 ${userBiens.dubaiMall.quantite} Dubai Mall`);
-        if (userBiens.abuDhabiMall && userBiens.abuDhabiMall.quantite > 0) immoTextes.push(`🏬 ${userBiens.abuDhabiMall.quantite} Abu Dhabi Mall`);
+        
+        let totalGainHeure = 0;
+        let totalPerteHeure = 0;
+
+        const typesBiens = [
+          { key: 'snack', tauXHeure: 1000, label: 'Snacks', estMall: false },
+          { key: 'hotel', tauXHeure: 3500, label: 'Hôtels', estMall: false },
+          { key: 'centreCommercial', tauXHeure: 10000, label: 'Centres Com.', estMall: false },
+          { key: 'dubaiMall', tauXHeure: 50000, label: 'Dubai Malls', estMall: true },
+          { key: 'abuDhabiMall', tauXHeure: 500000, label: 'Abu Dhabi Malls', estMall: true }
+        ];
+
+        typesBiens.forEach(type => {
+          if (userBiens[type.key] && userBiens[type.key].quantite > 0) {
+            let qte = userBiens[type.key].quantite;
+            immoTextes.push(`🏢 ${qte} ${type.label}`);
+
+            let gainPotentiel = type.tauXHeure * qte;
+            if (type.estMall) {
+              const dernierePartieQuiz = userBiens.dernierePartie30k || 0;
+              const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
+              if (tempsSansJouer > 4) {
+                totalPerteHeure += gainPotentiel;
+              } else {
+                totalGainHeure += gainPotentiel;
+              }
+            } else {
+              totalGainHeure += gainPotentiel;
+            }
+          }
+        });
+
         if (userBiens.garage5 && userBiens.garage5.quantite > 0) immoTextes.push(`🚘 ${userBiens.garage5.quantite} Gar.(5)`);
         if (userBiens.garage20 && userBiens.garage20.quantite > 0) immoTextes.push(`🏎️ ${userBiens.garage20.quantite} Gar.(20)`);
 
         let detailsHtml = immoTextes.length > 0 ? immoTextes.join(' • ') : 'Aucune propriété';
+
+        // Signal visuel établissements (Gains en vert, Pertes en rouge)
+        let signalHtml = "";
+        if (totalGainHeure > 0) {
+          signalHtml += `<div style="color: #38ef7d; font-size: 11px; font-weight: bold; margin-top: 2px;">📈 +${totalGainHeure.toLocaleString('fr-FR')} € / h</div>`;
+        }
+        if (totalPerteHeure > 0) {
+          signalHtml += `<div style="color: #ff453a; font-size: 11px; font-weight: bold; margin-top: 2px;">📉 -${totalPerteHeure.toLocaleString('fr-FR')} € / h (Inactif Mall)</div>`;
+        }
 
         let div = document.createElement('div');
         div.className = 'dark-card-item';
@@ -1095,6 +1129,7 @@
           <div>
             <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''}</div>
             <div class="dark-card-sub">${detailsHtml}</div>
+            ${signalHtml}
           </div>
           <div class="dark-card-amount ${j.solde < 0 ? 'deficit' : ''}">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
         `;
@@ -1235,7 +1270,6 @@
       }
     }
 
-    // CALCULE LA CAPACITÉ TOTALE DE GARAGE ET LES VOITURES POSSÉDÉES
     function calculerCapaciteEtVoitures(user) {
       const userBiens = possessionsImmo[user] || {};
       let capaciteTotale = 0;
@@ -1246,7 +1280,6 @@
         capaciteTotale += userBiens.garage20.quantite * 20;
       }
 
-      // Nombre de voitures déjà possédées depuis l'historique
       let voituresPossedees = 0;
       const nomCatalogueExactsAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => a.nom);
       const nomCatalogueAvecEmojiAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => `${a.emoji} ${a.nom}`);
@@ -1270,7 +1303,6 @@
       let user = lastUserValide;
       let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
 
-      // Vérification des conditions d'achat d'automobiles (Garage requis & Capacité)
       let voituresDansPanier = listeArticles.filter(i => i.cat === "Automobiles").length;
       if (voituresDansPanier > 0) {
         let statsGarage = calculerCapaciteEtVoitures(user);
@@ -1338,11 +1370,9 @@
       if (niveauQuizActif === 'extreme') {
         if (questionsJoueesDansSession < 10) {
           if (!estJoueurProtege(lastUserValide)) {
-            // Annulation des gains accumulés pendant la session si positifs
             if (gainsSessionQuiz > 0) {
               appliquerMouvementSoldeFirebase(-gainsSessionQuiz, "Annulation gains Extrême (Abandon < 10 quest.)");
             }
-            // Application de la pénalité de 50 000€
             appliquerMouvementSoldeFirebase(-50000, "Pénalité Abandon Extrême ⚠️ (<10 quest.)");
             alert(`⚠️ ABANDON EN MODE EXTRÊME !\nVous n'avez fait que ${questionsJoueesDansSession}/10 questions.\n- Gains de la session annulés.\n- Pénalité forfaitaire de -50 000 € appliquée à ${lastUserValide}.`);
           } else {
@@ -1370,7 +1400,6 @@
     function relancerChrono() {
       clearInterval(intervalChrono);
 
-      // PAS DE CHRONO NI LIMITE DE TEMPS POUR TERRANCE ET JOYCE
       if (estJoueurProtege(lastUserValide)) {
         const box = document.getElementById('quizTimerBox');
         box.innerText = "♾️ Pas de limite";
@@ -1412,7 +1441,6 @@
       genererNouvelleQuestionQuiz();
     }
 
-    /* GESTION EXCLUSIVE DU CALCUL MENTAL (MULTIPLICATIONS) */
     function genererNouvelleQuestionQuiz() {
       let titreMatiere = "Multiplications (3 à 10)";
       if (niveauQuizActif === 'extreme') {
@@ -1438,7 +1466,6 @@
             choix.push(faux);
           }
         }
-        // Mélanger les 3 choix
         choix.sort(() => Math.random() - 0.5);
 
         const container = document.getElementById('qcmContainer');
@@ -1463,7 +1490,6 @@
       relancerChrono();
     }
 
-    /* VÉRIFICATION CHOIX QCM (EXTRÊME) */
     function validerChoixQCM(valSaisie) {
       clearInterval(intervalChrono);
       questionsJoueesDansSession++;
@@ -1488,7 +1514,6 @@
       genererNouvelleQuestionQuiz();
     }
 
-    /* VÉRIFICATION PAVÉ NUMÉRIQUE */
     function taperQuizChiffre(chiffre) {
       const inputField = document.getElementById('quizReponseInput');
       inputField.value += chiffre;
@@ -1547,7 +1572,6 @@
         let nouveauSolde = Math.round((soldeActuel + montant) * 100) / 100;
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
-        // Si le gain de la transaction est au moins de 30 000€, réinitialiser la sécurité des Malls
         if (montant >= 30000) {
           enregistrerActiviteMallSiGagne30k(lastUserValide, montant);
         }
