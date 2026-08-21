@@ -486,6 +486,23 @@
       font-weight: bold; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-family: monospace;
     }
 
+    .btn-vente-immo {
+      background: #2b6cb0;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn-vente-immo.bloque {
+      background: #4a5568;
+      color: #a0aec0;
+      cursor: not-allowed;
+    }
+
     .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .reglages-title { font-size: 18px; font-weight: 800; color: #ffffff; }
     .btn-close { background: #1a222d; border: none; color: #a0aec0; border-radius: 50%; width: 36px; height: 36px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -583,7 +600,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v2.9.1 (Signal Établissements Banque)</div>
+    <div class="version-tag">v3.0.0 (Système Revente Immo + 24h Mall)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -920,13 +937,13 @@
       { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65\"", prix: 799.00 },
       { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75\"", prix: 1199.00 },
 
-      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T1 Marseille", prix: 115000.00 },
-      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T2 Marseille", prix: 185000.00 },
-      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T3 Vue mer", prix: 280000.00 },
-      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T4 Standing", prix: 395000.00 },
-      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00 },
-      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00 },
-      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00 },
+      { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T1 Marseille", prix: 115000.00, immoKey: "t1" },
+      { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T2 Marseille", prix: 185000.00, immoKey: "t2" },
+      { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T3 Vue mer", prix: 280000.00, immoKey: "t3" },
+      { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T4 Standing", prix: 395000.00, immoKey: "t4" },
+      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00, immoKey: "maisonT4" },
+      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00, immoKey: "maisonT5" },
+      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00, immoKey: "villaT6" },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
       { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
       { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Com. (+10k€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 },
@@ -984,7 +1001,7 @@
       });
     }
 
-    /* REVENUS PAR HEURE PLEINE ET PÉNALITÉ DE MALLS SI INACTIF (> 4h) */
+    /* REVENUS PAR HEURE PLEINE ET PÉNALITÉ DE MALLS SI INACTIF (> 24h) */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1017,7 +1034,8 @@
                 const dernierePartieQuiz = biens.dernierePartie30k || 0;
                 const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
 
-                if (tempsSansJouer > 4) {
+                // CHANGEMENT: Passage de 4h à 24h d'inactivité
+                if (tempsSansJouer > 24) {
                   deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
                 } else {
                   deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
@@ -1052,8 +1070,70 @@
       if (!item.immoKey) return;
       const ref = db.ref(`immobilier/${user}/${item.immoKey}`);
       ref.once('value', (snapshot) => {
-        const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now() };
-        ref.set({ quantite: currentData.quantite + 1, dernierPaiement: Date.now() });
+        const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now(), achats: [] };
+        let quantite = (currentData.quantite || 0) + 1;
+        let achats = currentData.achats || [];
+        // Si d'anciennes données n'ont pas la liste d'achats, on simule l'historique
+        if (achats.length === 0 && currentData.quantite > 0) {
+          for(let i=0; i<currentData.quantite; i++) {
+            achats.push(currentData.dernierPaiement || Date.now());
+          }
+        }
+        achats.push(Date.now());
+        ref.set({ quantite: quantite, dernierPaiement: currentData.dernierPaiement || Date.now(), achats: achats });
+      });
+    }
+
+    /* REVENTE IMMOBILIÈRE (+50% PAR JOUR SI DÉTENU DEPUIS 3 JOURS) */
+    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien) {
+      const ref = db.ref(`immobilier/${user}/${immoKey}`);
+      ref.once('value', (snapshot) => {
+        const data = snapshot.val();
+        if (!data || !data.achats || !data.achats[indexAchat]) return;
+
+        const dateAchat = data.achats[indexAchat];
+        const maintenant = Date.now();
+        const joursEcoules = (maintenant - dateAchat) / (1000 * 3600 * 24);
+
+        if (joursEcoules < 3) {
+          alert("Vous devez attendre au moins 3 jours après l'achat pour revendre ce bien !");
+          return;
+        }
+
+        // +50% de la valeur par jour
+        const prixRevente = Math.round(prixBase * (1 + 0.50 * joursEcoules) * 100) / 100;
+
+        if (confirm(`Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`)) {
+          let nouveauxAchats = [...data.achats];
+          nouveauxAchats.splice(indexAchat, 1);
+          let nouvelleQuantite = Math.max(0, (data.quantite || 1) - 1);
+
+          ref.set({
+            quantite: nouvelleQuantite,
+            dernierPaiement: data.dernierPaiement || maintenant,
+            achats: nouveauxAchats
+          });
+
+          let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+          let nouveauSolde = Math.round((soldeActuel + prixRevente) * 100) / 100;
+          db.ref(`banques/${user}`).set(nouveauSolde);
+
+          // Inscription du mouvement
+          const now = new Date();
+          const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+          const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+          db.ref('tickets').push({
+            codePin: "REVENTE",
+            utilisateur: user,
+            date: dateFormatee + " " + heureFormatee + " (Revente Immo)",
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            articles: [{ nom: `Revente ${nomBien}`, prix: prixRevente }],
+            total: prixRevente
+          });
+
+          alert(`🎉 Bien revendu avec succès pour ${prixRevente.toLocaleString('fr-FR')} € !`);
+        }
       });
     }
 
@@ -1098,7 +1178,8 @@
             if (type.estMall) {
               const dernierePartieQuiz = userBiens.dernierePartie30k || 0;
               const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
-              if (tempsSansJouer > 4) {
+              // CHANGEMENT: Passage de 4h à 24h
+              if (tempsSansJouer > 24) {
                 totalPerteHeure += gainPotentiel;
               } else {
                 totalGainHeure += gainPotentiel;
@@ -1735,11 +1816,76 @@
         `;
         container.appendChild(fortuneCard);
 
+        // SECTION REVENTE IMMOBILIÈRE
+        const sectionImmoTitle = document.createElement('div');
+        sectionImmoTitle.className = 'section-title';
+        sectionImmoTitle.style.marginTop = '14px';
+        sectionImmoTitle.style.marginBottom = '8px';
+        sectionImmoTitle.innerText = "🏘️ Revente Immobilière (+50%/jour après 3j)";
+        container.appendChild(sectionImmoTitle);
+
+        let userBiens = possessionsImmo[nomClient] || {};
+        let aDesBiens = false;
+        const maintenant = Date.now();
+
+        baseArticles.filter(a => a.cat === "Immobilier Marseille" && a.immoKey).forEach(itemImmo => {
+          const key = itemImmo.immoKey;
+          if (userBiens[key] && userBiens[key].achats && userBiens[key].achats.length > 0) {
+            userBiens[key].achats.forEach((dateAchat, idx) => {
+              aDesBiens = true;
+              const secondes = (maintenant - dateAchat) / 1000;
+              const joursEcoules = secondes / (3600 * 24);
+              const dispoVente = joursEcoules >= 3;
+              const prixReventeVal = Math.round(itemImmo.prix * (1 + 0.50 * joursEcoules) * 100) / 100;
+
+              let pill = document.createElement('div');
+              pill.className = 'possession-pill';
+              pill.style.flexDirection = 'column';
+              pill.style.alignItems = 'flex-start';
+
+              let tempsRestantTxt = "";
+              if (!dispoVente) {
+                let heuresRestantes = Math.ceil((3 * 24) - (secondes / 3600));
+                tempsRestantTxt = `⏳ Dispo dans ~${heuresRestantes}h`;
+              } else {
+                tempsRestantTxt = `📈 Val. Revente : ${prixReventeVal.toLocaleString('fr-FR')} € (+${Math.floor(joursEcoules * 50)}%)`;
+              }
+
+              pill.innerHTML = `
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <strong style="color:#ffffff;">${itemImmo.emoji} ${itemImmo.nom}</strong>
+                    <div style="font-size:11px; color:#8b98a5; margin-top:2px;">Acheté: ${new Date(dateAchat).toLocaleDateString('fr-FR')}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-size:11px; color:#38ef7d;">${tempsRestantTxt}</div>
+                    <button class="btn-vente-immo ${dispoVente ? '' : 'bloque'}" 
+                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}', ${idx}, ${itemImmo.prix}, '${itemImmo.nom}')` : ''}">
+                      ${dispoVente ? '🏷️ Revendre' : '🔒 Bloqué (<3j)'}
+                    </button>
+                  </div>
+                </div>
+              `;
+              container.appendChild(pill);
+            });
+          }
+        });
+
+        if (!aDesBiens) {
+          let emptyDiv = document.createElement('div');
+          emptyDiv.style.textAlign = 'center';
+          emptyDiv.style.color = '#a0aec0';
+          emptyDiv.style.fontSize = '12px';
+          emptyDiv.style.margin = '6px 0';
+          emptyDiv.innerText = "Aucun bien immobilier éligible à la revente.";
+          container.appendChild(emptyDiv);
+        }
+
         const sectionTitle = document.createElement('div');
         sectionTitle.className = 'section-title';
-        sectionTitle.style.marginTop = '12px';
+        sectionTitle.style.marginTop = '14px';
         sectionTitle.style.marginBottom = '8px';
-        sectionTitle.innerText = "Articles & Biens Possédés";
+        sectionTitle.innerText = "Tous les Articles & Biens Possédés";
         container.appendChild(sectionTitle);
 
         let clesPossessions = Object.keys(mapPossessions);
