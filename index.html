@@ -1148,40 +1148,22 @@
 
       listeJoueurs.sort((a, b) => b.solde - a.solde);
 
-      const maintenant = Date.now();
-
       listeJoueurs.forEach(j => {
         let userBiens = possessionsImmo[j.prenom] || {};
         let immoTextes = [];
-        
-        let totalGainHeure = 0;
-        let totalPerteHeure = 0;
 
         const typesBiens = [
-          { key: 'snack', tauXHeure: 1000, label: 'Snacks', estMall: false },
-          { key: 'hotel', tauXHeure: 3500, label: 'Hôtels', estMall: false },
-          { key: 'centreCommercial', tauXHeure: 10000, label: 'Centres Com.', estMall: false },
-          { key: 'dubaiMall', tauXHeure: 50000, label: 'Dubai Malls', estMall: true },
-          { key: 'abuDhabiMall', tauXHeure: 500000, label: 'Abu Dhabi Malls', estMall: true }
+          { key: 'snack', label: 'Snacks' },
+          { key: 'hotel', label: 'Hôtels' },
+          { key: 'centreCommercial', label: 'Centres Com.' },
+          { key: 'dubaiMall', label: 'Dubai Malls' },
+          { key: 'abuDhabiMall', label: 'Abu Dhabi Malls' }
         ];
 
         typesBiens.forEach(type => {
           if (userBiens[type.key] && userBiens[type.key].quantite > 0) {
             let qte = userBiens[type.key].quantite;
             immoTextes.push(`🏢 ${qte} ${type.label}`);
-
-            let gainPotentiel = type.tauXHeure * qte;
-            if (type.estMall) {
-              const dernierePartieQuiz = userBiens.dernierePartie30k || 0;
-              const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
-              if (tempsSansJouer > 24) {
-                totalPerteHeure += gainPotentiel;
-              } else {
-                totalGainHeure += gainPotentiel;
-              }
-            } else {
-              totalGainHeure += gainPotentiel;
-            }
           }
         });
 
@@ -1190,21 +1172,12 @@
 
         let detailsHtml = immoTextes.length > 0 ? immoTextes.join(' • ') : 'Aucune propriété';
 
-        let signalHtml = "";
-        if (totalGainHeure > 0) {
-          signalHtml += `<div style="color: #38ef7d; font-size: 11px; font-weight: bold; margin-top: 2px;">📈 +${totalGainHeure.toLocaleString('fr-FR')} € / h</div>`;
-        }
-        if (totalPerteHeure > 0) {
-          signalHtml += `<div style="color: #ff453a; font-size: 11px; font-weight: bold; margin-top: 2px;">📉 -${totalPerteHeure.toLocaleString('fr-FR')} € / h (Inactif Mall)</div>`;
-        }
-
         let div = document.createElement('div');
         div.className = 'dark-card-item';
         div.innerHTML = `
           <div>
             <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''}</div>
             <div class="dark-card-sub">${detailsHtml}</div>
-            ${signalHtml}
           </div>
           <div class="dark-card-amount ${j.solde < 0 ? 'deficit' : ''}">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
         `;
@@ -1931,134 +1904,130 @@
       document.getElementById('historiqueOverlay').classList.add('active');
     }
 
-    function fermerHistorique() {
-      document.getElementById('historiqueOverlay').classList.remove('active');
-      joueurSelectionneVueDetail = null;
-    }
+    function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
 
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
 
     function ouvrirEcranReglages() {
-      afficherReglagesArticles();
-      afficherReglagesJoueurs();
+      afficherReglagesList();
+      afficherJoueursList();
       document.getElementById('reglagesOverlay').classList.add('active');
     }
 
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
     function changerOngletReglages(onglet) {
-      const btnArt = document.getElementById('btnTabArticles');
-      const btnJoueur = document.getElementById('btnTabJoueurs');
-      const vueArt = document.getElementById('vueReglagesArticles');
-      const vueJoueur = document.getElementById('vueReglagesJoueurs');
-
       if (onglet === 'articles') {
-        btnArt.className = 'tab-btn active';
-        btnJoueur.className = 'tab-btn';
-        vueArt.style.display = 'flex';
-        vueJoueur.style.display = 'none';
+        document.getElementById('btnTabArticles').classList.add('active');
+        document.getElementById('btnTabJoueurs').classList.remove('active');
+        document.getElementById('vueReglagesArticles').style.display = 'flex';
+        document.getElementById('vueReglagesJoueurs').style.display = 'none';
       } else {
-        btnArt.className = 'tab-btn';
-        btnJoueur.className = 'tab-btn active';
-        vueArt.style.display = 'none';
-        vueJoueur.style.display = 'flex';
+        document.getElementById('btnTabJoueurs').classList.add('active');
+        document.getElementById('btnTabArticles').classList.remove('active');
+        document.getElementById('vueReglagesJoueurs').style.display = 'flex';
+        document.getElementById('vueReglagesArticles').style.display = 'none';
       }
     }
 
-    function afficherReglagesArticles() {
-      const list = document.getElementById('reglagesList');
-      list.innerHTML = "";
+    function afficherReglagesList() {
+      const container = document.getElementById('reglagesList');
+      container.innerHTML = "";
       baseArticles.forEach((item, index) => {
-        let div = document.createElement('div');
-        div.className = 'item-editor';
+        const div = document.createElement('div');
+        div.className = "item-editor";
         div.innerHTML = `
-          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticle(${index}, 'emoji', this.value)">
-          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticle(${index}, 'nom', this.value)">
-          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticle(${index}, 'prix', parseFloat(this.value))">
+          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleSysteme(${index}, 'emoji', this.value)">
+          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleSysteme(${index}, 'nom', this.value)">
+          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticleSysteme(${index}, 'prix', this.value)">
+          <button style="background:#e53e3e; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="supprimerArticleSysteme(${index})">✕</button>
         `;
-        list.appendChild(div);
+        container.appendChild(div);
       });
     }
 
-    function modifierArticle(index, champ, valeur) {
-      if (baseArticles[index]) {
-        baseArticles[index][champ] = valeur;
-        afficherArticles();
-      }
+    function modifierArticleSysteme(index, champ, valeur) {
+      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
+      else { baseArticles[index][champ] = valeur; }
+      afficherArticles();
+    }
+
+    function supprimerArticleSysteme(index) {
+      baseArticles.splice(index, 1);
+      afficherReglagesList();
+      afficherArticles();
     }
 
     function ajouterNouvelArticleSysteme() {
-      const emoji = document.getElementById('nouveauEmoji').value.trim() || '📦';
+      const emoji = document.getElementById('nouveauEmoji').value.trim() || "📦";
       const nom = document.getElementById('nouveauNom').value.trim();
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
 
-      if (!nom || isNaN(prix) || prix < 0) {
-        alert("Veuillez saisir un nom et un prix valide.");
-        return;
-      }
+      if (!nom || isNaN(prix)) { alert("Veuillez saisir un nom et un prix valides."); return; }
 
-      baseArticles.push({
-        id: Date.now(),
-        cat: cat,
-        emoji: emoji,
-        nom: nom,
-        prix: prix
-      });
-
+      let newId = Date.now();
+      baseArticles.push({ id: newId, cat: cat, emoji: emoji, nom: nom, prix: prix });
+      
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
 
-      afficherReglagesArticles();
+      afficherReglagesList();
       afficherArticles();
-      alert("Article ajouté au catalogue !");
     }
 
-    function afficherReglagesJoueurs() {
-      const list = document.getElementById('joueursList');
-      list.innerHTML = "";
-      Object.keys(USERS_MAP).forEach(pin => {
-        let nomJoueur = USERS_MAP[pin];
-        let div = document.createElement('div');
-        div.className = 'item-editor';
+    function afficherJoueursList() {
+      const container = document.getElementById('joueursList');
+      container.innerHTML = "";
+      Object.entries(USERS_MAP).forEach(([pin, prenom]) => {
+        const div = document.createElement('div');
+        div.className = "item-editor";
         div.innerHTML = `
-          <span style="width: 70px; font-weight: bold; font-family: monospace; color:#38bdf8;">[ ${pin} ]</span>
-          <span style="flex-grow:1; font-weight:bold;">${nomJoueur} ${estJoueurProtege(nomJoueur) ? '⭐' : ''}</span>
+          <span style="font-weight:bold; width:60px; color:#a0aec0;">${pin}</span>
+          <span style="flex-grow:1; color:white; font-weight:600;">${prenom} ${estJoueurProtege(prenom) ? '⭐' : ''}</span>
+          <button style="background:#e53e3e; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="supprimerJoueurSysteme('${pin}')">✕</button>
         `;
-        list.appendChild(div);
+        container.appendChild(div);
       });
     }
 
     function ajouterNouveauJoueurSysteme() {
-      const nom = document.getElementById('nouveauJoueurNom').value.trim();
+      const prenom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
 
-      if (!nom || !pin || pin.length !== 4 || isNaN(pin)) {
-        alert("Saisissez un prénom et un code PIN à 4 chiffres.");
+      if (!prenom || pin.length !== 4 || isNaN(pin)) {
+        alert("Veuillez entrer un prénom valide et un code PIN à 4 chiffres.");
         return;
       }
 
-      if (USERS_MAP[pin]) {
-        alert("Ce code PIN est déjà attribué à un autre joueur.");
-        return;
-      }
-
-      USERS_MAP[pin] = nom;
+      USERS_MAP[pin] = prenom;
       db.ref('utilisateurs').set(USERS_MAP);
-      db.ref(`banques/${nom}`).set(20000.00);
+
+      db.ref(`banques/${prenom}`).once('value', (snapshot) => {
+        if (snapshot.val() === null) {
+          db.ref(`banques/${prenom}`).set(20000.00);
+        }
+      });
 
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
 
-      afficherReglagesJoueurs();
-      alert(`Joueur ${nom} inscrit avec 20 000 € !`);
+      afficherJoueursList();
+    }
+
+    function supprimerJoueurSysteme(pin) {
+      if (confirm(`Voulez-vous supprimer ce joueur (PIN: ${pin}) ?`)) {
+        delete USERS_MAP[pin];
+        db.ref('utilisateurs').set(USERS_MAP);
+        afficherJoueursList();
+      }
     }
 
     function jouerSonValidation() {
-      if (!audioCtx) return;
       try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
         osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
@@ -2072,18 +2041,19 @@
     }
 
     function jouerSonErreur() {
-      if (!audioCtx) return;
       try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
         gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
+        osc.stop(audioCtx.currentTime + 0.4);
       } catch (e) {}
     }
   </script>
