@@ -1034,7 +1034,6 @@
                 const dernierePartieQuiz = biens.dernierePartie30k || 0;
                 const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
 
-                // CHANGEMENT: Passage de 4h à 24h d'inactivité
                 if (tempsSansJouer > 24) {
                   deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
                 } else {
@@ -1073,7 +1072,6 @@
         const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now(), achats: [] };
         let quantite = (currentData.quantite || 0) + 1;
         let achats = currentData.achats || [];
-        // Si d'anciennes données n'ont pas la liste d'achats, on simule l'historique
         if (achats.length === 0 && currentData.quantite > 0) {
           for(let i=0; i<currentData.quantite; i++) {
             achats.push(currentData.dernierPaiement || Date.now());
@@ -1100,7 +1098,6 @@
           return;
         }
 
-        // +50% de la valeur par jour
         const prixRevente = Math.round(prixBase * (1 + 0.50 * joursEcoules) * 100) / 100;
 
         if (confirm(`Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`)) {
@@ -1118,7 +1115,6 @@
           let nouveauSolde = Math.round((soldeActuel + prixRevente) * 100) / 100;
           db.ref(`banques/${user}`).set(nouveauSolde);
 
-          // Inscription du mouvement
           const now = new Date();
           const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
           const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -1178,7 +1174,6 @@
             if (type.estMall) {
               const dernierePartieQuiz = userBiens.dernierePartie30k || 0;
               const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
-              // CHANGEMENT: Passage de 4h à 24h
               if (tempsSansJouer > 24) {
                 totalPerteHeure += gainPotentiel;
               } else {
@@ -1195,7 +1190,6 @@
 
         let detailsHtml = immoTextes.length > 0 ? immoTextes.join(' • ') : 'Aucune propriété';
 
-        // Signal visuel établissements (Gains en vert, Pertes en rouge)
         let signalHtml = "";
         if (totalGainHeure > 0) {
           signalHtml += `<div style="color: #38ef7d; font-size: 11px; font-weight: bold; margin-top: 2px;">📈 +${totalGainHeure.toLocaleString('fr-FR')} € / h</div>`;
@@ -1379,10 +1373,18 @@
       return { capaciteTotale, voituresPossedees };
     }
 
+    /* VALIDATION DU PAIEMENT AVEC VÉRIFICATION STRICTE DU SOLDE BANCAIRE */
     function validerPaiement() {
       let totalPaye = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       let user = lastUserValide;
       let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+
+      // Contrôle de solde suffisant
+      if (soldeActuel < totalPaye) {
+        let manque = (totalPaye - soldeActuel).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        alert(`🚫 SOLDE INSUFFISANT !\n\nSolde actuel : ${soldeActuel.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €\nTotal achat : ${totalPaye.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €\nIl vous manque : ${manque} €`);
+        return;
+      }
 
       let voituresDansPanier = listeArticles.filter(i => i.cat === "Automobiles").length;
       if (voituresDansPanier > 0) {
@@ -1816,7 +1818,6 @@
         `;
         container.appendChild(fortuneCard);
 
-        // SECTION REVENTE IMMOBILIÈRE
         const sectionImmoTitle = document.createElement('div');
         sectionImmoTitle.className = 'section-title';
         sectionImmoTitle.style.marginTop = '14px';
@@ -1929,102 +1930,118 @@
       afficherClassementEtPossessions();
       document.getElementById('historiqueOverlay').classList.add('active');
     }
-    function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
+
+    function fermerHistorique() {
+      document.getElementById('historiqueOverlay').classList.remove('active');
+      joueurSelectionneVueDetail = null;
+    }
 
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
+
     function ouvrirEcranReglages() {
-      afficherListeArticlesReglages();
-      afficherListeJoueursReglages();
+      afficherReglagesArticles();
+      afficherReglagesJoueurs();
       document.getElementById('reglagesOverlay').classList.add('active');
     }
+
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
     function changerOngletReglages(onglet) {
-      document.getElementById('btnTabArticles').classList.toggle('active', onglet === 'articles');
-      document.getElementById('btnTabJoueurs').classList.toggle('active', onglet === 'joueurs');
-      document.getElementById('vueReglagesArticles').style.display = onglet === 'articles' ? 'flex' : 'none';
-      document.getElementById('vueReglagesJoueurs').style.display = onglet === 'joueurs' ? 'flex' : 'none';
+      const btnArt = document.getElementById('btnTabArticles');
+      const btnJoueur = document.getElementById('btnTabJoueurs');
+      const vueArt = document.getElementById('vueReglagesArticles');
+      const vueJoueur = document.getElementById('vueReglagesJoueurs');
+
+      if (onglet === 'articles') {
+        btnArt.className = 'tab-btn active';
+        btnJoueur.className = 'tab-btn';
+        vueArt.style.display = 'flex';
+        vueJoueur.style.display = 'none';
+      } else {
+        btnArt.className = 'tab-btn';
+        btnJoueur.className = 'tab-btn active';
+        vueArt.style.display = 'none';
+        vueJoueur.style.display = 'flex';
+      }
     }
 
-    function afficherListeArticlesReglages() {
-      const container = document.getElementById('reglagesList');
-      container.innerHTML = "";
+    function afficherReglagesArticles() {
+      const list = document.getElementById('reglagesList');
+      list.innerHTML = "";
       baseArticles.forEach((item, index) => {
-        const div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleReglages(${index}, 'emoji', this.value)">
-          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleReglages(${index}, 'nom', this.value)">
-          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticleReglages(${index}, 'prix', this.value)">
-          <button class="btn-suppr-ligne" onclick="supprimerArticleReglages(${index})">✕</button>
+          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticle(${index}, 'emoji', this.value)">
+          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticle(${index}, 'nom', this.value)">
+          <input type="number" step="0.01" class="prix-input" value="${item.prix}" onchange="modifierArticle(${index}, 'prix', parseFloat(this.value))">
         `;
-        container.appendChild(div);
+        list.appendChild(div);
       });
     }
 
-    function modifierArticleReglages(index, champ, valeur) {
-      if (champ === 'prix') { baseArticles[index][champ] = parseFloat(valeur) || 0; }
-      else { baseArticles[index][champ] = valeur; }
-      afficherArticles();
-    }
-
-    function supprimerArticleReglages(index) {
-      baseArticles.splice(index, 1);
-      afficherListeArticlesReglages();
-      afficherArticles();
+    function modifierArticle(index, champ, valeur) {
+      if (baseArticles[index]) {
+        baseArticles[index][champ] = valeur;
+        afficherArticles();
+      }
     }
 
     function ajouterNouvelArticleSysteme() {
-      const emoji = document.getElementById('nouveauEmoji').value || '🍕';
-      const nom = document.getElementById('nouveauNom').value;
+      const emoji = document.getElementById('nouveauEmoji').value.trim() || '📦';
+      const nom = document.getElementById('nouveauNom').value.trim();
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
 
-      if (!nom || isNaN(prix)) { alert("Veuillez saisir un nom et un prix valides."); return; }
+      if (!nom || isNaN(prix) || prix < 0) {
+        alert("Veuillez saisir un nom et un prix valide.");
+        return;
+      }
 
-      const newId = Date.now();
-      baseArticles.push({ id: newId, cat: cat, emoji: emoji, nom: nom, prix: prix });
+      baseArticles.push({
+        id: Date.now(),
+        cat: cat,
+        emoji: emoji,
+        nom: nom,
+        prix: prix
+      });
 
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
 
-      afficherListeArticlesReglages();
+      afficherReglagesArticles();
       afficherArticles();
+      alert("Article ajouté au catalogue !");
     }
 
-    function afficherListeJoueursReglages() {
-      const container = document.getElementById('joueursList');
-      container.innerHTML = "";
+    function afficherReglagesJoueurs() {
+      const list = document.getElementById('joueursList');
+      list.innerHTML = "";
       Object.keys(USERS_MAP).forEach(pin => {
-        const nom = USERS_MAP[pin];
-        const div = document.createElement('div');
+        let nomJoueur = USERS_MAP[pin];
+        let div = document.createElement('div');
         div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" class="emoji-input" value="${pin}" readonly style="background:#2d3748; color:#a0aec0;">
-          <input type="text" class="nom-input" value="${nom}" onchange="modifierJoueurReglages('${pin}', this.value)">
-          <button class="btn-suppr-ligne" onclick="supprimerJoueurReglages('${pin}')">✕</button>
+          <span style="width: 70px; font-weight: bold; font-family: monospace; color:#38bdf8;">[ ${pin} ]</span>
+          <span style="flex-grow:1; font-weight:bold;">${nomJoueur} ${estJoueurProtege(nomJoueur) ? '⭐' : ''}</span>
         `;
-        container.appendChild(div);
+        list.appendChild(div);
       });
-    }
-
-    function modifierJoueurReglages(pin, nouveauNom) {
-      if (!nouveauNom.trim()) return;
-      USERS_MAP[pin] = nouveauNom.trim();
-      db.ref('utilisateurs').set(USERS_MAP);
-    }
-
-    function supprimerJoueurReglages(pin) {
-      delete USERS_MAP[pin];
-      db.ref('utilisateurs').set(USERS_MAP);
-      afficherListeJoueursReglages();
     }
 
     function ajouterNouveauJoueurSysteme() {
       const nom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
 
-      if (!nom || pin.length !== 4) { alert("Saisissez un nom et un PIN exact à 4 chiffres."); return; }
+      if (!nom || !pin || pin.length !== 4 || isNaN(pin)) {
+        alert("Saisissez un prénom et un code PIN à 4 chiffres.");
+        return;
+      }
+
+      if (USERS_MAP[pin]) {
+        alert("Ce code PIN est déjà attribué à un autre joueur.");
+        return;
+      }
 
       USERS_MAP[pin] = nom;
       db.ref('utilisateurs').set(USERS_MAP);
@@ -2033,7 +2050,8 @@
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
 
-      afficherListeJoueursReglages();
+      afficherReglagesJoueurs();
+      alert(`Joueur ${nom} inscrit avec 20 000 € !`);
     }
 
     function jouerSonValidation() {
@@ -2046,8 +2064,10 @@
         osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
       } catch (e) {}
     }
 
@@ -2060,8 +2080,10 @@
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
         gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
       } catch (e) {}
     }
   </script>
