@@ -600,7 +600,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v3.0.0 (Système Revente Immo + 24h Mall)</div>
+    <div class="version-tag">v3.1.0 (Revente Mall -20%)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -863,7 +863,6 @@
       "1806": "Joyce"
     };
 
-    // VÉRIFICATION DES JOUEURS PROTÉGÉS (TERRANCE ET JOYCE)
     function estJoueurProtege(nom) {
       if (!nom) return false;
       const n = nom.trim().toLowerCase();
@@ -946,9 +945,9 @@
       { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00, immoKey: "villaT6" },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
       { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
-      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Com. (+10k€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00 },
-      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (+50k€/h)", prix: 50000000.00, immoKey: "dubaiMall", revenuHeure: 50000.00, estMall: true },
-      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (+500k€/h)", prix: 100000000.00, immoKey: "abuDhabiMall", revenuHeure: 500000.00, estMall: true },
+      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Com. (+10k€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00, estCentreCommercial: true },
+      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (+50k€/h)", prix: 50000000.00, immoKey: "dubaiMall", revenuHeure: 50000.00, estMall: true, estCentreCommercial: true },
+      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (+500k€/h)", prix: 100000000.00, immoKey: "abuDhabiMall", revenuHeure: 500000.00, estMall: true, estCentreCommercial: true },
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
       { id: 514, cat: "Immobilier Marseille", emoji: "🏎️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 }
     ];
@@ -1001,7 +1000,6 @@
       });
     }
 
-    /* REVENUS PAR HEURE PLEINE ET PÉNALITÉ DE MALLS SI INACTIF (> 24h) */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1082,8 +1080,8 @@
       });
     }
 
-    /* REVENTE IMMOBILIÈRE (+50% PAR JOUR SI DÉTENU DEPUIS 3 JOURS) */
-    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien) {
+    /* REVENTE IMMOBILIÈRE & CENTRES COMMERCIAUX À -20% */
+    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien, estCentreCommercial) {
       const ref = db.ref(`immobilier/${user}/${immoKey}`);
       ref.once('value', (snapshot) => {
         const data = snapshot.val();
@@ -1093,14 +1091,23 @@
         const maintenant = Date.now();
         const joursEcoules = (maintenant - dateAchat) / (1000 * 3600 * 24);
 
-        if (joursEcoules < 3) {
-          alert("Vous devez attendre au moins 3 jours après l'achat pour revendre ce bien !");
-          return;
+        let prixRevente = 0;
+        if (estCentreCommercial) {
+          // Vente des centres commerciaux à -20% du prix d'achat
+          prixRevente = Math.round(prixBase * 0.80 * 100) / 100;
+        } else {
+          if (joursEcoules < 3) {
+            alert("Vous devez attendre au moins 3 jours après l'achat pour revendre ce bien !");
+            return;
+          }
+          prixRevente = Math.round(prixBase * (1 + 0.50 * joursEcoules) * 100) / 100;
         }
 
-        const prixRevente = Math.round(prixBase * (1 + 0.50 * joursEcoules) * 100) / 100;
+        let messageConfirmation = estCentreCommercial 
+          ? `Voulez-vous revendre votre centre commercial ${nomBien} à -20% pour ${prixRevente.toLocaleString('fr-FR')} € ?`
+          : `Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`;
 
-        if (confirm(`Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`)) {
+        if (confirm(messageConfirmation)) {
           let nouveauxAchats = [...data.achats];
           nouveauxAchats.splice(indexAchat, 1);
           let nouvelleQuantite = Math.max(0, (data.quantite || 1) - 1);
@@ -1346,13 +1353,11 @@
       return { capaciteTotale, voituresPossedees };
     }
 
-    /* VALIDATION DU PAIEMENT AVEC VÉRIFICATION STRICTE DU SOLDE BANCAIRE */
     function validerPaiement() {
       let totalPaye = listeArticles.reduce((acc, item) => acc + item.prix, 0);
       let user = lastUserValide;
       let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
 
-      // Contrôle de solde suffisant
       if (soldeActuel < totalPaye) {
         let manque = (totalPaye - soldeActuel).toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         alert(`🚫 SOLDE INSUFFISANT !\n\nSolde actuel : ${soldeActuel.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €\nTotal achat : ${totalPaye.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €\nIl vous manque : ${manque} €`);
@@ -1795,7 +1800,7 @@
         sectionImmoTitle.className = 'section-title';
         sectionImmoTitle.style.marginTop = '14px';
         sectionImmoTitle.style.marginBottom = '8px';
-        sectionImmoTitle.innerText = "🏘️ Revente Immobilière (+50%/jour après 3j)";
+        sectionImmoTitle.innerText = "🏘️ Revente (Immo & Centres Commerciaux -20%)";
         container.appendChild(sectionImmoTitle);
 
         let userBiens = possessionsImmo[nomClient] || {};
@@ -1809,21 +1814,30 @@
               aDesBiens = true;
               const secondes = (maintenant - dateAchat) / 1000;
               const joursEcoules = secondes / (3600 * 24);
-              const dispoVente = joursEcoules >= 3;
-              const prixReventeVal = Math.round(itemImmo.prix * (1 + 0.50 * joursEcoules) * 100) / 100;
+              
+              let dispoVente = false;
+              let prixReventeVal = 0;
+              let tempsRestantTxt = "";
+
+              if (itemImmo.estCentreCommercial) {
+                dispoVente = true; // Vente immédiate à -20% pour les centres commerciaux
+                prixReventeVal = Math.round(itemImmo.prix * 0.80 * 100) / 100;
+                tempsRestantTxt = `📉 Revente Mall (-20%) : ${prixReventeVal.toLocaleString('fr-FR')} €`;
+              } else {
+                dispoVente = joursEcoules >= 3;
+                prixReventeVal = Math.round(itemImmo.prix * (1 + 0.50 * joursEcoules) * 100) / 100;
+                if (!dispoVente) {
+                  let heuresRestantes = Math.ceil((3 * 24) - (secondes / 3600));
+                  tempsRestantTxt = `⏳ Dispo dans ~${heuresRestantes}h`;
+                } else {
+                  tempsRestantTxt = `📈 Val. Revente : ${prixReventeVal.toLocaleString('fr-FR')} € (+${Math.floor(joursEcoules * 50)}%)`;
+                }
+              }
 
               let pill = document.createElement('div');
               pill.className = 'possession-pill';
               pill.style.flexDirection = 'column';
               pill.style.alignItems = 'flex-start';
-
-              let tempsRestantTxt = "";
-              if (!dispoVente) {
-                let heuresRestantes = Math.ceil((3 * 24) - (secondes / 3600));
-                tempsRestantTxt = `⏳ Dispo dans ~${heuresRestantes}h`;
-              } else {
-                tempsRestantTxt = `📈 Val. Revente : ${prixReventeVal.toLocaleString('fr-FR')} € (+${Math.floor(joursEcoules * 50)}%)`;
-              }
 
               pill.innerHTML = `
                 <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
@@ -1834,7 +1848,7 @@
                   <div style="text-align:right;">
                     <div style="font-size:11px; color:#38ef7d;">${tempsRestantTxt}</div>
                     <button class="btn-vente-immo ${dispoVente ? '' : 'bloque'}" 
-                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}', ${idx}, ${itemImmo.prix}, '${itemImmo.nom}')` : ''}">
+                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}', ${idx}, ${itemImmo.prix}, '${itemImmo.nom}', ${itemImmo.estCentreCommercial ? 'true' : 'false'})` : ''}">
                       ${dispoVente ? '🏷️ Revendre' : '🔒 Bloqué (<3j)'}
                     </button>
                   </div>
