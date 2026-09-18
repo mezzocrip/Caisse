@@ -509,7 +509,7 @@
 
     .reglages-list { overflow-y: auto; max-height: 40vh; margin-bottom: 12px; -webkit-overflow-scrolling: touch; }
     .item-editor { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .item-editor input { padding: 8px; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 13px; }
+    .item-editor input, .item-editor select { padding: 8px; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 13px; }
     .item-editor input.emoji-input { width: 44px; text-align: center; }
     .item-editor input.nom-input { flex-grow: 1; }
     .item-editor input.prix-input { width: 80px; }
@@ -600,7 +600,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v3.1.0 (Revente Mall -20%)</div>
+    <div class="version-tag">v3.2.0 (Malls Inactivité 7j / Onglet École)</div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -737,12 +737,19 @@
     </div>
   </div>
 
-  <!-- MODAL HISTORIQUE / ACQUISITION -->
+  <!-- MODAL HISTORIQUE / ACQUISITION / CLASSEMENT -->
   <div class="historique-overlay" id="historiqueOverlay">
     <div class="historique-card">
       <div class="reglages-header">
         <span class="reglages-title" id="historiqueTitle">Classement Général 🧾</span>
         <button class="btn-close" onclick="fermerHistorique()">✕</button>
+      </div>
+
+      <!-- ONGLET DE FILTRE FAMILLE / ECOLE (Si pas en vue détail) -->
+      <div class="categories-tabs" id="tabsClassementGroupe" style="margin-bottom: 10px;">
+        <button class="tab-btn active" id="btnTabClassementTous" onclick="changerOngletClassement('tous')">🌐 Tous</button>
+        <button class="tab-btn" id="btnTabClassementFamille" onclick="changerOngletClassement('famille')">👨‍👩‍👧‍👦 Famille</button>
+        <button class="tab-btn" id="btnTabClassementEcole" onclick="changerOngletClassement('ecole')">🏫 École</button>
       </div>
 
       <div class="historique-list" id="historiqueList">
@@ -795,6 +802,12 @@
           <div class="item-editor">
             <input type="text" id="nouveauJoueurNom" class="nom-input" placeholder="Prénom">
             <input type="number" inputmode="numeric" id="nouveauJoueurPin" class="prix-input" placeholder="PIN (4 ch.)" maxlength="4">
+          </div>
+          <div class="item-editor" style="margin-top: 5px;">
+            <select id="nouveauJoueurGroupe" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 13px;">
+              <option value="Famille">👨‍👩‍👧‍👦 Membre de la Famille</option>
+              <option value="École">🏫 Joueur de l'École</option>
+            </select>
           </div>
           <button class="btn-ajouter-article" style="background:#2b6cb0;" onclick="ajouterNouveauJoueurSysteme()">+ Enregistrer le joueur</button>
         </div>
@@ -855,13 +868,29 @@
       "f1807d96a7ee007d4b4fb24e4d5804aa1f79f40076a084bcbb53158cfa40a7cf": "Joyce"
     };
 
+    // Format avec prise en compte du groupe (Famille par défaut)
     let USERS_MAP = {
-      "0712": "Yves",
-      "2807": "Terrance",
-      "2006": "Lamar",
-      "2410": "Marjo",
-      "1806": "Joyce"
+      "0712": { nom: "Yves", groupe: "Famille" },
+      "2807": { nom: "Terrance", groupe: "Famille" },
+      "2006": { nom: "Lamar", groupe: "Famille" },
+      "2410": { nom: "Marjo", groupe: "Famille" },
+      "1806": { nom: "Joyce", groupe: "Famille" }
     };
+
+    function ObtenirPrenomUser(pinOuObj) {
+      if (!pinOuObj) return "Anonyme";
+      if (typeof pinOuObj === 'string') return pinOuObj;
+      if (pinOuObj.nom) return pinOuObj.nom;
+      return "Anonyme";
+    }
+
+    function ObtenirGroupeUser(prenom) {
+      let entree = Object.values(USERS_MAP).find(u => (typeof u === 'object' ? u.nom : u) === prenom);
+      if (entree && typeof entree === 'object' && entree.groupe) {
+        return entree.groupe;
+      }
+      return "Famille";
+    }
 
     function estJoueurProtege(nom) {
       if (!nom) return false;
@@ -886,6 +915,7 @@
     let comptesComplets = {};
     let possessionsImmo = {};
     let joueurSelectionneVueDetail = null;
+    let filtreClassementActif = "tous"; // "tous", "famille", "ecole"
 
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
@@ -970,8 +1000,22 @@
     function ecouterJoueursFirebase() {
       db.ref('utilisateurs').on('value', (snapshot) => {
         const data = snapshot.val();
-        if (!data) { db.ref('utilisateurs').set(USERS_MAP); } 
-        else { USERS_MAP = data; afficherClassementEtPossessions(); }
+        if (!data) { 
+          db.ref('utilisateurs').set(USERS_MAP); 
+        } else { 
+          // Harmonisation anciens/nouveaux formats
+          let userMapMiseAJour = {};
+          Object.keys(data).forEach(pin => {
+            let val = data[pin];
+            if (typeof val === 'string') {
+              userMapMiseAJour[pin] = { nom: val, groupe: "Famille" };
+            } else {
+              userMapMiseAJour[pin] = val;
+            }
+          });
+          USERS_MAP = userMapMiseAJour; 
+          afficherClassementEtPossessions(); 
+        }
       });
     }
 
@@ -981,7 +1025,10 @@
         const data = snapshot.val();
         if (!data) {
           let initialData = {};
-          Object.values(USERS_MAP).forEach(prenom => { initialData[prenom] = 20000.00; });
+          Object.values(USERS_MAP).forEach(u => { 
+            let prenom = ObtenirPrenomUser(u);
+            initialData[prenom] = 20000.00; 
+          });
           banquesRef.set(initialData);
         } else {
           comptesComplets = data;
@@ -1000,6 +1047,7 @@
       });
     }
 
+    /* GESTION INACTIVITÉ ET CENTRES COMMERCIAUX */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1012,11 +1060,11 @@
 
         let deltaTotalARecup = 0;
         const typesBiens = [
-          { key: 'snack', tauXHeure: 1000, estMall: false },
-          { key: 'hotel', tauXHeure: 3500, estMall: false },
-          { key: 'centreCommercial', tauXHeure: 10000, estMall: false },
-          { key: 'dubaiMall', tauXHeure: 50000, estMall: true },
-          { key: 'abuDhabiMall', tauXHeure: 500000, estMall: true }
+          { key: 'snack', tauXHeure: 1000, estCentre: false },
+          { key: 'hotel', tauXHeure: 3500, estCentre: false },
+          { key: 'centreCommercial', tauXHeure: 10000, estCentre: true },
+          { key: 'dubaiMall', tauXHeure: 50000, estCentre: true },
+          { key: 'abuDhabiMall', tauXHeure: 500000, estCentre: true }
         ];
 
         typesBiens.forEach(type => {
@@ -1028,13 +1076,18 @@
             const heuresCompletes = Math.floor(secondesEcoulees / 3600);
 
             if (qte > 0 && heuresCompletes >= 1) {
-              if (type.estMall) {
-                const dernierePartieQuiz = biens.dernierePartie30k || 0;
-                const tempsSansJouer = (maintenant - dernierePartieQuiz) / (1000 * 3600);
+              if (type.estCentre) {
+                // RÈGLE : Inactivité au bout de 1 semaine (168h).
+                // Perte de 100 000 € par jour au-delà de 7 jours sans jouer.
+                const derniereActivite = biens.dernierePartie30k || 0;
+                const heuresInactivite = (maintenant - derniereActivite) / (1000 * 3600);
 
-                if (tempsSansJouer > 24) {
-                  deltaTotalARecup -= heuresCompletes * type.tauXHeure * qte;
+                if (heuresInactivite > 168) {
+                  // Au-delà de 7 jours (168h), perte de 100,000 € / jour = ~4166.67 € / heure par centre
+                  let perteParHeure = (100000 / 24) * qte;
+                  deltaTotalARecup -= heuresCompletes * perteParHeure;
                 } else {
+                  // Actif (< 7 jours) : génère ses revenus normaux
                   deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
                 }
               } else {
@@ -1093,7 +1146,6 @@
 
         let prixRevente = 0;
         if (estCentreCommercial) {
-          // Vente des centres commerciaux à -20% du prix d'achat
           prixRevente = Math.round(prixBase * 0.80 * 100) / 100;
         } else {
           if (joursEcoules < 3) {
@@ -1148,9 +1200,10 @@
       if (!container) return;
       container.innerHTML = "";
 
-      let listeJoueurs = Object.values(USERS_MAP).map(prenom => {
+      let listeJoueurs = Object.values(USERS_MAP).map(u => {
+        let prenom = ObtenirPrenomUser(u);
         let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
-        return { prenom: prenom, solde: solde };
+        return { prenom: prenom, solde: solde, groupe: ObtenirGroupeUser(prenom) };
       });
 
       listeJoueurs.sort((a, b) => b.solde - a.solde);
@@ -1183,7 +1236,7 @@
         div.className = 'dark-card-item';
         div.innerHTML = `
           <div>
-            <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''}</div>
+            <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} <span style="font-size:11px; opacity:0.6;">(${j.groupe})</span></div>
             <div class="dark-card-sub">${detailsHtml}</div>
           </div>
           <div class="dark-card-amount ${j.solde < 0 ? 'deficit' : ''}">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
@@ -1304,9 +1357,10 @@
 
     async function verifierCodePin() {
       const hashSaisi = await hashPin(pinSaisi);
-      const userTrouve = PIN_HASH_MAP[hashSaisi] || USERS_MAP[pinSaisi];
+      let userTrouveRaw = PIN_HASH_MAP[hashSaisi] || USERS_MAP[pinSaisi];
+      let userTrouve = ObtenirPrenomUser(userTrouveRaw);
 
-      if (userTrouve) {
+      if (userTrouve && userTrouve !== "Anonyme") {
         lastPinValide = pinSaisi;
         lastUserValide = userTrouve;
         fermerCodePin();
@@ -1339,7 +1393,7 @@
       const nomCatalogueExactsAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => a.nom);
       const nomCatalogueAvecEmojiAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => `${a.emoji} ${a.nom}`);
 
-      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === user);
+      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_MAP[t.codePin])) === user);
       ticketsJoueur.forEach(ticket => {
         if (ticket.articles && Array.isArray(ticket.articles)) {
           ticket.articles.forEach(art => {
@@ -1675,9 +1729,18 @@
       });
     }
 
+    function changerOngletClassement(type) {
+      filtreClassementActif = type;
+      document.getElementById('btnTabClassementTous').className = `tab-btn ${type === 'tous' ? 'active' : ''}`;
+      document.getElementById('btnTabClassementFamille').className = `tab-btn ${type === 'famille' ? 'active' : ''}`;
+      document.getElementById('btnTabClassementEcole').className = `tab-btn ${type === 'ecole' ? 'active' : ''}`;
+      afficherClassementEtPossessions();
+    }
+
     function afficherClassementEtPossessions() {
       const container = document.getElementById('historiqueList');
       const titleElement = document.getElementById('historiqueTitle');
+      const tabsElement = document.getElementById('tabsClassementGroupe');
       if (!container) return;
       container.innerHTML = "";
 
@@ -1690,11 +1753,18 @@
       }
 
       if (!joueurSelectionneVueDetail) {
-        if (titleElement) titleElement.innerText = "Classement Général 🧾";
+        if (tabsElement) tabsElement.style.display = "flex";
 
-        let listeClassement = Object.values(USERS_MAP).map(prenom => {
+        let titreTxt = "Classement Général 🧾";
+        if (filtreClassementActif === 'famille') titreTxt = "Classement Famille 👨‍👩‍👧‍👦";
+        else if (filtreClassementActif === 'ecole') titreTxt = "Classement École 🏫";
+        if (titleElement) titleElement.innerText = titreTxt;
+
+        let listeClassement = Object.values(USERS_MAP).map(u => {
+          let prenom = ObtenirPrenomUser(u);
+          let groupe = ObtenirGroupeUser(prenom);
           let soldeBanque = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
-          let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === prenom);
+          let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_MAP[t.codePin])) === prenom);
           
           let totalValeurAchats = 0;
           let immoTextes = [];
@@ -1723,12 +1793,25 @@
 
           return {
             prenom: prenom,
+            groupe: groupe,
             fortuneTotale: fortuneTotale,
             resumeBiens: resumeBiens
           };
         });
 
+        // Filtrage par Onglet
+        if (filtreClassementActif === 'famille') {
+          listeClassement = listeClassement.filter(j => j.groupe === 'Famille');
+        } else if (filtreClassementActif === 'ecole') {
+          listeClassement = listeClassement.filter(j => j.groupe === 'École');
+        }
+
         listeClassement.sort((a, b) => b.fortuneTotale - a.fortuneTotale);
+
+        if (listeClassement.length === 0) {
+          container.innerHTML = `<div style="text-align:center; color:#a0aec0; margin-top:20px;">Aucun joueur trouvé dans la catégorie ${filtreClassementActif}.</div>`;
+          return;
+        }
 
         listeClassement.forEach(j => {
           let div = document.createElement('div');
@@ -1740,7 +1823,7 @@
 
           div.innerHTML = `
             <div>
-              <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''}</div>
+              <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} <span style="font-size:11px; opacity:0.6;">(${j.groupe})</span></div>
               ${j.resumeBiens ? `<div class="dark-card-sub">${j.resumeBiens}</div>` : ''}
             </div>
             <div class="dark-card-amount ${j.fortuneTotale < 0 ? 'deficit' : ''}">${j.fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
@@ -1749,6 +1832,7 @@
         });
 
       } else {
+        if (tabsElement) tabsElement.style.display = "none";
         let nomClient = joueurSelectionneVueDetail;
         if (titleElement) titleElement.innerText = `Profil : ${nomClient}`;
 
@@ -1762,7 +1846,7 @@
         container.appendChild(btnBack);
 
         let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
-        let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || USERS_MAP[t.codePin]) === nomClient);
+        let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_MAP[t.codePin])) === nomClient);
 
         let mapPossessions = {};
         let totalValeurAchats = 0;
@@ -1820,7 +1904,7 @@
               let tempsRestantTxt = "";
 
               if (itemImmo.estCentreCommercial) {
-                dispoVente = true; // Vente immédiate à -20% pour les centres commerciaux
+                dispoVente = true;
                 prixReventeVal = Math.round(itemImmo.prix * 0.80 * 100) / 100;
                 tempsRestantTxt = `📉 Revente Mall (-20%) : ${prixReventeVal.toLocaleString('fr-FR')} €`;
               } else {
@@ -1848,7 +1932,7 @@
                   <div style="text-align:right;">
                     <div style="font-size:11px; color:#38ef7d;">${tempsRestantTxt}</div>
                     <button class="btn-vente-immo ${dispoVente ? '' : 'bloque'}" 
-                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}', ${idx}, ${itemImmo.prix}, '${itemImmo.nom}', ${itemImmo.estCentreCommercial ? 'true' : 'false'})` : ''}">
+                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}', ${idx},${itemImmo.prix}, '${itemImmo.nom}',${itemImmo.estCentreCommercial ? 'true' : 'false'})` : ''}">
                       ${dispoVente ? '🏷️ Revendre' : '🔒 Bloqué (<3j)'}
                     </button>
                   </div>
@@ -1993,12 +2077,14 @@
     function afficherJoueursList() {
       const container = document.getElementById('joueursList');
       container.innerHTML = "";
-      Object.entries(USERS_MAP).forEach(([pin, prenom]) => {
+      Object.entries(USERS_MAP).forEach(([pin, userObj]) => {
+        let prenom = ObtenirPrenomUser(userObj);
+        let groupe = ObtenirGroupeUser(prenom);
         const div = document.createElement('div');
         div.className = "item-editor";
         div.innerHTML = `
-          <span style="font-weight:bold; width:60px; color:#a0aec0;">${pin}</span>
-          <span style="flex-grow:1; color:white; font-weight:600;">${prenom} ${estJoueurProtege(prenom) ? '⭐' : ''}</span>
+          <span style="font-weight:bold; width:50px; color:#a0aec0;">${pin}</span>
+          <span style="flex-grow:1; color:white; font-weight:600;">${prenom} ${estJoueurProtege(prenom) ? '⭐' : ''} <span style="font-size:11px; color:#8b98a5;">(${groupe})</span></span>
           <button style="background:#e53e3e; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="supprimerJoueurSysteme('${pin}')">✕</button>
         `;
         container.appendChild(div);
@@ -2008,13 +2094,14 @@
     function ajouterNouveauJoueurSysteme() {
       const prenom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
+      const groupe = document.getElementById('nouveauJoueurGroupe').value;
 
       if (!prenom || pin.length !== 4 || isNaN(pin)) {
         alert("Veuillez entrer un prénom valide et un code PIN à 4 chiffres.");
         return;
       }
 
-      USERS_MAP[pin] = prenom;
+      USERS_MAP[pin] = { nom: prenom, groupe: groupe };
       db.ref('utilisateurs').set(USERS_MAP);
 
       db.ref(`banques/${prenom}`).once('value', (snapshot) => {
@@ -2027,6 +2114,7 @@
       document.getElementById('nouveauJoueurPin').value = "";
 
       afficherJoueursList();
+      alert(`Joueur ${prenom} enregistré dans la catégorie "${groupe}" avec 20 000 € !`);
     }
 
     function supprimerJoueurSysteme(pin) {
