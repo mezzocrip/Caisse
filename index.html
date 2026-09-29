@@ -85,16 +85,16 @@
     .btn-quiz-mode { background: #6b46c1; color: #fff; border: none; border-radius: 14px; padding: 12px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; }
     .btn-reset { background: none; border: none; color: #e53e3e; font-weight: bold; cursor: pointer; padding: 6px; font-size: 12px; width: 100%; text-align: center; }
 
-    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay, .creer-ecole-overlay {
+    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay, .creer-ecole-overlay, .aide-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center;
       opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9998;
     }
-    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active, .creer-ecole-overlay.active {
+    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active, .creer-ecole-overlay.active, .aide-overlay.active {
       opacity: 1; pointer-events: auto;
     }
     
-    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card, .creer-ecole-card {
+    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card, .creer-ecole-card, .aide-card {
       background: #121820; width: 92%; max-width: 440px; border-radius: 24px; padding: 22px; color: white;
       text-align: left; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.08);
       max-height: 90vh; display: flex; flex-direction: column;
@@ -164,6 +164,7 @@
     .btn-level-moyen { background: #7c2d12; border: 1px solid #f97316; color: #ffedd5; }
     .btn-level-difficile { background: #7f1d1d; border: 1px solid #ef4444; color: #fee2e2; }
     .btn-level-extreme { background: #4c1d95; border: 1px solid #a855f7; color: #f3e8ff; }
+    .btn-level-ultime { background: #831843; border: 1px solid #f43f5e; color: #ffe4e6; }
     .level-name { font-size: 15px; font-weight: bold; }
     .level-desc { font-size: 12px; opacity: 0.85; }
 
@@ -185,6 +186,10 @@
 
     .badge-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.1); margin-left: 6px; font-weight: bold; }
 
+    .aide-content { font-size: 13px; color: #cbd5e0; line-height: 1.5; overflow-y: auto; max-height: 70vh; padding-right: 6px; }
+    .aide-section { background: #1a222d; border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+    .aide-section-title { font-size: 14px; font-weight: bold; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+
     @media (min-width: 600px) { .articles-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (min-width: 768px) and (orientation: landscape) {
       .layout-ipad { display: grid; grid-template-columns: 340px 1fr; gap: 16px; }
@@ -202,6 +207,7 @@
         <button class="btn-quick-add" onclick="ouvrirModalCreerEcole()">🏫 + Joueur École</button>
         <button class="btn-icon" onclick="ouvrirBanque()" title="Comptes Bancaires">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Acquisitions">🧾</button>
+        <button class="btn-icon" onclick="ouvrirAide()" title="Règles du jeu">❓</button>
         <button class="btn-icon" onclick="ouvrirReglagesProteges()" title="Réglages">⚙️</button>
       </div>
     </div>
@@ -232,15 +238,68 @@
     <div class="actions-section">
       <div class="actions-grid">
         <button class="btn-validation" onclick="demanderCodePin('paiement')">Payer</button>
-        <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Multiplications 🧮</button>
+        <button class="btn-quiz-mode" onclick="demanderCodePin('quiz_login')">Calcul Mental 🧮</button>
       </div>
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v4.0.0 (Entreprises & Badges Cash)</div>
+    <div class="version-tag">v4.1.0 (Mode Ultime & Minuteur 10s)</div>
   </div>
 
-  <!-- MODAL CREATION JOUEUR ECOLE (AVEC CODE PIN OBLIGATOIRE) -->
+  <!-- MODAL AIDE ET REGLES -->
+  <div class="aide-overlay" id="aideOverlay">
+    <div class="aide-card">
+      <div class="reglages-header">
+        <span class="reglages-title">Règles du Jeu & Guide 📜</span>
+        <button class="btn-close" onclick="fermerAide()">✕</button>
+      </div>
+      <div class="aide-content">
+        <div class="aide-section">
+          <div class="aide-section-title">🎮 Principe Général</div>
+          Accumulez de la fortune, achetez des biens immobiliers, des automobiles d'exception et des entreprises internationales. Gérez votre compte bancaire via la caisse enregistreuse !
+        </div>
+
+        <div class="aide-section">
+          <div class="aide-section-title">🔑 Codes PIN & Connexion</div>
+          • Chaque joueur dispose d'un code PIN à 4 chiffres.<br>
+          • Les codes PIN peuvent être identiques entre joueurs tant qu'ils n'ont pas le même prénom.<br>
+          • Pour créer un joueur École, cliquez sur <strong>🏫 + Joueur École</strong> (solde de départ : 20 000 €).
+        </div>
+
+        <div class="aide-section">
+          <div class="aide-section-title">🧮 Calcul Mental (Gains & Pertes)</div>
+          Résolvez des calculs mathématiques sous un délai strict de <strong>10 secondes</strong> par question :<br>
+          • 🟢 <strong>Facile</strong> : Multiplications | Gain : +1 000 € | Perte : -1 000 €<br>
+          • 🟠 <strong>Intermédiaire</strong> : Multiplications | Gain : +3 000 € | Perte : -3 000 €<br>
+          • 🔴 <strong>Difficile</strong> : Multiplications | Gain : +6 000 € | Perte : -6 000 €<br>
+          • 💀 <strong>Extrême (QCM)</strong> : Multiplications (Min 10 questions) | Gain : +15 000 € | Perte : -50 000 €<br>
+          • 🔥 <strong>ULTIME</strong> : Additions & Soustractions à 2 chiffres (ex: 45+56) | Gain : +100 000 € | Perte : -100 000 €
+        </div>
+
+        <div class="aide-section">
+          <div class="aide-section-title">🚘 Automobiles & Garages</div>
+          • Vous devez posséder au moins un garage (5 ou 20 places) dans <em>Immobilier Marseille</em> pour acheter des véhicules.<br>
+          • La capacité de vos garages limite le nombre d'automobiles que vous pouvez acheter.
+        </div>
+
+        <div class="aide-section">
+          <div class="aide-section-title">🏢 Immobilier, Malls & Entreprises</div>
+          • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels, Malls et Entreprises gagnent 10%/h automatiquement après 24h d'achat.<br>
+          • <strong>Maisons</strong> : Revente possible à tout moment avec +150% de plus-value toutes les 12 heures !<br>
+          • <strong>Centres Commerciaux / Malls</strong> : Revente possible avec -20% de décote.<br>
+          • <strong>Autres Biens</strong> : Revente possible après 3 jours d'achat (+50%/jour).
+        </div>
+
+        <div class="aide-section">
+          <div class="aide-section-title">🏆 Badges Cash</div>
+          Débloquez des insignes prestigieux au fur et à mesure que votre compte bancaire augmente :<br>
+          🥉 Bronze (100 Mrd) | 🥈 Argent (1 Trillon) | 🥇 Or (10 Trillons) | 💎 Platine (100 Trillons) | 👑 Ultima (1 Quadrillon).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREATION JOUEUR ECOLE -->
   <div class="creer-ecole-overlay" id="creerEcoleOverlay">
     <div class="creer-ecole-card">
       <div class="reglages-header">
@@ -249,7 +308,7 @@
       </div>
       <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Saisissez le prénom et le code PIN à 4 chiffres du joueur. Solde initial : 20 000 €.</p>
       <div class="item-editor" style="margin-bottom: 10px;">
-        <input type="text" id="ecoleNomInput" class="nom-input" placeholder="Prénom de l'élève" style="width:100%; padding:12px; font-size:15px;">
+        <input type="text" id="ecoleNomInput" class="nom-input" placeholder="Prénom" style="width:100%; padding:12px; font-size:15px;">
       </div>
       <div class="item-editor" style="margin-bottom: 16px;">
         <input type="number" inputmode="numeric" id="ecolePinInput" class="nom-input" placeholder="Code PIN (4 chiffres)" maxlength="4" style="width:100%; padding:12px; font-size:15px;">
@@ -258,37 +317,45 @@
     </div>
   </div>
 
-  <!-- MODAL CODE PIN -->
+  <!-- MODAL CODE PIN (SELECTION PAR PIN OU PSEUDO) -->
   <div class="pin-overlay" id="pinOverlay">
     <div class="pin-card" id="pinCard">
       <div class="pin-title" id="pinTitleModal">Code PIN requis</div>
       <div class="pin-subtitle" id="pinSubtitleModal">Saisissez votre code à 4 chiffres</div>
       
-      <div class="pin-dots">
-        <div class="dot" id="dot0"></div>
-        <div class="dot" id="dot1"></div>
-        <div class="dot" id="dot2"></div>
-        <div class="dot" id="dot3"></div>
+      <div id="selectionJoueurPinSimilaire" style="display:none; margin-bottom: 14px;">
+        <div style="font-size:13px; color:#f97316; margin-bottom:8px; font-weight:bold;">Plusieurs joueurs ont ce code PIN !</div>
+        <select id="selectJoueurPinDoublon" style="width:100%; padding:10px; border-radius:10px; background:#2c2c2e; color:white; border:1px solid #4a5568; font-size:14px; font-weight:bold;"></select>
+        <button class="btn-ajouter-article" style="margin-top:10px; background:#38ef7d; color:#000;" onclick="confirmerChoixJoueurDoublon()">Valider mon choix</button>
       </div>
 
-      <div class="error-msg" id="pinErrorMsg"></div>
+      <div id="pinBoxContainer">
+        <div class="pin-dots">
+          <div class="dot" id="dot0"></div>
+          <div class="dot" id="dot1"></div>
+          <div class="dot" id="dot2"></div>
+          <div class="dot" id="dot3"></div>
+        </div>
 
-      <div class="pin-grid">
-        <button class="btn-pin" onclick="taperCodePin('1')">1</button>
-        <button class="btn-pin" onclick="taperCodePin('2')">2</button>
-        <button class="btn-pin" onclick="taperCodePin('3')">3</button>
-        
-        <button class="btn-pin" onclick="taperCodePin('4')">4</button>
-        <button class="btn-pin" onclick="taperCodePin('5')">5</button>
-        <button class="btn-pin" onclick="taperCodePin('6')">6</button>
-        
-        <button class="btn-pin" onclick="taperCodePin('7')">7</button>
-        <button class="btn-pin" onclick="taperCodePin('8')">8</button>
-        <button class="btn-pin" onclick="taperCodePin('9')">9</button>
-        
-        <button class="btn-pin btn-cancel" onclick="fermerCodePin()">Annuler</button>
-        <button class="btn-pin" onclick="taperCodePin('0')">0</button>
-        <button class="btn-pin btn-del" onclick="effacerChiffrePin()">⌫</button>
+        <div class="error-msg" id="pinErrorMsg"></div>
+
+        <div class="pin-grid">
+          <button class="btn-pin" onclick="taperCodePin('1')">1</button>
+          <button class="btn-pin" onclick="taperCodePin('2')">2</button>
+          <button class="btn-pin" onclick="taperCodePin('3')">3</button>
+          
+          <button class="btn-pin" onclick="taperCodePin('4')">4</button>
+          <button class="btn-pin" onclick="taperCodePin('5')">5</button>
+          <button class="btn-pin" onclick="taperCodePin('6')">6</button>
+          
+          <button class="btn-pin" onclick="taperCodePin('7')">7</button>
+          <button class="btn-pin" onclick="taperCodePin('8')">8</button>
+          <button class="btn-pin" onclick="taperCodePin('9')">9</button>
+          
+          <button class="btn-pin btn-cancel" onclick="fermerCodePin()">Annuler</button>
+          <button class="btn-pin" onclick="taperCodePin('0')">0</button>
+          <button class="btn-pin btn-del" onclick="effacerChiffrePin()">⌫</button>
+        </div>
       </div>
     </div>
   </div>
@@ -297,13 +364,13 @@
   <div class="quiz-level-overlay" id="quizLevelOverlay">
     <div class="level-card">
       <div class="level-title">Niveau de difficulté 🧮</div>
-      <div class="level-subtitle">Choisissez votre vitesse et vos gains</div>
+      <div class="level-subtitle">Tous les niveaux : 10 secondes par question !</div>
 
       <div class="level-btn-group">
         <button class="btn-level btn-level-facile" onclick="demarrerQuizAvecNiveau('facile')">
           <div>
             <div class="level-name">🟢 Facile</div>
-            <div class="level-desc">10 sec / réponse</div>
+            <div class="level-desc">10 sec / Multiplications</div>
           </div>
           <div class="level-name">+1 000 €</div>
         </button>
@@ -311,7 +378,7 @@
         <button class="btn-level btn-level-moyen" onclick="demarrerQuizAvecNiveau('intermediaire')">
           <div>
             <div class="level-name">🟠 Intermédiaire</div>
-            <div class="level-desc">6 sec / réponse</div>
+            <div class="level-desc">10 sec / Multiplications</div>
           </div>
           <div class="level-name">+3 000 €</div>
         </button>
@@ -319,7 +386,7 @@
         <button class="btn-level btn-level-difficile" onclick="demarrerQuizAvecNiveau('difficile')">
           <div>
             <div class="level-name">🔴 Difficile</div>
-            <div class="level-desc">3 sec / réponse</div>
+            <div class="level-desc">10 sec / Multiplications</div>
           </div>
           <div class="level-name">+6 000 €</div>
         </button>
@@ -327,9 +394,17 @@
         <button class="btn-level btn-level-extreme" onclick="demarrerQuizAvecNiveau('extreme')">
           <div>
             <div class="level-name">💀 Extrême (QCM 3 Choix)</div>
-            <div class="level-desc">2s / réps. Min 10 questions. Err: -50k€</div>
+            <div class="level-desc">10s / Réps. Min 10 questions. Err: -50k€</div>
           </div>
           <div class="level-name">+15 000 €</div>
+        </button>
+
+        <button class="btn-level btn-level-ultime" onclick="demarrerQuizAvecNiveau('ultime')">
+          <div>
+            <div class="level-name">🔥 ULTIME (+ / - à 2 chiffres)</div>
+            <div class="level-desc">10s / Additions & Soustractions (ex: 45+56)</div>
+          </div>
+          <div class="level-name">+100 000 €</div>
         </button>
       </div>
     </div>
@@ -346,7 +421,7 @@
       <div class="quiz-timer-box" id="quizTimerBox">⏳ 10s</div>
 
       <div class="quiz-question-box">
-        <div class="quiz-matiere" id="quizMatiere">Multiplications (3 à 10)</div>
+        <div class="quiz-matiere" id="quizMatiere">Calcul Mental</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
@@ -400,7 +475,7 @@
 
       <div class="categories-tabs" id="tabsClassementGroupe" style="margin-bottom: 10px;">
         <button class="tab-btn active" id="btnTabClassementTous" onclick="changerOngletClassement('tous')">🌐 Tous</button>
-        <button class="tab-btn" id="btnTabClassementFamille" onclick="changerOngletClassement('famille')">👨‍👩‍👧‍👦 Famille</button>
+        <button class="tab-btn" id="btnTabClassementFamille" onclick="changerOngletClassement('famille')">👨‍‍👩‍👧‍👦 Famille</button>
         <button class="tab-btn" id="btnTabClassementEcole" onclick="changerOngletClassement('ecole')">🏫 École</button>
       </div>
 
@@ -515,13 +590,14 @@
       "f1807d96a7ee007d4b4fb24e4d5804aa1f79f40076a084bcbb53158cfa40a7cf": "Joyce"
     };
 
-    let USERS_MAP = {
-      "0712": { nom: "Yves", groupe: "Famille" },
-      "2807": { nom: "Terrance", groupe: "Famille" },
-      "2006": { nom: "Lamar", groupe: "Famille" },
-      "2410": { nom: "Marjo", groupe: "Famille" },
-      "1806": { nom: "Joyce", groupe: "Famille" }
-    };
+    // STRUCTURE DE STOCKAGE DES JOUEURS DANS FIREBASE (MULTIPLE JOUEURS PAR PIN PERMIS)
+    let USERS_LIST = [
+      { pin: "0712", nom: "Yves", groupe: "Famille" },
+      { pin: "2807", nom: "Terrance", groupe: "Famille" },
+      { pin: "2006", nom: "Lamar", groupe: "Famille" },
+      { pin: "2410", nom: "Marjo", groupe: "Famille" },
+      { pin: "1806", nom: "Joyce", groupe: "Famille" }
+    ];
 
     // PALIER BADGES CASH (EN EUROS)
     const PALIERS_BADGES = [
@@ -554,8 +630,8 @@
     }
 
     function ObtenirGroupeUser(prenom) {
-      let entree = Object.values(USERS_MAP).find(u => (typeof u === 'object' ? u.nom : u) === prenom);
-      if (entree && typeof entree === 'object' && entree.groupe) {
+      let entree = USERS_LIST.find(u => u.nom === prenom);
+      if (entree && entree.groupe) {
         return entree.groupe;
       }
       return "Famille";
@@ -605,7 +681,7 @@
       { id: 806, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 5008", prix: 40490.00 },
       { id: 807, cat: "Automobiles", emoji: "🏎", nom: "Tesla Model 3", prix: 39990.00 },
       { id: 808, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model Y", prix: 44990.00 },
-      { id: 809, cat: "Automobiles", emoji: "🏎️️", nom: "Tesla Model S", prix: 92990.00 },
+      { id: 809, cat: "Automobiles", emoji: "🏎", nom: "Tesla Model S", prix: 92990.00 },
       { id: 810, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model X", prix: 99990.00 },
       { id: 811, cat: "Automobiles", emoji: "📐", nom: "Tesla Cybertruck", prix: 102000.00 },
       { id: 812, cat: "Automobiles", emoji: "⚡", nom: "BYD Dolphin", prix: 33990.00 },
@@ -629,9 +705,8 @@
       { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (10%/h après 24h)", prix: 50000000.00, immoKey: "dubaiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
       { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (10%/h après 24h)", prix: 100000000.00, immoKey: "abuDhabiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
-      { id: 514, cat: "Immobilier Marseille", emoji: "🏎️️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
+      { id: 514, cat: "Immobilier Marseille", emoji: "🏎", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
 
-      // NOUVELLE CATEGORIE : ENTREPRISES CONNUES (10%/h après 24h)
       { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
@@ -657,7 +732,11 @@
       setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
-    /* MODAL CREATION ECOLE AVEC PIN OBLIGATOIRE */
+    /* MODAL AIDE */
+    function ouvrirAide() { document.getElementById('aideOverlay').classList.add('active'); }
+    function fermerAide() { document.getElementById('aideOverlay').classList.remove('active'); }
+
+    /* MODAL CREATION ECOLE AVEC PIN */
     function ouvrirModalCreerEcole() {
       document.getElementById('ecoleNomInput').value = "";
       document.getElementById('ecolePinInput').value = "";
@@ -673,7 +752,7 @@
       const pin = document.getElementById('ecolePinInput').value.trim();
 
       if (!prenom) {
-        alert("Veuillez saisir un prénom d'élève !");
+        alert("Veuillez saisir un prénom !");
         return;
       }
 
@@ -682,13 +761,15 @@
         return;
       }
 
-      if (USERS_MAP[pin]) {
-        alert("Ce code PIN est déjà utilisé. Choisissez-en un autre !");
+      // PERMET LES PIN SIMILAIRES TANT QUE LE PSEUDO/PRENOM EST DIFFERENT
+      let doublonNom = USERS_LIST.find(u => u.nom.toLowerCase() === prenom.toLowerCase());
+      if (doublonNom) {
+        alert("Ce prénom est déjà utilisé par un autre joueur ! Veuillez en choisir un autre.");
         return;
       }
 
-      USERS_MAP[pin] = { nom: prenom, groupe: "École" };
-      db.ref('utilisateurs').set(USERS_MAP);
+      USERS_LIST.push({ pin: pin, nom: prenom, groupe: "École" });
+      db.ref('utilisateurs_v2').set(USERS_LIST);
 
       db.ref(`banques/${prenom}`).set(20000.00);
 
@@ -697,21 +778,12 @@
     }
 
     function ecouterJoueursFirebase() {
-      db.ref('utilisateurs').on('value', (snapshot) => {
+      db.ref('utilisateurs_v2').on('value', (snapshot) => {
         const data = snapshot.val();
         if (!data) { 
-          db.ref('utilisateurs').set(USERS_MAP); 
+          db.ref('utilisateurs_v2').set(USERS_LIST); 
         } else { 
-          let userMapMiseAJour = {};
-          Object.keys(data).forEach(pin => {
-            let val = data[pin];
-            if (typeof val === 'string') {
-              userMapMiseAJour[pin] = { nom: val, groupe: "Famille" };
-            } else {
-              userMapMiseAJour[pin] = val;
-            }
-          });
-          USERS_MAP = userMapMiseAJour; 
+          USERS_LIST = Array.isArray(data) ? data : Object.values(data); 
           afficherClassementEtPossessions(); 
         }
       });
@@ -723,7 +795,7 @@
         const data = snapshot.val();
         if (!data) {
           let initialData = {};
-          Object.values(USERS_MAP).forEach(u => { 
+          USERS_LIST.forEach(u => { 
             let prenom = ObtenirPrenomUser(u);
             initialData[prenom] = 20000.00; 
           });
@@ -745,7 +817,6 @@
       });
     }
 
-    /* REVENUS HORAIRES (10%/h après 24h d'achat) ET AUCUNE PERTE SUR LES MALLS */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -827,7 +898,6 @@
       });
     }
 
-    /* REVENTE MAISONS (+150% TOUTES LES 12H) & AUTRES BIENS */
     function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien, estMaison, estCentreCommercial) {
       const ref = db.ref(`immobilier/${user}/${immoKey}`);
       ref.once('value', (snapshot) => {
@@ -899,7 +969,7 @@
       if (!container) return;
       container.innerHTML = "";
 
-      let listeJoueurs = Object.values(USERS_MAP).map(u => {
+      let listeJoueurs = USERS_LIST.map(u => {
         let prenom = ObtenirPrenomUser(u);
         let solde = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
         return { prenom: prenom, solde: solde, groupe: ObtenirGroupeUser(prenom) };
@@ -990,13 +1060,15 @@
         document.getElementById('pinTitleModal').innerText = "Sécurité Réglages";
         document.getElementById('pinSubtitleModal').innerText = "Code administrateur requis";
       } else if (action === 'quiz_login') {
-        document.getElementById('pinTitleModal').innerText = "Connexion Multiplications 🧮";
+        document.getElementById('pinTitleModal').innerText = "Connexion Calcul Mental 🧮";
         document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour jouer";
       }
 
       actionApresPin = action;
       pinSaisi = "";
       blocageSaisie = false;
+      document.getElementById('selectionJoueurPinSimilaire').style.display = "none";
+      document.getElementById('pinBoxContainer').style.display = "block";
       mettreAJourPointsPin();
       document.getElementById('pinErrorMsg').innerText = "";
       document.getElementById('pinOverlay').classList.add('active');
@@ -1036,16 +1108,36 @@
 
     async function verifierCodePin() {
       const hashSaisi = await hashPin(pinSaisi);
-      let userTrouveRaw = PIN_HASH_MAP[hashSaisi] || USERS_MAP[pinSaisi];
-      let userTrouve = ObtenirPrenomUser(userTrouveRaw);
 
-      if (userTrouve && userTrouve !== "Anonyme") {
+      // CAS SPECIAUX ADMIN / SECURISE
+      if (PIN_HASH_MAP[hashSaisi]) {
         lastPinValide = pinSaisi;
-        lastUserValide = userTrouve;
+        lastUserValide = PIN_HASH_MAP[hashSaisi];
         fermerCodePin();
-        if (actionApresPin === 'paiement') { validerPaiement(); }
-        else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
-        else if (actionApresPin === 'quiz_login') { ouvrirSelectionNiveauQuiz(); }
+        executerActionPostPin();
+        return;
+      }
+
+      // CHERCHER LES JOUEURS ASSOCIÉS À CE CODE PIN
+      let joueursCorrespondants = USERS_LIST.filter(u => u.pin === pinSaisi);
+
+      if (joueursCorrespondants.length === 1) {
+        lastPinValide = pinSaisi;
+        lastUserValide = joueursCorrespondants[0].nom;
+        fermerCodePin();
+        executerActionPostPin();
+      } else if (joueursCorrespondants.length > 1) {
+        // EN CAS DE CODES PIN SIMILAIRES / IDENTIQUES
+        document.getElementById('pinBoxContainer').style.display = "none";
+        const select = document.getElementById('selectJoueurPinDoublon');
+        select.innerHTML = "";
+        joueursCorrespondants.forEach(j => {
+          let opt = document.createElement('option');
+          opt.value = j.nom;
+          opt.innerText = `${j.nom} (${j.groupe})`;
+          select.appendChild(opt);
+        });
+        document.getElementById('selectionJoueurPinSimilaire').style.display = "block";
       } else {
         document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
         mettreAJourPointsPin(true);
@@ -1056,6 +1148,22 @@
           blocageSaisie = false;
         }, 400);
       }
+    }
+
+    function confirmerChoixJoueurDoublon() {
+      const nomChoisi = document.getElementById('selectJoueurPinDoublon').value;
+      if (nomChoisi) {
+        lastPinValide = pinSaisi;
+        lastUserValide = nomChoisi;
+        fermerCodePin();
+        executerActionPostPin();
+      }
+    }
+
+    function executerActionPostPin() {
+      if (actionApresPin === 'paiement') { validerPaiement(); }
+      else if (actionApresPin === 'reglages') { ouvrirEcranReglages(); }
+      else if (actionApresPin === 'quiz_login') { ouvrirSelectionNiveauQuiz(); }
     }
 
     function calculerCapaciteEtVoitures(user) {
@@ -1072,7 +1180,7 @@
       const nomCatalogueExactsAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => a.nom);
       const nomCatalogueAvecEmojiAuto = baseArticles.filter(a => a.cat === "Automobiles").map(a => `${a.emoji} ${a.nom}`);
 
-      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_MAP[t.codePin])) === user);
+      let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_LIST.find(u => u.pin === t.codePin))) === user);
       ticketsJoueur.forEach(ticket => {
         if (ticket.articles && Array.isArray(ticket.articles)) {
           ticket.articles.forEach(art => {
@@ -1138,15 +1246,18 @@
 
     function ouvrirSelectionNiveauQuiz() { document.getElementById('quizLevelOverlay').classList.add('active'); }
 
+    /* UNIFORMISATION DE TOUS LES NIVEAUX A 10 SECONDES + AJOUT MODE ULTIME */
     function demarrerQuizAvecNiveau(niveau) {
       niveauQuizActif = niveau;
       questionsJoueesDansSession = 0;
       gainsSessionQuiz = 0;
+      chronoMaxParQuestion = 10; // TOUS LES NIVEAUX APPLIQUENT 10 SECONDES
 
-      if (niveau === 'facile') { chronoMaxParQuestion = 10; gainParQuestion = 1000; perteParQuestion = 1000; }
-      else if (niveau === 'intermediaire') { chronoMaxParQuestion = 6; gainParQuestion = 3000; perteParQuestion = 3000; }
-      else if (niveau === 'difficile') { chronoMaxParQuestion = 3; gainParQuestion = 6000; perteParQuestion = 6000; }
-      else if (niveau === 'extreme') { chronoMaxParQuestion = 2; gainParQuestion = 15000; perteParQuestion = 50000; }
+      if (niveau === 'facile') { gainParQuestion = 1000; perteParQuestion = 1000; }
+      else if (niveau === 'intermediaire') { gainParQuestion = 3000; perteParQuestion = 3000; }
+      else if (niveau === 'difficile') { gainParQuestion = 6000; perteParQuestion = 6000; }
+      else if (niveau === 'extreme') { gainParQuestion = 15000; perteParQuestion = 50000; }
+      else if (niveau === 'ultime') { gainParQuestion = 100000; perteParQuestion = 100000; }
 
       let infoGain = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} €`;
       infoGain += estJoueurProtege(lastUserValide) ? ` | Erreur : 0 € (Bonus ⭐)` : ` | Erreur : -${perteParQuestion.toLocaleString('fr-FR')} €`;
@@ -1167,10 +1278,19 @@
             if (gainsSessionQuiz > 0) {
               appliquerMouvementSoldeFirebase(-gainsSessionQuiz, "Annulation gains Extrême (Abandon < 10 quest.)");
             }
-            appliquerMouvementSoldeFirebase(-50000, "Pénalité Abandon Extrême ⚠️ (<10 quest.)");
+            appliquerMouvementSoldeFirebase(-50000, "Pénalité Abandon Extrême ⚠️️ (<10 quest.)");
             alert(`⚠️ ABANDON EN MODE EXTRÊME !\nVous n'avez fait que ${questionsJoueesDansSession}/10 questions.\n- Gains de la session annulés.\n- Pénalité forfaitaire de -50 000 € appliquée à ${lastUserValide}.`);
           } else {
             alert(`👑 ABANDON EXTRÊME !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
+          }
+        }
+      } else if (niveauQuizActif === 'ultime') {
+        if (questionsJoueesDansSession === 0) {
+          if (!estJoueurProtege(lastUserValide)) {
+            appliquerMouvementSoldeFirebase(-100000, "Pénalité Abandon Ultime ⚠️");
+            alert(`⚠️ ABANDON EN MODE ULTIME !\nPénalité de -100 000 € appliquée à ${lastUserValide}.`);
+          } else {
+            alert(`👑 ABANDON ULTIME !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
           }
         }
       } else {
@@ -1217,7 +1337,7 @@
     function mettreAJourAffichageChrono() {
       const box = document.getElementById('quizTimerBox');
       box.innerText = `⏳ ${tempsRestant}s`;
-      box.className = tempsRestant <= Math.ceil(chronoMaxParQuestion / 3) ? "quiz-timer-box danger" : "quiz-timer-box";
+      box.className = tempsRestant <= 3 ? "quiz-timer-box danger" : "quiz-timer-box";
     }
 
     function traiterTempsEcouleQuiz() {
@@ -1229,27 +1349,53 @@
         alert(`⏱ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
       } else {
         gainsSessionQuiz -= perteParQuestion;
-        appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Temps écoulé`);
+        appliquerMouvementSoldeFirebase(-perteParQuestion, `Calcul Mental (${niveauQuizActif}) - Temps écoulé`);
         alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
       }
       genererNouvelleQuestionQuiz();
     }
 
+    /* GENERATION DES QUESTIONS DONT MODE ULTIME (+ / - A 2 CHIFFRES) */
     function genererNouvelleQuestionQuiz() {
       let titreMatiere = "Multiplications (3 à 10)";
       if (niveauQuizActif === 'extreme') {
         titreMatiere += ` • Prog: ${questionsJoueesDansSession}/10 min`;
+      } else if (niveauQuizActif === 'ultime') {
+        titreMatiere = "Mode Ultime 🔥 (+ / - à 2 chiffres)";
       }
+
       document.getElementById('quizHeaderTitle').innerText = "Calcul Mental 🧮";
       document.getElementById('quizMatiere').innerText = titreMatiere;
 
-      const a = Math.floor(Math.random() * 8) + 3;
-      const b = Math.floor(Math.random() * 8) + 3;
-      const reponseCorrecte = a * b;
+      let reponseCorrecte = 0;
 
-      document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
+      if (niveauQuizActif === 'ultime') {
+        const estAddition = Math.random() < 0.5;
+        const num1 = Math.floor(Math.random() * 90) + 10; // Chiffre à 2 chiffres (10-99)
+        const num2 = Math.floor(Math.random() * 90) + 10; // Chiffre à 2 chiffres (10-99)
 
-      if (niveauQuizActif === 'extreme') {
+        if (estAddition) {
+          reponseCorrecte = num1 + num2;
+          document.getElementById('quizEnonce').innerText = `${num1} + ${num2} = ?`;
+        } else {
+          let maxVal = Math.max(num1, num2);
+          let minVal = Math.min(num1, num2);
+          reponseCorrecte = maxVal - minVal;
+          document.getElementById('quizEnonce').innerText = `${maxVal} - ${minVal} = ?`;
+        }
+
+        document.getElementById('vueQuizMaths').style.display = "block";
+        document.getElementById('vueQuizQCM').style.display = "none";
+        document.getElementById('quizReponseInput').value = "";
+
+        questionActiveCourante = { type: 'maths', bonneReponse: reponseCorrecte.toString() };
+
+      } else if (niveauQuizActif === 'extreme') {
+        const a = Math.floor(Math.random() * 8) + 3;
+        const b = Math.floor(Math.random() * 8) + 3;
+        reponseCorrecte = a * b;
+
+        document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
         document.getElementById('vueQuizMaths').style.display = "none";
         document.getElementById('vueQuizQCM').style.display = "block";
 
@@ -1273,7 +1419,13 @@
         });
 
         questionActiveCourante = { type: 'qcm', bonneReponse: reponseCorrecte.toString() };
+
       } else {
+        const a = Math.floor(Math.random() * 8) + 3;
+        const b = Math.floor(Math.random() * 8) + 3;
+        reponseCorrecte = a * b;
+
+        document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
         document.getElementById('vueQuizMaths').style.display = "block";
         document.getElementById('vueQuizQCM').style.display = "none";
         document.getElementById('quizReponseInput').value = "";
@@ -1293,7 +1445,7 @@
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
         gainsSessionQuiz += gainParQuestion;
-        appliquerMouvementSoldeFirebase(gainParQuestion, `Multiplications (${niveauQuizActif}) - Bonne réponse`);
+        appliquerMouvementSoldeFirebase(gainParQuestion, `Calcul Mental (${niveauQuizActif}) - Bonne réponse`);
       } else {
         jouerSonErreur();
         if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
@@ -1301,7 +1453,7 @@
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
         } else {
           gainsSessionQuiz -= perteParQuestion;
-          appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
+          appliquerMouvementSoldeFirebase(-perteParQuestion, `Calcul Mental (${niveauQuizActif}) - Erreur`);
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
         }
       }
@@ -1332,7 +1484,7 @@
         jouerSonValidation();
         if (navigator.vibrate) { navigator.vibrate([50, 30, 50]); }
         gainsSessionQuiz += gainParQuestion;
-        appliquerMouvementSoldeFirebase(gainParQuestion, `Multiplications (${niveauQuizActif}) - Bonne réponse`);
+        appliquerMouvementSoldeFirebase(gainParQuestion, `Calcul Mental (${niveauQuizActif}) - Bonne réponse`);
         genererNouvelleQuestionQuiz();
         return;
       }
@@ -1347,7 +1499,7 @@
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
         } else {
           gainsSessionQuiz -= perteParQuestion;
-          appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Erreur`);
+          appliquerMouvementSoldeFirebase(-perteParQuestion, `Calcul Mental (${niveauQuizActif}) - Erreur`);
           alert(`❌ Mauvaise réponse !\nLa bonne réponse était : ${bonne}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
         }
         genererNouvelleQuestionQuiz();
@@ -1435,11 +1587,11 @@
         else if (filtreClassementActif === 'ecole') titreTxt = "Classement École 🏫";
         if (titleElement) titleElement.innerText = titreTxt;
 
-        let listeClassement = Object.values(USERS_MAP).map(u => {
+        let listeClassement = USERS_LIST.map(u => {
           let prenom = ObtenirPrenomUser(u);
           let groupe = ObtenirGroupeUser(prenom);
           let soldeBanque = comptesComplets[prenom] !== undefined ? comptesComplets[prenom] : 20000.00;
-          let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_MAP[t.codePin])) === prenom);
+          let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_LIST.find(us => us.pin === t.codePin))) === prenom);
           
           let totalValeurAchats = 0;
           let immoTextes = [];
@@ -1523,7 +1675,7 @@
         container.appendChild(btnBack);
 
         let soldeBanque = comptesComplets[nomClient] !== undefined ? comptesComplets[nomClient] : 20000.00;
-        let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_MAP[t.codePin])) === nomClient);
+        let ticketsJoueur = tousLesTickets.filter(t => (t.utilisateur || ObtenirPrenomUser(USERS_LIST.find(us => us.pin === t.codePin))) === nomClient);
 
         let mapPossessions = {};
         let totalValeurAchats = 0;
@@ -1757,15 +1909,15 @@
     function afficherJoueursList() {
       const container = document.getElementById('joueursList');
       container.innerHTML = "";
-      Object.entries(USERS_MAP).forEach(([pin, userObj]) => {
+      USERS_LIST.forEach((userObj, idx) => {
         let prenom = ObtenirPrenomUser(userObj);
         let groupe = ObtenirGroupeUser(prenom);
         const div = document.createElement('div');
         div.className = "item-editor";
         div.innerHTML = `
-          <span style="font-weight:bold; width:50px; color:#a0aec0;">${pin}</span>
+          <span style="font-weight:bold; width:50px; color:#a0aec0;">${userObj.pin}</span>
           <span style="flex-grow:1; color:white; font-weight:600;">${prenom} ${estJoueurProtege(prenom) ? '⭐' : ''} <span style="font-size:11px; color:#8b98a5;">(${groupe})</span></span>
-          <button style="background:#e53e3e; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="supprimerJoueurSysteme('${pin}')">✕</button>
+          <button style="background:#e53e3e; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer;" onclick="supprimerJoueurSysteme(${idx})">✕</button>
         `;
         container.appendChild(div);
       });
@@ -1781,8 +1933,14 @@
         return;
       }
 
-      USERS_MAP[pin] = { nom: prenom, groupe: groupe };
-      db.ref('utilisateurs').set(USERS_MAP);
+      let doublonNom = USERS_LIST.find(u => u.nom.toLowerCase() === prenom.toLowerCase());
+      if (doublonNom) {
+        alert("Ce prénom est déjà utilisé par un autre joueur ! Veuillez en choisir un autre.");
+        return;
+      }
+
+      USERS_LIST.push({ pin: pin, nom: prenom, groupe: groupe });
+      db.ref('utilisateurs_v2').set(USERS_LIST);
 
       db.ref(`banques/${prenom}`).once('value', (snapshot) => {
         if (snapshot.val() === null) {
@@ -1797,10 +1955,11 @@
       alert(`Joueur ${prenom} enregistré dans la catégorie "${groupe}" avec 20 000 € !`);
     }
 
-    function supprimerJoueurSysteme(pin) {
-      if (confirm(`Voulez-vous supprimer ce joueur (PIN: ${pin}) ?`)) {
-        delete USERS_MAP[pin];
-        db.ref('utilisateurs').set(USERS_MAP);
+    function supprimerJoueurSysteme(index) {
+      let player = USERS_LIST[index];
+      if (player && confirm(`Voulez-vous supprimer le joueur ${player.nom} (PIN: ${player.pin}) ?`)) {
+        USERS_LIST.splice(index, 1);
+        db.ref('utilisateurs_v2').set(USERS_LIST);
         afficherJoueursList();
       }
     }
