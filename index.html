@@ -14,494 +14,132 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
-    }
+    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
     html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #0d1117;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      background-color: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Container Plein Écran */
     .caisse-container {
-      background: white;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      background: white; width: 100vw; height: 100vh; height: 100dvh;
+      display: flex; flex-direction: column; justify-content: space-between;
       padding: calc(14px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
       position: relative;
     }
 
     .version-tag {
-      position: absolute;
-      bottom: calc(5px + env(safe-area-inset-bottom));
-      right: 15px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #a0aec0;
-      font-family: monospace;
-      z-index: 10;
+      position: absolute; bottom: calc(5px + env(safe-area-inset-bottom)); right: 15px;
+      font-size: 11px; font-weight: 600; color: #a0aec0; font-family: monospace; z-index: 10;
     }
 
-    .header-caisse {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      flex-shrink: 0;
+    .header-caisse { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
+    h1 { color: #1a202c; margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .header-actions { display: flex; gap: 8px; }
+    
+    .btn-quick-add {
+      background: #2b6cb0; color: white; border: none; border-radius: 12px;
+      padding: 0 12px; font-size: 13px; font-weight: bold; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; height: 44px;
     }
-    h1 {
-      color: #1a202c;
-      margin: 0;
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .header-actions {
-      display: flex;
-      gap: 10px;
-    }
+    .btn-quick-add:active { background: #2c5282; }
+
     .btn-icon {
-      background: #edf2f7;
-      border: none;
-      border-radius: 12px;
-      width: 44px;
-      height: 44px;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background-color 0.1s;
+      background: #edf2f7; border: none; border-radius: 12px; width: 44px; height: 44px;
+      font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center;
     }
-    .btn-icon:active {
-      background: #cbd5e0;
-    }
+    .btn-icon:active { background: #cbd5e0; }
 
-    .layout-ipad {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      overflow: hidden;
-      justify-content: space-between;
-    }
+    .layout-ipad { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; justify-content: space-between; }
+    .col-gauche { display: flex; flex-direction: column; flex-shrink: 0; }
 
-    .col-gauche {
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-
-    .ecran {
-      background-color: #1a202c;
-      border-radius: 14px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .total-label {
-      color: #a0aec0;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
-    }
-    .total-montant {
-      color: #38ef7d;
-      font-size: 32px;
-      font-family: monospace;
-      font-weight: bold;
-      margin-top: 2px;
-    }
+    .ecran { background-color: #1a202c; border-radius: 14px; padding: 10px 14px; margin-bottom: 8px; text-align: center; }
+    .total-label { color: #a0aec0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .total-montant { color: #38ef7d; font-size: 28px; font-family: monospace; font-weight: bold; margin-top: 2px; }
 
     .ticket-container {
-      background: #f8fafc;
-      border: 2px dashed #cbd5e0;
-      border-radius: 12px;
-      padding: 8px 12px;
-      margin-bottom: 10px;
-      max-height: 110px;
-      overflow-y: auto;
-      text-align: left;
-      -webkit-overflow-scrolling: touch;
+      background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px; padding: 8px 12px;
+      margin-bottom: 10px; max-height: 100px; overflow-y: auto; text-align: left; -webkit-overflow-scrolling: touch;
     }
-    .ticket-vide {
-      color: #a0aec0;
-      font-size: 13px;
-      text-align: center;
-      margin: 6px 0;
-      font-style: italic;
-    }
-    .ligne-ticket {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      color: #2d3748;
-      padding: 6px 0;
-      border-bottom: 1px solid #edf2f7;
-    }
-    .ligne-ticket:last-child {
-      border-bottom: none;
-    }
-    .btn-suppr-ligne {
-      background: #fed7d7;
-      color: #9b2c2c;
-      border: none;
-      border-radius: 8px;
-      font-size: 12px;
-      padding: 4px 8px;
-      cursor: pointer;
-      margin-left: 8px;
-      font-weight: bold;
-    }
+    .ticket-vide { color: #a0aec0; font-size: 13px; text-align: center; margin: 6px 0; font-style: italic; }
+    .ligne-ticket { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #2d3748; padding: 4px 0; border-bottom: 1px solid #edf2f7; }
+    .btn-suppr-ligne { background: #fed7d7; color: #9b2c2c; border: none; border-radius: 8px; font-size: 12px; padding: 2px 6px; cursor: pointer; margin-left: 8px; font-weight: bold; }
 
-    .section-title {
-      font-size: 12px;
-      color: #718096;
-      margin-bottom: 6px;
-      text-align: left;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .section-title { font-size: 12px; color: #718096; margin-bottom: 6px; text-align: left; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .col-droite { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; margin-bottom: 8px; }
 
-    .col-droite {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      overflow: hidden;
-      margin-bottom: 8px;
-    }
+    .categories-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; scrollbar-width: none; align-items: center; flex-shrink: 0; }
+    .categories-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { background: #e2e8f0; color: #4a5568; border: none; padding: 8px 14px; border-radius: 22px; font-size: 12px; font-weight: bold; white-space: nowrap; cursor: pointer; flex-shrink: 0; min-height: 38px; display: flex; align-items: center; }
+    .tab-btn.active { background: #3182ce; color: white; }
 
-    .categories-tabs {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-      scrollbar-width: none;
-      align-items: center;
-      flex-shrink: 0;
-      -webkit-overflow-scrolling: touch;
-    }
-    .categories-tabs::-webkit-scrollbar {
-      display: none;
-    }
-    .tab-btn {
-      background: #e2e8f0;
-      color: #4a5568;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 22px;
-      font-size: 13px;
-      font-weight: bold;
-      white-space: nowrap;
-      cursor: pointer;
-      flex-shrink: 0;
-      min-height: 42px;
-      display: flex;
-      align-items: center;
-    }
-    .tab-btn.active {
-      background: #3182ce;
-      color: white;
-    }
+    .articles-scroll { flex-grow: 1; overflow-y: auto; padding-right: 2px; -webkit-overflow-scrolling: touch; }
+    .articles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .btn-article { background: #f7fafc; border: 1.5px solid #cbd5e0; border-radius: 14px; padding: 10px 6px; font-size: 12px; font-weight: 600; color: #2d3748; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 72px; }
+    .btn-article:active { background-color: #e2e8f0; transform: scale(0.98); }
+    .emoji { font-size: 22px; }
+    .prix-tag { font-weight: 800; color: #2b6cb0; font-size: 11px; background: #ebf8ff; padding: 2px 6px; border-radius: 8px; }
 
-    .articles-scroll {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding-right: 2px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .articles-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .btn-article {
-      background: #f7fafc;
-      border: 1.5px solid #cbd5e0;
-      border-radius: 14px;
-      padding: 12px 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #2d3748;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      min-height: 72px;
-      touch-action: manipulation;
-      transition: background-color 0.1s, transform 0.05s;
-    }
-    .btn-article:active {
-      background-color: #e2e8f0;
-      transform: scale(0.98);
-    }
-    .emoji {
-      font-size: 24px;
-    }
-    .prix-tag {
-      font-weight: 800;
-      color: #2b6cb0;
-      font-size: 12px;
-      background: #ebf8ff;
-      padding: 2px 8px;
-      border-radius: 8px;
-    }
+    .actions-section { flex-shrink: 0; margin-top: 4px; }
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+    .btn-validation { background: #000; color: #fff; border: none; border-radius: 14px; padding: 12px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; }
+    .btn-quiz-mode { background: #6b46c1; color: #fff; border: none; border-radius: 14px; padding: 12px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; }
+    .btn-reset { background: none; border: none; color: #e53e3e; font-weight: bold; cursor: pointer; padding: 6px; font-size: 12px; width: 100%; text-align: center; }
 
-    .actions-section {
-      flex-shrink: 0;
-      margin-top: 4px;
+    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay, .creer-ecole-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9998;
     }
-    .actions-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    .btn-validation {
-      background: #000;
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 17px;
-      font-weight: 700;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 52px;
-      touch-action: manipulation;
-    }
-    .btn-validation:active {
-      opacity: 0.85;
-    }
-    .btn-quiz-mode {
-      background: #6b46c1;
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 17px;
-      font-weight: 700;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 52px;
-      touch-action: manipulation;
-    }
-    .btn-quiz-mode:active {
-      opacity: 0.85;
-    }
-    .btn-reset {
-      background: none;
-      border: none;
-      color: #e53e3e;
-      font-weight: bold;
-      cursor: pointer;
-      padding: 8px;
-      font-size: 12px;
-      width: 100%;
-      text-align: center;
-      touch-action: manipulation;
-    }
-
-    /* MODALS & OVERLAYS DARK / MODERN UI */
-    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .quiz-level-overlay, .quiz-overlay, .apple-pay-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-      z-index: 9998;
-    }
-    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
+    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .quiz-level-overlay.active, .quiz-overlay.active, .apple-pay-overlay.active, .creer-ecole-overlay.active {
+      opacity: 1; pointer-events: auto;
     }
     
-    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card {
-      background: #121820;
-      width: 92%;
-      max-width: 440px;
-      border-radius: 24px;
-      padding: 22px;
-      color: white;
-      text-align: left;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.08);
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
+    .banque-card, .historique-card, .reglages-card, .level-card, .quiz-card, .creer-ecole-card {
+      background: #121820; width: 92%; max-width: 440px; border-radius: 24px; padding: 22px; color: white;
+      text-align: left; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.08);
+      max-height: 90vh; display: flex; flex-direction: column;
     }
 
-    .pin-card {
-      background: #1c1c1e;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 28px;
-      padding: 22px;
-      color: white;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-
+    .pin-card { background: #1c1c1e; width: 90%; max-width: 400px; border-radius: 28px; padding: 22px; color: white; text-align: center; }
     .pin-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
     .pin-subtitle { font-size: 14px; color: #8e8e93; margin-bottom: 18px; }
     .pin-dots { display: flex; justify-content: center; gap: 16px; margin-bottom: 18px; }
-    .dot {
-      width: 18px; height: 18px; border-radius: 50%;
-      border: 2px solid #3a3a3c; background: transparent; transition: all 0.15s ease;
-    }
-    .dot.filled { background: #0a84ff; border-color: #0a84ff; box-shadow: 0 0 10px rgba(10, 132, 255, 0.5); }
-    .dot.error { background: #ff453a; border-color: #ff453a; box-shadow: 0 0 10px rgba(255, 69, 58, 0.5); }
+    .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #3a3a3c; background: transparent; transition: all 0.15s ease; }
+    .dot.filled { background: #0a84ff; border-color: #0a84ff; }
+    .dot.error { background: #ff453a; border-color: #ff453a; }
     .error-msg { color: #ff453a; font-size: 13px; font-weight: 600; min-height: 20px; margin-bottom: 15px; text-align: center; }
 
     .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 10px; }
-    .btn-pin {
-      background: #2c2c2e; color: white; border: none; border-radius: 50%;
-      width: 68px; height: 68px; margin: 0 auto; font-size: 24px; font-weight: 600;
-      display: flex; justify-content: center; align-items: center; cursor: pointer; touch-action: manipulation;
-    }
-    .btn-pin:active { background: #48484a; }
+    .btn-pin { background: #2c2c2e; color: white; border: none; border-radius: 50%; width: 68px; height: 68px; margin: 0 auto; font-size: 24px; font-weight: 600; display: flex; justify-content: center; align-items: center; cursor: pointer; }
     .btn-pin.btn-cancel { font-size: 14px; color: #ff453a; background: transparent; font-weight: bold; }
     .btn-pin.btn-del { font-size: 20px; color: #8e8e93; background: transparent; }
 
-    /* PAVÉ NUMÉRIQUE POUR MATHS */
-    .quiz-numpad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .btn-num {
-      background: #202b38;
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 14px 0;
-      font-size: 22px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      touch-action: manipulation;
-      transition: background 0.1s;
-    }
-    .btn-num:active { background: #3182ce; color: white; }
+    .quiz-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    .btn-num { background: #202b38; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 14px 0; font-size: 22px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; }
     .btn-num.btn-num-del { background: #2d3748; color: #cbd5e0; }
     .btn-num.btn-num-quit { background: #450a0a; color: #fca5a5; font-size: 12px; font-weight: bold; }
 
-    /* VUE QCM 3 CHOIX (NIVEAU EXTRÊME) */
-    .qcm-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .btn-qcm {
-      background: #1e293b;
-      border: 2px solid #334155;
-      color: #ffffff;
-      font-size: 24px;
-      font-weight: bold;
-      padding: 16px;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all 0.1s ease;
-      touch-action: manipulation;
-    }
-    .btn-qcm:active {
-      background: #3b82f6;
-      border-color: #60a5fa;
-      transform: scale(0.98);
-    }
+    .qcm-container { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .btn-qcm { background: #1e293b; border: 2px solid #334155; color: #ffffff; font-size: 24px; font-weight: bold; padding: 16px; border-radius: 16px; cursor: pointer; }
 
-    /* CLASSEMENT BANQUE ET ACQUISITION */
     .dark-card-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 18px;
-      background: #1a222d;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: background 0.15s ease;
-      min-height: 54px;
+      display: flex; justify-content: space-between; align-items: center; padding: 14px 16px;
+      background: #1a222d; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; margin-bottom: 10px; cursor: pointer;
     }
-    .dark-card-item:active { background: #242f3e; }
-    .dark-card-name { font-size: 16px; font-weight: 700; color: #ffffff; }
+    .dark-card-name { font-size: 15px; font-weight: 700; color: #ffffff; }
     .dark-card-sub { font-size: 12px; color: #8b98a5; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
-    .dark-card-amount { font-size: 18px; font-family: monospace; font-weight: bold; color: #38ef7d; text-align: right; }
+    .dark-card-amount { font-size: 16px; font-family: monospace; font-weight: bold; color: #38ef7d; text-align: right; }
     .dark-card-amount.deficit { color: #ff453a; }
 
     .historique-list { overflow-y: auto; flex-grow: 1; margin-top: 6px; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; }
 
-    .btn-back {
-      background: #1a222d; color: #38bdf8; border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px; padding: 10px 16px; font-size: 13px; font-weight: bold;
-      cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; width: fit-content;
-      min-height: 42px;
-    }
+    .btn-back { background: #1a222d; color: #38bdf8; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 16px; font-size: 13px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; width: fit-content; }
 
-    .possession-pill {
-      background: #202b38; border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 12px; margin-bottom: 8px;
-      display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #e2e8f0;
-    }
-    .possession-badge-green {
-      background: rgba(56, 239, 125, 0.15); color: #38ef7d;
-      font-weight: bold; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-family: monospace;
-    }
+    .possession-pill { background: #202b38; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #e2e8f0; }
+    .possession-badge-green { background: rgba(56, 239, 125, 0.15); color: #38ef7d; font-weight: bold; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-family: monospace; }
 
-    .btn-vente-immo {
-      background: #2b6cb0;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 11px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-    .btn-vente-immo.bloque {
-      background: #4a5568;
-      color: #a0aec0;
-      cursor: not-allowed;
-    }
+    .btn-vente-immo { background: #2b6cb0; color: white; border: none; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 4px; }
+    .btn-vente-immo.bloque { background: #4a5568; color: #a0aec0; cursor: not-allowed; }
 
     .reglages-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .reglages-title { font-size: 18px; font-weight: 800; color: #ffffff; }
@@ -534,7 +172,6 @@
     .quiz-title { font-size: 17px; font-weight: bold; color: #ffffff; }
     .quiz-user-badge { background: #3182ce; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; }
     .quiz-timer-box { font-size: 15px; font-weight: bold; color: #f97316; background: #431407; padding: 4px 14px; border-radius: 18px; display: inline-block; margin-bottom: 8px; }
-    .quiz-timer-box.danger { color: #ef4444; background: #450a0a; animation: pulse 0.5s infinite alternate; }
     .quiz-question-box { background: #1a222d; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; margin-bottom: 8px; }
     .quiz-matiere { font-size: 11px; text-transform: uppercase; color: #a0aec0; font-weight: bold; margin-bottom: 4px; }
     .quiz-enonce { font-size: 22px; font-weight: bold; color: #ffffff; margin-bottom: 8px; line-height: 1.3; }
@@ -546,10 +183,9 @@
     .face-id-icon { width: 56px; height: 56px; margin: 12px auto; border: 3px solid #30d158; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; }
     .face-id-icon.success { background: #30d158; color: white; }
 
-    /* TABLETTES / PAYSAGE (>= 600px) */
-    @media (min-width: 600px) {
-      .articles-grid { grid-template-columns: repeat(3, 1fr); }
-    }
+    .badge-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.1); margin-left: 6px; font-weight: bold; }
+
+    @media (min-width: 600px) { .articles-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (min-width: 768px) and (orientation: landscape) {
       .layout-ipad { display: grid; grid-template-columns: 340px 1fr; gap: 16px; }
       .ticket-container { max-height: 160px; }
@@ -563,6 +199,7 @@
     <div class="header-caisse">
       <h1>Marseille Monopoly 🎲</h1>
       <div class="header-actions">
+        <button class="btn-quick-add" onclick="ouvrirModalCreerEcole()">🏫 + Joueur École</button>
         <button class="btn-icon" onclick="ouvrirBanque()" title="Comptes Bancaires">🏦</button>
         <button class="btn-icon" onclick="ouvrirHistorique()" title="Acquisitions">🧾</button>
         <button class="btn-icon" onclick="ouvrirReglagesProteges()" title="Réglages">⚙️</button>
@@ -600,7 +237,22 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v3.2.0 (Malls Inactivité 7j / Onglet École)</div>
+    <div class="version-tag">v4.0.0 (Entreprises & Badges Cash)</div>
+  </div>
+
+  <!-- MODAL CREATION JOUEUR ECOLE (ACCUEIL SANS PIN) -->
+  <div class="creer-ecole-overlay" id="creerEcoleOverlay">
+    <div class="creer-ecole-card">
+      <div class="reglages-header">
+        <span class="reglages-title">Nouveau Joueur École 🏫</span>
+        <button class="btn-close" onclick="fermerModalCreerEcole()">✕</button>
+      </div>
+      <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Création instantanée sans code PIN. Le joueur démarrera avec un solde initial de 20 000 €.</p>
+      <div class="item-editor" style="margin-bottom: 12px;">
+        <input type="text" id="ecoleNomInput" class="nom-input" placeholder="Prénom de l'élève" style="width:100%; padding:12px; font-size:15px;">
+      </div>
+      <button class="btn-ajouter-article" style="background:#2b6cb0; padding:14px; font-size:15px;" onclick="validerCreationJoueurEcole()">Créer le joueur (20 000 €)</button>
+    </div>
   </div>
 
   <!-- MODAL CODE PIN -->
@@ -695,7 +347,6 @@
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
         <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
         
-        <!-- VUE PAVÉ NUMÉRIQUE (MATHS NIVEAUX CLASSIQUES) -->
         <div id="vueQuizMaths">
           <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" readonly>
           <div class="quiz-numpad">
@@ -714,7 +365,6 @@
           </div>
         </div>
 
-        <!-- VUE QCM (NIVEAU EXTRÊME) -->
         <div id="vueQuizQCM" style="display: none;">
           <div class="qcm-container" id="qcmContainer"></div>
           <button class="btn-num btn-num-quit" style="width: 100%; margin-top: 10px; padding: 10px;" onclick="quitterQuizManuel()">Quitter</button>
@@ -745,7 +395,6 @@
         <button class="btn-close" onclick="fermerHistorique()">✕</button>
       </div>
 
-      <!-- ONGLET DE FILTRE FAMILLE / ECOLE (Si pas en vue détail) -->
       <div class="categories-tabs" id="tabsClassementGroupe" style="margin-bottom: 10px;">
         <button class="tab-btn active" id="btnTabClassementTous" onclick="changerOngletClassement('tous')">🌐 Tous</button>
         <button class="tab-btn" id="btnTabClassementFamille" onclick="changerOngletClassement('famille')">👨‍👩‍👧‍👦 Famille</button>
@@ -783,11 +432,9 @@
           </div>
           <div class="item-editor" style="margin-top: 5px;">
             <select id="nouvelleCategorie" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 13px;">
-              <option value="Smartphones">Smartphones</option>
-              <option value="Consoles & Tech">Consoles & Tech</option>
               <option value="Automobiles">Automobiles & Véhicules</option>
-              <option value="Écrans & TV">Écrans & TV</option>
               <option value="Immobilier Marseille">Immobilier Marseille</option>
+              <option value="Entreprises Connues">Entreprises Connues</option>
             </select>
           </div>
           <button class="btn-ajouter-article" onclick="ajouterNouvelArticleSysteme()">+ Ajouter au catalogue</button>
@@ -828,7 +475,6 @@
   </div>
 
   <script>
-    /* ANTI-TRICHE ET BLOCAGE DEVTOOLS */
     (function antiTriche() {
       document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
       document.addEventListener('keydown', function(e) {
@@ -838,7 +484,6 @@
       }, false);
     })();
 
-    // CONFIGURATION FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyBtij22GLTXBbdWxbUX42rKP_HQIeah7AQ",
       authDomain: "caisse-enregistreuse-terrance.firebaseapp.com",
@@ -852,7 +497,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Blocage strict zoom iOS
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function (event) {
       const now = (new Date()).getTime();
@@ -868,7 +512,6 @@
       "f1807d96a7ee007d4b4fb24e4d5804aa1f79f40076a084bcbb53158cfa40a7cf": "Joyce"
     };
 
-    // Format avec prise en compte du groupe (Famille par défaut)
     let USERS_MAP = {
       "0712": { nom: "Yves", groupe: "Famille" },
       "2807": { nom: "Terrance", groupe: "Famille" },
@@ -876,6 +519,29 @@
       "2410": { nom: "Marjo", groupe: "Famille" },
       "1806": { nom: "Joyce", groupe: "Famille" }
     };
+
+    // PALIER BADGES CASH (EN EUROS)
+    const PALIERS_BADGES = [
+      { montant: 100000000000, nom: "Bronze 🥉", code: "bronze" },
+      { montant: 1000000000000, nom: "Argent 🥈", code: "argent" },
+      { montant: 10000000000000, nom: "Or 🥇", code: "or" },
+      { montant: 100000000000000, nom: "Platine 💎", code: "platine" },
+      { montant: 1000000000000000, nom: "Ultima 👑", code: "ultima" }
+    ];
+
+    function ObtenirInfosBadge(soldeCash) {
+      let currentBadge = null;
+      let nextPalier = PALIERS_BADGES[0];
+
+      for (let i = 0; i < PALIERS_BADGES.length; i++) {
+        if (soldeCash >= PALIERS_BADGES[i].montant) {
+          currentBadge = PALIERS_BADGES[i];
+          nextPalier = PALIERS_BADGES[i + 1] || null;
+        }
+      }
+
+      return { badgeActuel: currentBadge, prochainPalier: nextPalier };
+    }
 
     function ObtenirPrenomUser(pinOuObj) {
       if (!pinOuObj) return "Anonyme";
@@ -915,7 +581,7 @@
     let comptesComplets = {};
     let possessionsImmo = {};
     let joueurSelectionneVueDetail = null;
-    let filtreClassementActif = "tous"; // "tous", "famille", "ecole"
+    let filtreClassementActif = "tous";
 
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
@@ -928,29 +594,13 @@
     let intervalChrono = null;
 
     let baseArticles = [
-      { id: 201, cat: "Smartphones", emoji: "📱", nom: "iPhone 13 Pro Max", prix: 859.00 },
-      { id: 202, cat: "Smartphones", emoji: "📱", nom: "iPhone 14 Pro Max", prix: 999.00 },
-      { id: 203, cat: "Smartphones", emoji: "📱", nom: "iPhone 15 Pro Max", prix: 1199.00 },
-      { id: 204, cat: "Smartphones", emoji: "📱", nom: "iPhone 16 Pro Max", prix: 1479.00 },
-      { id: 205, cat: "Smartphones", emoji: "📱", nom: "iPhone 17 Pro Max", prix: 1599.00 },
-      { id: 206, cat: "Smartphones", emoji: "📱", nom: "Samsung Galaxy S24 Ultra", prix: 1469.00 },
-
-      { id: 301, cat: "Consoles & Tech", emoji: "🎮", nom: "PlayStation 5 (PS5)", prix: 549.99 },
-      { id: 302, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette PS5 DualSense", prix: 69.99 },
-      { id: 303, cat: "Consoles & Tech", emoji: "🎮", nom: "Xbox Series X", prix: 499.99 },
-      { id: 304, cat: "Consoles & Tech", emoji: "🎮", nom: "Manette Xbox Series", prix: 59.99 },
-      { id: 305, cat: "Consoles & Tech", emoji: "💻", nom: "iPad mini 6", prix: 559.00 },
-      { id: 306, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 14\"", prix: 1999.00 },
-      { id: 307, cat: "Consoles & Tech", emoji: "💻", nom: "MacBook Pro 16\"", prix: 2899.00 },
-      { id: 308, cat: "Consoles & Tech", emoji: "🖥️", nom: "Mac mini", prix: 699.00 },
-
       { id: 801, cat: "Automobiles", emoji: "🚗", nom: "Audi A3 Sportback", prix: 36790.00 },
       { id: 802, cat: "Automobiles", emoji: "🚗", nom: "Fiat 500 Électrique", prix: 18790.00 },
       { id: 803, cat: "Automobiles", emoji: "🚗", nom: "Citroën C4", prix: 27800.00 },
       { id: 804, cat: "Automobiles", emoji: "🚙", nom: "Renault Clio 5", prix: 19900.00 },
       { id: 805, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 3008", prix: 38850.00 },
       { id: 806, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 5008", prix: 40490.00 },
-      { id: 807, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model 3", prix: 39990.00 },
+      { id: 807, cat: "Automobiles", emoji: "🏎️️", nom: "Tesla Model 3", prix: 39990.00 },
       { id: 808, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model Y", prix: 44990.00 },
       { id: 809, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model S", prix: 92990.00 },
       { id: 810, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model X", prix: 99990.00 },
@@ -963,26 +613,33 @@
       { id: 817, cat: "Automobiles", emoji: "⚡", nom: "BYD Han", prix: 70800.00 },
       { id: 818, cat: "Automobiles", emoji: "👑", nom: "Range Rover Autograph", prix: 144900.00 },
 
-      { id: 401, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 65\"", prix: 799.00 },
-      { id: 402, cat: "Écrans & TV", emoji: "📺", nom: "Écran TV Samsung 75\"", prix: 1199.00 },
-
       { id: 501, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T1 Marseille", prix: 115000.00, immoKey: "t1" },
       { id: 502, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T2 Marseille", prix: 185000.00, immoKey: "t2" },
       { id: 503, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T3 Vue mer", prix: 280000.00, immoKey: "t3" },
       { id: 504, cat: "Immobilier Marseille", emoji: "🏢", nom: "Appart T4 Standing", prix: 395000.00, immoKey: "t4" },
-      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00, immoKey: "maisonT4" },
-      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00, immoKey: "maisonT5" },
-      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00, immoKey: "villaT6" },
+      { id: 505, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T4 (Piscine)", prix: 620000.00, immoKey: "maisonT4", estMaison: true },
+      { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00, immoKey: "maisonT5", estMaison: true },
+      { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00, immoKey: "villaT6", estMaison: true },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
-      { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (+3 500€/h)", prix: 500000.00, immoKey: "hotel", revenuHeure: 3500.00 },
-      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Com. (+10k€/h)", prix: 1000000.00, immoKey: "centreCommercial", revenuHeure: 10000.00, estCentreCommercial: true },
-      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (+50k€/h)", prix: 50000000.00, immoKey: "dubaiMall", revenuHeure: 50000.00, estMall: true, estCentreCommercial: true },
-      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (+500k€/h)", prix: 100000000.00, immoKey: "abuDhabiMall", revenuHeure: 500000.00, estMall: true, estCentreCommercial: true },
+      { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (10%/h après 24h)", prix: 500000.00, immoKey: "hotel", tauxPourcentHeure: 0.10, delaiActivationHeures: 24 },
+      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (10%/h après 24h)", prix: 1000000.00, immoKey: "centreCommercial", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estCentreCommercial: true },
+      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (10%/h après 24h)", prix: 50000000.00, immoKey: "dubaiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
+      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (10%/h après 24h)", prix: 100000000.00, immoKey: "abuDhabiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
-      { id: 514, cat: "Immobilier Marseille", emoji: "🏎️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 }
+      { id: 514, cat: "Immobilier Marseille", emoji: "🏎️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
+
+      // NOUVELLE CATEGORIE : ENTREPRISES CONNUES (10%/h après 24h)
+      { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 904, cat: "Entreprises Connues", emoji: "🔍", nom: "Alphabet (Google)", prix: 2100000000000.00, immoKey: "ent_goog", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 350000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true }
     ];
 
-    let categorieActive = "Smartphones";
+    let categorieActive = "Automobiles";
     let listeArticles = [];
     let audioCtx = null;
 
@@ -997,13 +654,39 @@
       setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
+    /* MODAL RAPIDE ECOLE ACCUEIL */
+    function ouvrirModalCreerEcole() {
+      document.getElementById('ecoleNomInput').value = "";
+      document.getElementById('creerEcoleOverlay').classList.add('active');
+    }
+
+    function fermerModalCreerEcole() {
+      document.getElementById('creerEcoleOverlay').classList.remove('active');
+    }
+
+    function validerCreationJoueurEcole() {
+      const prenom = document.getElementById('ecoleNomInput').value.trim();
+      if (!prenom) {
+        alert("Veuillez saisir un prénom d'élève !");
+        return;
+      }
+
+      let pinAlea = Math.floor(1000 + Math.random() * 9000).toString();
+      USERS_MAP[pinAlea] = { nom: prenom, groupe: "École" };
+      db.ref('utilisateurs').set(USERS_MAP);
+
+      db.ref(`banques/${prenom}`).set(20000.00);
+
+      fermerModalCreerEcole();
+      alert(`🎉 Joueur de l'École "${prenom}" créé avec succès avec 20 000 € !`);
+    }
+
     function ecouterJoueursFirebase() {
       db.ref('utilisateurs').on('value', (snapshot) => {
         const data = snapshot.val();
         if (!data) { 
           db.ref('utilisateurs').set(USERS_MAP); 
         } else { 
-          // Harmonisation anciens/nouveaux formats
           let userMapMiseAJour = {};
           Object.keys(data).forEach(pin => {
             let val = data[pin];
@@ -1047,7 +730,7 @@
       });
     }
 
-    /* GESTION INACTIVITÉ ET CENTRES COMMERCIAUX */
+    /* REVENUS HORAIRES (10%/h après 24h d'achat) ET AUCUNE PERTE SUR LES MALLS */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -1059,48 +742,50 @@
         if (!biens) return;
 
         let deltaTotalARecup = 0;
-        const typesBiens = [
-          { key: 'snack', tauXHeure: 1000, estCentre: false },
-          { key: 'hotel', tauXHeure: 3500, estCentre: false },
-          { key: 'centreCommercial', tauXHeure: 10000, estCentre: true },
-          { key: 'dubaiMall', tauXHeure: 50000, estCentre: true },
-          { key: 'abuDhabiMall', tauXHeure: 500000, estCentre: true }
-        ];
 
-        typesBiens.forEach(type => {
-          if (biens[type.key]) {
-            const dataBien = biens[type.key];
-            const qte = dataBien.quantite || 0;
-            const dernierPaiement = dataBien.dernierPaiement || maintenant;
-            const secondesEcoulees = (maintenant - dernierPaiement) / 1000;
-            const heuresCompletes = Math.floor(secondesEcoulees / 3600);
+        Object.keys(biens).forEach(immoKey => {
+          if (immoKey === 'dernierePartie30k') return;
+          const dataBien = biens[immoKey];
+          if (!dataBien || !dataBien.achats) return;
 
-            if (qte > 0 && heuresCompletes >= 1) {
-              if (type.estCentre) {
-                // RÈGLE : Inactivité au bout de 1 semaine (168h).
-                // Perte de 100 000 € par jour au-delà de 7 jours sans jouer.
-                const derniereActivite = biens.dernierePartie30k || 0;
-                const heuresInactivite = (maintenant - derniereActivite) / (1000 * 3600);
+          const catalogueRef = baseArticles.find(a => a.immoKey === immoKey);
 
-                if (heuresInactivite > 168) {
-                  // Au-delà de 7 jours (168h), perte de 100,000 € / jour = ~4166.67 € / heure par centre
-                  let perteParHeure = (100000 / 24) * qte;
-                  deltaTotalARecup -= heuresCompletes * perteParHeure;
-                } else {
-                  // Actif (< 7 jours) : génère ses revenus normaux
-                  deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
-                }
-              } else {
-                deltaTotalARecup += heuresCompletes * type.tauXHeure * qte;
-              }
+          dataBien.achats.forEach((dateAchat, index) => {
+            let dernierPaiementIndiv = (dataBien.derniersPaiements && dataBien.derniersPaiements[index]) 
+              ? dataBien.derniersPaiements[index] 
+              : dateAchat;
 
-              const nouveauTempsPaiement = dernierPaiement + (heuresCompletes * 3600 * 1000);
-              updatesImmo[`immobilier/${user}/${type.key}/dernierPaiement`] = nouveauTempsPaiement;
+            let delaiMin = 0;
+            let gainParHeure = 0;
+
+            if (catalogueRef && catalogueRef.tauxPourcentHeure) {
+              delaiMin = (catalogueRef.delaiActivationHeures || 24) * 3600 * 1000;
+              gainParHeure = catalogueRef.prix * catalogueRef.tauxPourcentHeure;
+            } else if (immoKey === 'snack') {
+              gainParHeure = 1000;
             }
-          }
+
+            if (gainParHeure > 0) {
+              let debutEligibilite = dateAchat + delaiMin;
+              let debutCalcul = Math.max(dernierPaiementIndiv, debutEligibilite);
+
+              if (maintenant > debutCalcul) {
+                let secondesEcoulees = (maintenant - debutCalcul) / 1000;
+                let heuresCompletes = Math.floor(secondesEcoulees / 3600);
+
+                if (heuresCompletes >= 1) {
+                  deltaTotalARecup += heuresCompletes * gainParHeure;
+                  if (!updatesImmo[`immobilier/${user}/${immoKey}/derniersPaiements`]) {
+                    updatesImmo[`immobilier/${user}/${immoKey}/derniersPaiements`] = [...(dataBien.derniersPaiements || dataBien.achats)];
+                  }
+                  updatesImmo[`immobilier/${user}/${immoKey}/derniersPaiements`][index] = debutCalcul + (heuresCompletes * 3600 * 1000);
+                }
+              }
+            }
+          });
         });
 
-        if (deltaTotalARecup !== 0) {
+        if (deltaTotalARecup > 0) {
           let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
           updatesBanque[`banques/${user}`] = Math.round((soldeActuel + deltaTotalARecup) * 100) / 100;
         }
@@ -1110,31 +795,25 @@
       if (Object.keys(updatesImmo).length > 0) { db.ref().update(updatesImmo); }
     }
 
-    function enregistrerActiviteMallSiGagne30k(user, montantGagne) {
-      if (montantGagne >= 30000) {
-        db.ref(`immobilier/${user}/dernierePartie30k`).set(Date.now());
-      }
-    }
-
     function ajouterPossessionImmo(user, item) {
       if (!item.immoKey) return;
       const ref = db.ref(`immobilier/${user}/${item.immoKey}`);
       ref.once('value', (snapshot) => {
-        const currentData = snapshot.val() || { quantite: 0, dernierPaiement: Date.now(), achats: [] };
+        const currentData = snapshot.val() || { quantite: 0, achats: [], derniersPaiements: [] };
         let quantite = (currentData.quantite || 0) + 1;
         let achats = currentData.achats || [];
-        if (achats.length === 0 && currentData.quantite > 0) {
-          for(let i=0; i<currentData.quantite; i++) {
-            achats.push(currentData.dernierPaiement || Date.now());
-          }
-        }
-        achats.push(Date.now());
-        ref.set({ quantite: quantite, dernierPaiement: currentData.dernierPaiement || Date.now(), achats: achats });
+        let derniersPaiements = currentData.derniersPaiements || [];
+        const now = Date.now();
+
+        achats.push(now);
+        derniersPaiements.push(now);
+
+        ref.set({ quantite: quantite, achats: achats, derniersPaiements: derniersPaiements });
       });
     }
 
-    /* REVENTE IMMOBILIÈRE & CENTRES COMMERCIAUX À -20% */
-    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien, estCentreCommercial) {
+    /* REVENTE MAISONS (+150% TOUTES LES 12H) & AUTRES BIENS */
+    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien, estMaison, estCentreCommercial) {
       const ref = db.ref(`immobilier/${user}/${immoKey}`);
       ref.once('value', (snapshot) => {
         const data = snapshot.val();
@@ -1142,12 +821,17 @@
 
         const dateAchat = data.achats[indexAchat];
         const maintenant = Date.now();
-        const joursEcoules = (maintenant - dateAchat) / (1000 * 3600 * 24);
+        const heuresEcoulees = (maintenant - dateAchat) / (1000 * 3600);
+        const tranches12h = Math.floor(heuresEcoulees / 12);
 
         let prixRevente = 0;
-        if (estCentreCommercial) {
+        if (estMaison) {
+          // +150% par tranche de 12h
+          prixRevente = Math.round(prixBase * (1 + 1.50 * tranches12h) * 100) / 100;
+        } else if (estCentreCommercial) {
           prixRevente = Math.round(prixBase * 0.80 * 100) / 100;
         } else {
+          const joursEcoules = heuresEcoulees / 24;
           if (joursEcoules < 3) {
             alert("Vous devez attendre au moins 3 jours après l'achat pour revendre ce bien !");
             return;
@@ -1155,19 +839,20 @@
           prixRevente = Math.round(prixBase * (1 + 0.50 * joursEcoules) * 100) / 100;
         }
 
-        let messageConfirmation = estCentreCommercial 
-          ? `Voulez-vous revendre votre centre commercial ${nomBien} à -20% pour ${prixRevente.toLocaleString('fr-FR')} € ?`
-          : `Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`;
+        let messageConfirmation = `Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`;
 
         if (confirm(messageConfirmation)) {
           let nouveauxAchats = [...data.achats];
+          let nouveauxPaiements = data.derniersPaiements ? [...data.derniersPaiements] : [];
           nouveauxAchats.splice(indexAchat, 1);
+          if (nouveauxPaiements.length > indexAchat) nouveauxPaiements.splice(indexAchat, 1);
+
           let nouvelleQuantite = Math.max(0, (data.quantite || 1) - 1);
 
           ref.set({
             quantite: nouvelleQuantite,
-            dernierPaiement: data.dernierPaiement || maintenant,
-            achats: nouveauxAchats
+            achats: nouveauxAchats,
+            derniersPaiements: nouveauxPaiements
           });
 
           let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
@@ -1209,35 +894,15 @@
       listeJoueurs.sort((a, b) => b.solde - a.solde);
 
       listeJoueurs.forEach(j => {
-        let userBiens = possessionsImmo[j.prenom] || {};
-        let immoTextes = [];
-
-        const typesBiens = [
-          { key: 'snack', label: 'Snacks' },
-          { key: 'hotel', label: 'Hôtels' },
-          { key: 'centreCommercial', label: 'Centres Com.' },
-          { key: 'dubaiMall', label: 'Dubai Malls' },
-          { key: 'abuDhabiMall', label: 'Abu Dhabi Malls' }
-        ];
-
-        typesBiens.forEach(type => {
-          if (userBiens[type.key] && userBiens[type.key].quantite > 0) {
-            let qte = userBiens[type.key].quantite;
-            immoTextes.push(`🏢 ${qte} ${type.label}`);
-          }
-        });
-
-        if (userBiens.garage5 && userBiens.garage5.quantite > 0) immoTextes.push(`🚘 ${userBiens.garage5.quantite} Gar.(5)`);
-        if (userBiens.garage20 && userBiens.garage20.quantite > 0) immoTextes.push(`🏎️ ${userBiens.garage20.quantite} Gar.(20)`);
-
-        let detailsHtml = immoTextes.length > 0 ? immoTextes.join(' • ') : 'Aucune propriété';
+        let infosBadge = ObtenirInfosBadge(j.solde);
+        let badgeHtml = infosBadge.badgeActuel ? `<span class="badge-tag">${infosBadge.badgeActuel.nom}</span>` : '';
 
         let div = document.createElement('div');
         div.className = 'dark-card-item';
         div.innerHTML = `
           <div>
-            <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} <span style="font-size:11px; opacity:0.6;">(${j.groupe})</span></div>
-            <div class="dark-card-sub">${detailsHtml}</div>
+            <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} ${badgeHtml} <span style="font-size:11px; opacity:0.6;">(${j.groupe})</span></div>
+            ${infosBadge.prochainPalier ? `<div class="dark-card-sub">🎯 Prochain palier : ${infosBadge.prochainPalier.nom} (${infosBadge.prochainPalier.montant.toLocaleString('fr-FR')} €)</div>` : '<div class="dark-card-sub" style="color:#38ef7d;">🏆 Palier Max Ultima Rejoint !</div>'}
           </div>
           <div class="dark-card-amount ${j.solde < 0 ? 'deficit' : ''}">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
         `;
@@ -1246,13 +911,13 @@
     }
 
     function afficherOnglets() {
-      const categories = ["Smartphones", "Consoles & Tech", "Automobiles", "Écrans & TV", "Immobilier Marseille"];
+      const categories = ["Automobiles", "Immobilier Marseille", "Entreprises Connues"];
       const container = document.getElementById('categoriesTabs');
       container.innerHTML = "";
       categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = `tab-btn ${cat === categorieActive ? 'active' : ''}`;
-        btn.innerText = cat === "Automobiles" ? "🚗 Autos" : cat;
+        btn.innerText = cat === "Automobiles" ? "🚗 Autos" : cat === "Entreprises Connues" ? "🏢 Entreprises" : cat;
         btn.onclick = () => { categorieActive = cat; afficherOnglets(); afficherArticles(); };
         container.appendChild(btn);
       });
@@ -1547,7 +1212,7 @@
       if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
       
       if (estJoueurProtege(lastUserValide)) {
-        alert(`⏱️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
+        alert(`⏱️️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
       } else {
         gainsSessionQuiz -= perteParQuestion;
         appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Temps écoulé`);
@@ -1687,10 +1352,6 @@
         let nouveauSolde = Math.round((soldeActuel + montant) * 100) / 100;
         db.ref(`banques/${lastUserValide}`).set(nouveauSolde);
 
-        if (montant >= 30000) {
-          enregistrerActiviteMallSiGagne30k(lastUserValide, montant);
-        }
-
         const now = new Date();
         const dateFormatee = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const heureFormatee = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -1770,13 +1431,11 @@
           let immoTextes = [];
           let userBiens = possessionsImmo[prenom] || {};
 
-          if (userBiens.snack && userBiens.snack.quantite > 0) immoTextes.push(`🏠 ${userBiens.snack.quantite} Snack(s)`);
-          if (userBiens.hotel && userBiens.hotel.quantite > 0) immoTextes.push(`🏨 ${userBiens.hotel.quantite} Hôtel(s)`);
-          if (userBiens.centreCommercial && userBiens.centreCommercial.quantite > 0) immoTextes.push(`🏬 ${userBiens.centreCommercial.quantite} Centre(s) Com.`);
-          if (userBiens.dubaiMall && userBiens.dubaiMall.quantite > 0) immoTextes.push(`🏬 ${userBiens.dubaiMall.quantite} Dubai Mall`);
-          if (userBiens.abuDhabiMall && userBiens.abuDhabiMall.quantite > 0) immoTextes.push(`🏬 ${userBiens.abuDhabiMall.quantite} Abu Dhabi Mall`);
-          if (userBiens.garage5 && userBiens.garage5.quantite > 0) immoTextes.push(`🚘 ${userBiens.garage5.quantite} Gar.(5)`);
-          if (userBiens.garage20 && userBiens.garage20.quantite > 0) immoTextes.push(`🏎️ ${userBiens.garage20.quantite} Gar.(20)`);
+          baseArticles.filter(a => a.immoKey).forEach(itemImmo => {
+            if (userBiens[itemImmo.immoKey] && userBiens[itemImmo.immoKey].quantite > 0) {
+              immoTextes.push(`${itemImmo.emoji} ${userBiens[itemImmo.immoKey].quantite} ${itemImmo.nom}`);
+            }
+          });
 
           ticketsJoueur.forEach(ticket => {
             if (ticket.articles && Array.isArray(ticket.articles)) {
@@ -1794,12 +1453,12 @@
           return {
             prenom: prenom,
             groupe: groupe,
+            soldeBanque: soldeBanque,
             fortuneTotale: fortuneTotale,
             resumeBiens: resumeBiens
           };
         });
 
-        // Filtrage par Onglet
         if (filtreClassementActif === 'famille') {
           listeClassement = listeClassement.filter(j => j.groupe === 'Famille');
         } else if (filtreClassementActif === 'ecole') {
@@ -1814,6 +1473,9 @@
         }
 
         listeClassement.forEach(j => {
+          let infosBadge = ObtenirInfosBadge(j.soldeBanque);
+          let badgeHtml = infosBadge.badgeActuel ? `<span class="badge-tag">${infosBadge.badgeActuel.nom}</span>` : '';
+
           let div = document.createElement('div');
           div.className = 'dark-card-item';
           div.onclick = () => {
@@ -1823,8 +1485,9 @@
 
           div.innerHTML = `
             <div>
-              <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} <span style="font-size:11px; opacity:0.6;">(${j.groupe})</span></div>
+              <div class="dark-card-name">${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} ${badgeHtml} <span style="font-size:11px; opacity:0.6;">(${j.groupe})</span></div>
               ${j.resumeBiens ? `<div class="dark-card-sub">${j.resumeBiens}</div>` : ''}
+              ${infosBadge.prochainPalier ? `<div class="dark-card-sub">🎯 Palier : ${infosBadge.prochainPalier.nom}</div>` : ''}
             </div>
             <div class="dark-card-amount ${j.fortuneTotale < 0 ? 'deficit' : ''}">${j.fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
           `;
@@ -1865,6 +1528,7 @@
 
         let fortuneTotale = Math.round((soldeBanque + totalValeurAchats) * 100) / 100;
         let statsGar = calculerCapaciteEtVoitures(nomClient);
+        let infosBadge = ObtenirInfosBadge(soldeBanque);
 
         const fortuneCard = document.createElement('div');
         fortuneCard.className = 'dark-card-item';
@@ -1872,8 +1536,9 @@
         fortuneCard.style.background = '#202b38';
         fortuneCard.innerHTML = `
           <div>
-            <div class="dark-card-name" style="font-size:16px;">Fortune Globale ${estJoueurProtege(nomClient) ? '⭐' : ''}</div>
-            <div class="dark-card-sub">💵 Banque: ${soldeBanque.toLocaleString('fr-FR')} € | 📦 Biens: ${totalValeurAchats.toLocaleString('fr-FR')} €</div>
+            <div class="dark-card-name" style="font-size:16px;">Fortune Globale ${estJoueurProtege(nomClient) ? '⭐' : ''} ${infosBadge.badgeActuel ? infosBadge.badgeActuel.nom : ''}</div>
+            <div class="dark-card-sub">💵 Cash Banque: ${soldeBanque.toLocaleString('fr-FR')} €</div>
+            ${infosBadge.prochainPalier ? `<div class="dark-card-sub" style="color:#f97316;">🎯 Prochain Palier : ${infosBadge.prochainPalier.nom} (${infosBadge.prochainPalier.montant.toLocaleString('fr-FR')} €)</div>` : '<div class="dark-card-sub" style="color:#38ef7d;">🏆 Badge Maximal Atteint !</div>'}
             <div class="dark-card-sub" style="color: #38bdf8; margin-top: 4px;">🚘 Garage: ${statsGar.voituresPossedees} / ${statsGar.capaciteTotale} places occupées</div>
           </div>
           <div class="dark-card-amount ${fortuneTotale < 0 ? 'deficit' : ''}" style="font-size:20px;">${fortuneTotale.toLocaleString('fr-FR', {minimumFractionDigits: 2})} €</div>
@@ -1884,26 +1549,32 @@
         sectionImmoTitle.className = 'section-title';
         sectionImmoTitle.style.marginTop = '14px';
         sectionImmoTitle.style.marginBottom = '8px';
-        sectionImmoTitle.innerText = "🏘️ Revente (Immo & Centres Commerciaux -20%)";
+        sectionImmoTitle.innerText = "🏘️ Revente Immobilier & Biens";
         container.appendChild(sectionImmoTitle);
 
         let userBiens = possessionsImmo[nomClient] || {};
         let aDesBiens = false;
         const maintenant = Date.now();
 
-        baseArticles.filter(a => a.cat === "Immobilier Marseille" && a.immoKey).forEach(itemImmo => {
+        baseArticles.filter(a => a.immoKey).forEach(itemImmo => {
           const key = itemImmo.immoKey;
           if (userBiens[key] && userBiens[key].achats && userBiens[key].achats.length > 0) {
             userBiens[key].achats.forEach((dateAchat, idx) => {
               aDesBiens = true;
               const secondes = (maintenant - dateAchat) / 1000;
-              const joursEcoules = secondes / (3600 * 24);
+              const heuresEcoulees = secondes / 3600;
+              const tranches12h = Math.floor(heuresEcoulees / 12);
+              const joursEcoules = heuresEcoulees / 24;
               
               let dispoVente = false;
               let prixReventeVal = 0;
               let tempsRestantTxt = "";
 
-              if (itemImmo.estCentreCommercial) {
+              if (itemImmo.estMaison) {
+                dispoVente = true;
+                prixReventeVal = Math.round(itemImmo.prix * (1 + 1.50 * tranches12h) * 100) / 100;
+                tempsRestantTxt = `📈 Revente Maison (+150%/12h) : ${prixReventeVal.toLocaleString('fr-FR')} €`;
+              } else if (itemImmo.estCentreCommercial) {
                 dispoVente = true;
                 prixReventeVal = Math.round(itemImmo.prix * 0.80 * 100) / 100;
                 tempsRestantTxt = `📉 Revente Mall (-20%) : ${prixReventeVal.toLocaleString('fr-FR')} €`;
@@ -1911,7 +1582,7 @@
                 dispoVente = joursEcoules >= 3;
                 prixReventeVal = Math.round(itemImmo.prix * (1 + 0.50 * joursEcoules) * 100) / 100;
                 if (!dispoVente) {
-                  let heuresRestantes = Math.ceil((3 * 24) - (secondes / 3600));
+                  let heuresRestantes = Math.ceil((3 * 24) - heuresEcoulees);
                   tempsRestantTxt = `⏳ Dispo dans ~${heuresRestantes}h`;
                 } else {
                   tempsRestantTxt = `📈 Val. Revente : ${prixReventeVal.toLocaleString('fr-FR')} € (+${Math.floor(joursEcoules * 50)}%)`;
@@ -1932,7 +1603,7 @@
                   <div style="text-align:right;">
                     <div style="font-size:11px; color:#38ef7d;">${tempsRestantTxt}</div>
                     <button class="btn-vente-immo ${dispoVente ? '' : 'bloque'}" 
-                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}', ${idx},${itemImmo.prix}, '${itemImmo.nom}',${itemImmo.estCentreCommercial ? 'true' : 'false'})` : ''}">
+                      onclick="${dispoVente ? `revendreBienImmobilier('${nomClient}', '${key}',${idx}, ${itemImmo.prix}, '${itemImmo.nom}', ${itemImmo.estMaison ? 'true' : 'false'}, ${itemImmo.estCentreCommercial ? 'true' : 'false'})` : ''}">
                       ${dispoVente ? '🏷️ Revendre' : '🔒 Bloqué (<3j)'}
                     </button>
                   </div>
@@ -1949,7 +1620,7 @@
           emptyDiv.style.color = '#a0aec0';
           emptyDiv.style.fontSize = '12px';
           emptyDiv.style.margin = '6px 0';
-          emptyDiv.innerText = "Aucun bien immobilier éligible à la revente.";
+          emptyDiv.innerText = "Aucun bien immobilier/entreprise éligible à la revente.";
           container.appendChild(emptyDiv);
         }
 
@@ -1979,15 +1650,11 @@
             pill.innerHTML = `
               <div>
                 <strong style="color:#ffffff;">${nomArt}</strong>
-                <div style="font-size:11px; color:#8b98a5; margin-top:2px;">
-                  Unité: ${itemData.prixUnitaire.toLocaleString('fr-FR')} €
-                </div>
+                <div style="font-size:11px; color:#8b98a5; margin-top:2px;">Unité: ${itemData.prixUnitaire.toLocaleString('fr-FR')} €</div>
               </div>
               <div style="text-align:right;">
                 <span class="possession-badge-green">x${itemData.quantite}</span>
-                <div style="font-size:12px; font-family:monospace; font-weight:bold; color:#cbd5e0; margin-top:4px;">
-                  ${valTotaleItem.toLocaleString('fr-FR')} €
-                </div>
+                <div style="font-size:12px; font-family:monospace; font-weight:bold; color:#cbd5e0; margin-top:4px;">${valTotaleItem.toLocaleString('fr-FR')} €</div>
               </div>
             `;
             container.appendChild(pill);
@@ -2003,7 +1670,6 @@
     }
 
     function fermerHistorique() { document.getElementById('historiqueOverlay').classList.remove('active'); }
-
     function ouvrirReglagesProteges() { demanderCodePin('reglages'); }
 
     function ouvrirEcranReglages() {
@@ -2149,7 +1815,7 @@
         let gain = audioCtx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.15);
         gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
         osc.connect(gain);
