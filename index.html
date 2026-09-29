@@ -240,16 +240,19 @@
     <div class="version-tag">v4.0.0 (Entreprises & Badges Cash)</div>
   </div>
 
-  <!-- MODAL CREATION JOUEUR ECOLE (ACCUEIL SANS PIN) -->
+  <!-- MODAL CREATION JOUEUR ECOLE (AVEC CODE PIN OBLIGATOIRE) -->
   <div class="creer-ecole-overlay" id="creerEcoleOverlay">
     <div class="creer-ecole-card">
       <div class="reglages-header">
         <span class="reglages-title">Nouveau Joueur École 🏫</span>
         <button class="btn-close" onclick="fermerModalCreerEcole()">✕</button>
       </div>
-      <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Création instantanée sans code PIN. Le joueur démarrera avec un solde initial de 20 000 €.</p>
-      <div class="item-editor" style="margin-bottom: 12px;">
+      <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Saisissez le prénom et le code PIN à 4 chiffres du joueur. Solde initial : 20 000 €.</p>
+      <div class="item-editor" style="margin-bottom: 10px;">
         <input type="text" id="ecoleNomInput" class="nom-input" placeholder="Prénom de l'élève" style="width:100%; padding:12px; font-size:15px;">
+      </div>
+      <div class="item-editor" style="margin-bottom: 16px;">
+        <input type="number" inputmode="numeric" id="ecolePinInput" class="nom-input" placeholder="Code PIN (4 chiffres)" maxlength="4" style="width:100%; padding:12px; font-size:15px;">
       </div>
       <button class="btn-ajouter-article" style="background:#2b6cb0; padding:14px; font-size:15px;" onclick="validerCreationJoueurEcole()">Créer le joueur (20 000 €)</button>
     </div>
@@ -600,9 +603,9 @@
       { id: 804, cat: "Automobiles", emoji: "🚙", nom: "Renault Clio 5", prix: 19900.00 },
       { id: 805, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 3008", prix: 38850.00 },
       { id: 806, cat: "Automobiles", emoji: "🚙", nom: "Peugeot 5008", prix: 40490.00 },
-      { id: 807, cat: "Automobiles", emoji: "🏎️️", nom: "Tesla Model 3", prix: 39990.00 },
+      { id: 807, cat: "Automobiles", emoji: "🏎", nom: "Tesla Model 3", prix: 39990.00 },
       { id: 808, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model Y", prix: 44990.00 },
-      { id: 809, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model S", prix: 92990.00 },
+      { id: 809, cat: "Automobiles", emoji: "🏎️️", nom: "Tesla Model S", prix: 92990.00 },
       { id: 810, cat: "Automobiles", emoji: "🏎️", nom: "Tesla Model X", prix: 99990.00 },
       { id: 811, cat: "Automobiles", emoji: "📐", nom: "Tesla Cybertruck", prix: 102000.00 },
       { id: 812, cat: "Automobiles", emoji: "⚡", nom: "BYD Dolphin", prix: 33990.00 },
@@ -626,7 +629,7 @@
       { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (10%/h après 24h)", prix: 50000000.00, immoKey: "dubaiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
       { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (10%/h après 24h)", prix: 100000000.00, immoKey: "abuDhabiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
-      { id: 514, cat: "Immobilier Marseille", emoji: "🏎️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
+      { id: 514, cat: "Immobilier Marseille", emoji: "🏎️️", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
 
       // NOUVELLE CATEGORIE : ENTREPRISES CONNUES (10%/h après 24h)
       { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
@@ -636,7 +639,7 @@
       { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 350000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true }
+      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 3500000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true }
     ];
 
     let categorieActive = "Automobiles";
@@ -654,9 +657,10 @@
       setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
-    /* MODAL RAPIDE ECOLE ACCUEIL */
+    /* MODAL CREATION ECOLE AVEC PIN OBLIGATOIRE */
     function ouvrirModalCreerEcole() {
       document.getElementById('ecoleNomInput').value = "";
+      document.getElementById('ecolePinInput').value = "";
       document.getElementById('creerEcoleOverlay').classList.add('active');
     }
 
@@ -666,19 +670,30 @@
 
     function validerCreationJoueurEcole() {
       const prenom = document.getElementById('ecoleNomInput').value.trim();
+      const pin = document.getElementById('ecolePinInput').value.trim();
+
       if (!prenom) {
         alert("Veuillez saisir un prénom d'élève !");
         return;
       }
 
-      let pinAlea = Math.floor(1000 + Math.random() * 9000).toString();
-      USERS_MAP[pinAlea] = { nom: prenom, groupe: "École" };
+      if (pin.length !== 4 || isNaN(pin)) {
+        alert("Veuillez saisir un code PIN à 4 chiffres !");
+        return;
+      }
+
+      if (USERS_MAP[pin]) {
+        alert("Ce code PIN est déjà utilisé. Choisissez-en un autre !");
+        return;
+      }
+
+      USERS_MAP[pin] = { nom: prenom, groupe: "École" };
       db.ref('utilisateurs').set(USERS_MAP);
 
       db.ref(`banques/${prenom}`).set(20000.00);
 
       fermerModalCreerEcole();
-      alert(`🎉 Joueur de l'École "${prenom}" créé avec succès avec 20 000 € !`);
+      alert(`🎉 Joueur de l'École "${prenom}" créé avec succès !\nPIN: ${pin}\nSolde: 20 000 €`);
     }
 
     function ecouterJoueursFirebase() {
@@ -826,7 +841,6 @@
 
         let prixRevente = 0;
         if (estMaison) {
-          // +150% par tranche de 12h
           prixRevente = Math.round(prixBase * (1 + 1.50 * tranches12h) * 100) / 100;
         } else if (estCentreCommercial) {
           prixRevente = Math.round(prixBase * 0.80 * 100) / 100;
@@ -1212,7 +1226,7 @@
       if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
       
       if (estJoueurProtege(lastUserValide)) {
-        alert(`⏱️️ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
+        alert(`⏱ Temps écoulé !\nLa réponse était : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Aucune pénalité !`);
       } else {
         gainsSessionQuiz -= perteParQuestion;
         appliquerMouvementSoldeFirebase(-perteParQuestion, `Multiplications (${niveauQuizActif}) - Temps écoulé`);
