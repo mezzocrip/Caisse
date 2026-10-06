@@ -244,7 +244,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v4.2.0 (38 Entreprises • 10%/h)</div>
+    <div class="version-tag">v4.3.0 (118 Entreprises • 10%/h)</div>
   </div>
 
   <!-- MODAL AIDE ET REGLES -->
@@ -274,7 +274,7 @@
           • 🟠 <strong>Intermédiaire</strong> : Multiplications | Gain : +3 000 € | Perte : -3 000 €<br>
           • 🔴 <strong>Difficile</strong> : Multiplications | Gain : +6 000 € | Perte : -6 000 €<br>
           • 💀 <strong>Extrême (QCM)</strong> : Multiplications (Min 10 questions) | Gain : +15 000 € | Perte : -50 000 €<br>
-          • 🔥 <strong>ULTIME</strong> : Additions & Soustractions à 2 chiffres (ex: 45+56) | Gain : +100 000 € | Perte : -100 000 €
+          • 🔥 <strong>ULTIME</strong> : Additions & Souractions à 2 chiffres (ex: 45+56) | Gain : +100 000 € | Perte : -100 000 €
         </div>
 
         <div class="aide-section">
@@ -671,7 +671,7 @@
     let tempsRestant = 10;
     let intervalChrono = null;
 
-    // BASE D'ARTICLES : AUTOMOBILES, IMMOBILIER & 38 GROSSES ENTREPRISES (TOUTES A 10%/H)
+    // BASE D'ARTICLES : AUTOMOBILES, IMMOBILIER & 118 GROSSES ENTREPRISES (TOUTES A 10%/H)
     let baseArticles = [
       // AUTOMOBILES
       { id: 801, cat: "Automobiles", emoji: "🚗", nom: "Audi A3 Sportback", prix: 36790.00 },
@@ -709,7 +709,7 @@
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
       { id: 514, cat: "Immobilier Marseille", emoji: "🏎", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
 
-      // ENTREPRISES CONNUES (38 ENTREPRISES AU TOTAL • 10%/H APRES 24H)
+      // ENTREPRISES CONNUES (118 ENTREPRISES AU TOTAL • 10%/H APRES 24H)
       { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
@@ -717,7 +717,7 @@
       { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 3500000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 350000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 909, cat: "Entreprises Connues", emoji: "🎬", nom: "Netflix", prix: 280000000000.00, immoKey: "ent_nflx", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 910, cat: "Entreprises Connues", emoji: "✨", nom: "Walt Disney Company", prix: 210000000000.00, immoKey: "ent_disney", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 911, cat: "Entreprises Connues", emoji: "🥤", nom: "Coca-Cola", prix: 290000000000.00, immoKey: "ent_ko", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
@@ -747,7 +747,89 @@
       { id: 935, cat: "Entreprises Connues", emoji: "✈️", nom: "Airbus", prix: 115000000000.00, immoKey: "ent_airbus", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 936, cat: "Entreprises Connues", emoji: "🏎️", nom: "Ferrari", prix: 75000000000.00, immoKey: "ent_race", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
       { id: 937, cat: "Entreprises Connues", emoji: "💄", nom: "L'Oréal", prix: 220000000000.00, immoKey: "ent_or", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 938, cat: "Entreprises Connues", emoji: "🕊️", nom: "Hermès", prix: 230000000000.00, immoKey: "ent_rms", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true }
+      { id: 938, cat: "Entreprises Connues", emoji: "🕊️", nom: "Hermès", prix: 230000000000.00, immoKey: "ent_rms", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+
+      // 80 NOUVELLES ENTREPRISES (VALEURS DE 1 MRD A 1000 MRDS €)
+      { id: 939, cat: "Entreprises Connues", emoji: "⛽", nom: "TotalEnergies", prix: 140000000000.00, immoKey: "ent_tte", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 940, cat: "Entreprises Connues", emoji: "🏦", nom: "BNP Paribas", prix: 70000000000.00, immoKey: "ent_bnp", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 941, cat: "Entreprises Connues", emoji: "🛡️", nom: "AXA", prix: 75000000000.00, immoKey: "ent_cs", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 942, cat: "Entreprises Connues", emoji: "💊", nom: "Sanofi", prix: 110000000000.00, immoKey: "ent_san", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 943, cat: "Entreprises Connues", emoji: "⚡", nom: "Schneider Electric", prix: 130000000000.00, immoKey: "ent_su", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 944, cat: "Entreprises Connues", emoji: "🎈", nom: "Air Liquide", prix: 90000000000.00, immoKey: "ent_ai", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 945, cat: "Entreprises Connues", emoji: "🏗️", nom: "Vinci", prix: 60000000000.00, immoKey: "ent_dg", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 946, cat: "Entreprises Connues", emoji: "🕶️", nom: "EssilorLuxottica", prix: 95000000000.00, immoKey: "ent_el", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 947, cat: "Entreprises Connues", emoji: "✈️", nom: "Safran", prix: 85000000000.00, immoKey: "ent_saf", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 948, cat: "Entreprises Connues", emoji: "💎", nom: "Kering", prix: 35000000000.00, immoKey: "ent_ker", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 949, cat: "Entreprises Connues", emoji: "🥛", nom: "Danone", prix: 40000000000.00, immoKey: "ent_bn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 950, cat: "Entreprises Connues", emoji: "🚘", nom: "Stellantis", prix: 50000000000.00, immoKey: "ent_stla", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 951, cat: "Entreprises Connues", emoji: "🍷", nom: "Pernod Ricard", prix: 35000000000.00, immoKey: "ent_ri", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 952, cat: "Entreprises Connues", emoji: "💻", nom: "Capgemini", prix: 30000000000.00, immoKey: "ent_cap", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 953, cat: "Entreprises Connues", emoji: "🧱", nom: "Saint-Gobain", prix: 40000000000.00, immoKey: "ent_sgb", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 954, cat: "Entreprises Connues", emoji: "💡", nom: "ENGIE", prix: 38000000000.00, immoKey: "ent_engi", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 955, cat: "Entreprises Connues", emoji: "🌾", nom: "Crédit Agricole", prix: 42000000000.00, immoKey: "ent_aca", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 956, cat: "Entreprises Connues", emoji: "🔴", nom: "Société Générale", prix: 22000000000.00, immoKey: "ent_gle", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 957, cat: "Entreprises Connues", emoji: "📱", nom: "Orange", prix: 28000000000.00, immoKey: "ent_ora", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 958, cat: "Entreprises Connues", emoji: "🛞", nom: "Michelin", prix: 24000000000.00, immoKey: "ent_ml", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 959, cat: "Entreprises Connues", emoji: "🌱", nom: "Veolia", prix: 20000000000.00, immoKey: "ent_vie", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 960, cat: "Entreprises Connues", emoji: "🛒", nom: "Carrefour", prix: 12000000000.00, immoKey: "ent_ca", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 961, cat: "Entreprises Connues", emoji: "📢", nom: "Publicis Groupe", prix: 25000000000.00, immoKey: "ent_pub", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 962, cat: "Entreprises Connues", emoji: "🏢", nom: "Bouygues", prix: 13000000000.00, immoKey: "ent_en", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 963, cat: "Entreprises Connues", emoji: "🛡️", nom: "Thales", prix: 32000000000.00, immoKey: "ent_ho", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 964, cat: "Entreprises Connues", emoji: "🔌", nom: "Legrand", prix: 26000000000.00, immoKey: "ent_lr", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 965, cat: "Entreprises Connues", emoji: "📐", nom: "Dassault Systèmes", prix: 48000000000.00, immoKey: "ent_dsy", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 966, cat: "Entreprises Connues", emoji: "🔬", nom: "STMicroelectronics", prix: 35000000000.00, immoKey: "ent_stmpa", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 967, cat: "Entreprises Connues", emoji: "🏨", nom: "Accor", prix: 10000000000.00, immoKey: "ent_ac", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 968, cat: "Entreprises Connues", emoji: "🚗", nom: "Renault Group", prix: 11000000000.00, immoKey: "ent_rnno", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 969, cat: "Entreprises Connues", emoji: "🎮", nom: "Ubisoft", prix: 2500000000.00, immoKey: "ent_ubi", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 970, cat: "Entreprises Connues", emoji: "🎰", nom: "La Française des Jeux (FDJ)", prix: 7000000000.00, immoKey: "ent_fdj", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 971, cat: "Entreprises Connues", emoji: "📺", nom: "TF1 Groupe", prix: 2000000000.00, immoKey: "ent_tf1", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 972, cat: "Entreprises Connues", emoji: "📺", nom: "M6 Groupe", prix: 1500000000.00, immoKey: "ent_m6", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 973, cat: "Entreprises Connues", emoji: "🍽️", nom: "Sodexo", prix: 12000000000.00, immoKey: "ent_sw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 974, cat: "Entreprises Connues", emoji: "🎫", nom: "Edenred", prix: 11000000000.00, immoKey: "ent_eden", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 975, cat: "Entreprises Connues", emoji: "✅", nom: "Bureau Veritas", prix: 13000000000.00, immoKey: "ent_bvi", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 976, cat: "Entreprises Connues", emoji: "🏗️", nom: "Eiffage", prix: 10000000000.00, immoKey: "ent_fgr", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 977, cat: "Entreprises Connues", emoji: "🧫", nom: "Eurofins Scientific", prix: 10000000000.00, immoKey: "ent_erf", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 978, cat: "Entreprises Connues", emoji: "🧪", nom: "Arkema", prix: 7000000000.00, immoKey: "ent_ake", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 979, cat: "Entreprises Connues", emoji: "🥃", nom: "Rémy Cointreau", prix: 3500000000.00, immoKey: "ent_rco", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 980, cat: "Entreprises Connues", emoji: "☕", nom: "Groupe SEB", prix: 5000000000.00, immoKey: "ent_sk", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 981, cat: "Entreprises Connues", emoji: "🎧", nom: "Teleperformance", prix: 6000000000.00, immoKey: "ent_tep", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 982, cat: "Entreprises Connues", emoji: "🏢", nom: "Klépierre", prix: 7500000000.00, immoKey: "ent_li", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 983, cat: "Entreprises Connues", emoji: "🏢", nom: "Gecina", prix: 7000000000.00, immoKey: "ent_gfc", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 984, cat: "Entreprises Connues", emoji: "🏙️", nom: "Covivio", prix: 5000000000.00, immoKey: "ent_cov", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 985, cat: "Entreprises Connues", emoji: "💼", nom: "Wendel", prix: 4000000000.00, immoKey: "ent_mf", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 986, cat: "Entreprises Connues", emoji: "🚢", nom: "Bolloré", prix: 16000000000.00, immoKey: "ent_bol", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 987, cat: "Entreprises Connues", emoji: "🎵", nom: "Vivendi", prix: 10000000000.00, immoKey: "ent_viv", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 988, cat: "Entreprises Connues", emoji: "📡", nom: "Iliad (Free)", prix: 9000000000.00, immoKey: "ent_ild", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 989, cat: "Entreprises Connues", emoji: "🚢", nom: "CMA CGM", prix: 40000000000.00, immoKey: "ent_cmacgm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 990, cat: "Entreprises Connues", emoji: "⛺", nom: "Decathlon", prix: 15000000000.00, immoKey: "ent_decath", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 991, cat: "Entreprises Connues", emoji: "🔨", nom: "Leroy Merlin (Adeo)", prix: 18000000000.00, immoKey: "ent_leroy", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 992, cat: "Entreprises Connues", emoji: "🛒", nom: "Groupe Auchan", prix: 8000000000.00, immoKey: "ent_auchan", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 993, cat: "Entreprises Connues", emoji: "🏷️", nom: "E.Leclerc", prix: 25000000000.00, immoKey: "ent_leclerc", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 994, cat: "Entreprises Connues", emoji: "💻", nom: "SAP", prix: 250000000000.00, immoKey: "ent_sap", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 995, cat: "Entreprises Connues", emoji: "⚙️", nom: "Siemens", prix: 140000000000.00, immoKey: "ent_sie", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 996, cat: "Entreprises Connues", emoji: "📞", nom: "Deutsche Telekom", prix: 110000000000.00, immoKey: "ent_dte", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 997, cat: "Entreprises Connues", emoji: "🦅", nom: "Allianz", prix: 100000000000.00, immoKey: "ent_alv", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 998, cat: "Entreprises Connues", emoji: "🚘", nom: "Mercedes-Benz Group", prix: 65000000000.00, immoKey: "ent_mbg", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 999, cat: "Entreprises Connues", emoji: "🏎️", nom: "BMW Group", prix: 55000000000.00, immoKey: "ent_bmw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1000, cat: "Entreprises Connues", emoji: "🚗", nom: "Volkswagen Group", prix: 50000000000.00, immoKey: "ent_vw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1001, cat: "Entreprises Connues", emoji: "🏎️", nom: "Porsche AG", prix: 60000000000.00, immoKey: "ent_p911", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1002, cat: "Entreprises Connues", emoji: "👟", nom: "Adidas", prix: 40000000000.00, immoKey: "ent_ads", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1003, cat: "Entreprises Connues", emoji: "📦", nom: "Deutsche Post (DHL)", prix: 45000000000.00, immoKey: "ent_dpw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1004, cat: "Entreprises Connues", emoji: "🧪", nom: "Bayer", prix: 28000000000.00, immoKey: "ent_bayn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1005, cat: "Entreprises Connues", emoji: "⚗️", nom: "BASF", prix: 40000000000.00, immoKey: "ent_bas", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1006, cat: "Entreprises Connues", emoji: "👗", nom: "Inditex (Zara)", prix: 140000000000.00, immoKey: "ent_itx", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1007, cat: "Entreprises Connues", emoji: "🏦", nom: "Banco Santander", prix: 70000000000.00, immoKey: "ent_san_es", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1008, cat: "Entreprises Connues", emoji: "🏦", nom: "BBVA", prix: 55000000000.00, immoKey: "ent_bbva", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1009, cat: "Entreprises Connues", emoji: "⚡", nom: "Iberdrola", prix: 75000000000.00, immoKey: "ent_ibe", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1010, cat: "Entreprises Connues", emoji: "💡", nom: "Enel", prix: 65000000000.00, immoKey: "ent_enel", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1011, cat: "Entreprises Connues", emoji: "🏦", nom: "Intesa Sanpaolo", prix: 60000000000.00, immoKey: "ent_isp", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1012, cat: "Entreprises Connues", emoji: "🎮", nom: "Sony Group", prix: 110000000000.00, immoKey: "ent_sony", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1013, cat: "Entreprises Connues", emoji: "🍄", nom: "Nintendo", prix: 60000000000.00, immoKey: "ent_ntdo", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1014, cat: "Entreprises Connues", emoji: "🚘", nom: "Toyota Motor", prix: 260000000000.00, immoKey: "ent_tm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1015, cat: "Entreprises Connues", emoji: "🐧", nom: "Tencent", prix: 400000000000.00, immoKey: "ent_700", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1016, cat: "Entreprises Connues", emoji: "📦", nom: "Alibaba Group", prix: 200000000000.00, immoKey: "ent_baba", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1017, cat: "Entreprises Connues", emoji: "⛽", nom: "Shell", prix: 200000000000.00, immoKey: "ent_shel", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      { id: 1018, cat: "Entreprises Connues", emoji: "🍫", nom: "Nestlé", prix: 250000000000.00, immoKey: "ent_nesn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true }
     ];
 
     let categorieActive = "Automobiles";
@@ -1292,372 +1374,121 @@
         return { prenom: prenom, solde: solde, groupe: ObtenirGroupeUser(prenom) };
       });
 
-      if (filtreClassementActif === 'famille') joueurs = joueurs.filter(j => j.groupe === 'Famille');
-      else if (filtreClassementActif === 'ecole') joueurs = joueurs.filter(j => j.groupe === 'École');
+      if (filtreClassementActif !== 'tous') {
+        joueurs = joueurs.filter(j => j.groupe.toLowerCase() === filtreClassementActif.toLowerCase());
+      }
 
       joueurs.sort((a, b) => b.solde - a.solde);
 
+      if (joueurSelectionneVueDetail) {
+        afficherDetailJoueur(joueurSelectionneVueDetail);
+        return;
+      }
+
       joueurs.forEach((j, index) => {
-        let statsGarage = calculerCapaciteEtVoitures(j.prenom);
         let infosBadge = ObtenirInfosBadge(j.solde);
         let badgeHtml = infosBadge.badgeActuel ? `<span class="badge-tag">${infosBadge.badgeActuel.nom}</span>` : '';
 
         let div = document.createElement('div');
         div.className = 'dark-card-item';
-        div.onclick = () => afficherDetailJoueur(j.prenom);
+        div.onclick = () => { joueurSelectionneVueDetail = j.prenom; afficherClassementEtPossessions(); };
         div.innerHTML = `
           <div>
             <div class="dark-card-name">#${index + 1} ${j.prenom} ${estJoueurProtege(j.prenom) ? '⭐' : ''} ${badgeHtml}</div>
-            <div class="dark-card-sub">🚘 Garage : ${statsGarage.voituresPossedees}/${statsGarage.capaciteTotale} véhicule(s)</div>
+            <div class="dark-card-sub">👆 Cliquez pour voir le patrimoine</div>
           </div>
-          <div class="dark-card-amount">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
+          <div class="dark-card-amount ${j.solde < 0 ? 'deficit' : ''}">${j.solde.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</div>
         `;
         container.appendChild(div);
       });
     }
 
     function afficherDetailJoueur(user) {
-      joueurSelectionneVueDetail = user;
       const container = document.getElementById('historiqueList');
       container.innerHTML = "";
 
-      let btnBack = document.createElement('button');
-      btnBack.className = "btn-back";
-      btnBack.innerText = "← Retour au classement";
-      btnBack.onclick = () => { joueurSelectionneVueDetail = null; afficherClassementEtPossessions(); };
-      container.appendChild(btnBack);
+      const btnRetour = document.createElement('button');
+      btnRetour.className = 'btn-back';
+      btnRetour.innerHTML = '← Retour au classement';
+      btnRetour.onclick = () => { joueurSelectionneVueDetail = null; afficherClassementEtPossessions(); };
+      container.appendChild(btnRetour);
 
-      let userBiens = possessionsImmo[user] || {};
-      let aPossessions = false;
+      const titleDiv = document.createElement('div');
+      titleDiv.style.cssText = "font-size:16px; font-weight:bold; color:white; margin-bottom:12px;";
+      titleDiv.innerText = `Patrimoine de ${user}`;
+      container.appendChild(titleDiv);
+
+      const userBiens = possessionsImmo[user] || {};
+      let auMoinsUnBien = false;
 
       Object.keys(userBiens).forEach(immoKey => {
         if (immoKey === 'dernierePartie30k') return;
         const dataBien = userBiens[immoKey];
         if (!dataBien || !dataBien.achats || dataBien.achats.length === 0) return;
 
-        aPossessions = true;
-        const itemCat = baseArticles.find(a => a.immoKey === immoKey);
-        const nomBien = itemCat ? itemCat.nom : immoKey;
-        const emoji = itemCat ? itemCat.emoji : '🏢';
-        const prixBase = itemCat ? itemCat.prix : 0;
-        const estMaison = itemCat ? itemCat.estMaison : false;
-        const estCentreCommercial = itemCat ? itemCat.estCentreCommercial : false;
+        auMoinsUnBien = true;
+        const catalogueRef = baseArticles.find(a => a.immoKey === immoKey);
+        const nomBien = catalogueRef ? catalogueRef.nom : immoKey;
+        const emojiBien = catalogueRef ? catalogueRef.emoji : '🏠';
+        const prixBase = catalogueRef ? catalogueRef.prix : 0;
+        const estMaison = catalogueRef ? !!catalogueRef.estMaison : false;
+        const estCentreCommercial = catalogueRef ? !!catalogueRef.estCentreCommercial : false;
 
-        dataBien.achats.forEach((dateAchat, idx) => {
-          let div = document.createElement('div');
-          div.className = "possession-pill";
+        dataBien.achats.forEach((dateAchat, indexAchat) => {
+          const mainDiv = document.createElement('div');
+          mainDiv.className = 'possession-pill';
 
-          let dateTxt = new Date(dateAchat).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-          let htmlInfo = `<div><strong>${emoji} ${nomBien}</strong><br><span style="font-size:11px; opacity:0.7;">Acheté le ${dateTxt}</span></div>`;
+          let dateFormatee = new Date(dateAchat).toLocaleDateString('fr-FR') + ' ' + new Date(dateAchat).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+          
+          let boutonVente = `<button class="btn-vente-immo" onclick="revendreBienImmobilier('${user}', '${immoKey}', ${indexAchat}, ${prixBase}, '${nomBien.replace(/'/g, "\\'")}', ${estMaison}, ${estCentreCommercial})">💰 Revendre</button>`;
 
-          if (user === lastUserValide || estJoueurProtege(lastUserValide)) {
-            htmlInfo += `<button class="btn-vente-immo" onclick="revendreBienImmobilier('${user}', '${immoKey}', ${idx}, ${prixBase}, '${nomBien}', ${estMaison}, ${estCentreCommercial})">Revendre 🏷️</button>`;
-          }
-
-          div.innerHTML = htmlInfo;
-          container.appendChild(div);
+          mainDiv.innerHTML = `
+            <div>
+              <div style="font-weight:bold;">${emojiBien} ${nomBien}</div>
+              <div style="font-size:11px; opacity:0.7;">Acquis le : ${dateFormatee}</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="possession-badge-green">${prixBase.toLocaleString('fr-FR')} €</div>
+              ${boutonVente}
+            </div>
+          `;
+          container.appendChild(mainDiv);
         });
       });
 
-      if (!aPossessions) {
-        container.innerHTML += `<div style="text-align:center; color:#a0aec0; margin-top:20px;">Aucune possession immobilière.</div>`;
+      if (!auMoinsUnBien) {
+        container.innerHTML += `<div style="text-align:center; color:#a0aec0; margin-top:20px; font-style:italic;">Aucune possession immobilière ou entreprise pour le moment.</div>`;
       }
     }
 
-    function ouvrirSelectionNiveauQuiz() { document.getElementById('quizLevelOverlay').classList.add('active'); }
-
-    function demarrerQuizAvecNiveau(niveau) {
-      niveauQuizActif = niveau;
-      questionsJoueesDansSession = 0;
-      gainsSessionQuiz = 0;
-      chronoMaxParQuestion = 10;
-
-      if (niveau === 'facile') { gainParQuestion = 1000; perteParQuestion = 1000; }
-      else if (niveau === 'intermediaire') { gainParQuestion = 3000; perteParQuestion = 3000; }
-      else if (niveau === 'difficile') { gainParQuestion = 6000; perteParQuestion = 6000; }
-      else if (niveau === 'extreme') { gainParQuestion = 15000; perteParQuestion = 50000; }
-      else if (niveau === 'ultime') { gainParQuestion = 100000; perteParQuestion = 100000; }
-
-      let infoGain = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} €`;
-      infoGain += estJoueurProtege(lastUserValide) ? ` | Erreur : 0 € (Bonus ⭐)` : ` | Erreur : -${perteParQuestion.toLocaleString('fr-FR')} €`;
-      
-      document.getElementById('quizRewardInfo').innerText = infoGain;
-      document.getElementById('quizUserBadge').innerText = lastUserValide + (estJoueurProtege(lastUserValide) ? " ⭐" : "");
-
-      document.getElementById('quizLevelOverlay').classList.remove('active');
-      document.getElementById('quizOverlay').classList.add('active');
-
-      genererNouvelleQuestionQuiz();
-    }
-
-    function quitterQuizManuel() {
-      if (niveauQuizActif === 'extreme') {
-        if (questionsJoueesDansSession < 10) {
-          if (!estJoueurProtege(lastUserValide)) {
-            if (gainsSessionQuiz > 0) appliquerMouvementSoldeFirebase(-gainsSessionQuiz, "Annulation gains Extrême");
-            appliquerMouvementSoldeFirebase(-50000, "Pénalité Abandon Extrême ⚠️");
-            alert(`⚠️️ ABANDON EN MODE EXTRÊME !\nSeulement ${questionsJoueesDansSession}/10 questions.\n- Gains annulés.\n- Pénalité : -50 000 €.`);
-          } else {
-            alert(`👑 ABANDON EXTRÊME !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
-          }
-        }
-      } else if (niveauQuizActif === 'ultime') {
-        if (questionsJoueesDansSession === 0) {
-          if (!estJoueurProtege(lastUserValide)) {
-            appliquerMouvementSoldeFirebase(-100000, "Pénalité Abandon Ultime ⚠️");
-            alert(`⚠️ ABANDON EN MODE ULTIME !\nPénalité : -100 000 €.`);
-          } else {
-            alert(`👑 ABANDON ULTIME !\nComme vous êtes ${lastUserValide}, aucune pénalité n'est appliquée !`);
-          }
-        }
-      } else {
-        if (questionsJoueesDansSession === 0) {
-          if (!estJoueurProtege(lastUserValide)) {
-            appliquerMouvementSoldeFirebase(-10000, "Pénalité Abandon Instantané ⚠️");
-            alert(`⚠️ ABANDON IMMÉDIAT !\nPénalité : -10 000 €.`);
-          } else {
-            alert(`👑 ABANDON IMMÉDIAT !\nComme vous êtes ${lastUserValide}, aucune pénalité !`);
-          }
-        }
-      }
-      fermerQuiz();
-    }
-
-    function fermerQuiz() {
-      clearInterval(intervalChrono);
-      document.getElementById('quizOverlay').classList.remove('active');
-    }
-
-    function relancerChrono() {
-      clearInterval(intervalChrono);
-
-      if (estJoueurProtege(lastUserValide)) {
-        const box = document.getElementById('quizTimerBox');
-        box.innerText = "♾️️ Pas de limite";
-        box.className = "quiz-timer-box";
-        return;
-      }
-
-      tempsRestant = chronoMaxParQuestion;
-      mettreAJourAffichageChrono();
-
-      intervalChrono = setInterval(() => {
-        tempsRestant--;
-        mettreAJourAffichageChrono();
-        if (tempsRestant <= 0) {
-          clearInterval(intervalChrono);
-          traiterTempsEcouleQuiz();
-        }
-      }, 1000);
-    }
-
-    function mettreAJourAffichageChrono() {
-      const box = document.getElementById('quizTimerBox');
-      box.innerText = `⏳ ${tempsRestant}s`;
-      box.className = tempsRestant <= 3 ? "quiz-timer-box danger" : "quiz-timer-box";
-    }
-
-    function traiterTempsEcouleQuiz() {
-      questionsJoueesDansSession++;
-      jouerSonErreur();
-      if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
-      
-      if (estJoueurProtege(lastUserValide)) {
-        alert(`⏱ Temps écoulé !\nRéponse : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : Pas de pénalité !`);
-      } else {
-        gainsSessionQuiz -= perteParQuestion;
-        appliquerMouvementSoldeFirebase(-perteParQuestion, `Calcul (${niveauQuizActif}) - Temps écoulé`);
-        alert(`⏱️ Temps écoulé !\nRéponse : ${questionActiveCourante.bonneReponse}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
-      }
-      genererNouvelleQuestionQuiz();
-    }
-
-    function genererNouvelleQuestionQuiz() {
-      let titreMatiere = "Multiplications (3 à 10)";
-      if (niveauQuizActif === 'extreme') {
-        titreMatiere += ` • Prog: ${questionsJoueesDansSession}/10 min`;
-      } else if (niveauQuizActif === 'ultime') {
-        titreMatiere = "Mode Ultime 🔥 (+ / - à 2 chiffres)";
-      }
-
-      document.getElementById('quizHeaderTitle').innerText = "Calcul Mental 🧮";
-      document.getElementById('quizMatiere').innerText = titreMatiere;
-
-      let reponseCorrecte = 0;
-
-      if (niveauQuizActif === 'ultime') {
-        const estAddition = Math.random() < 0.5;
-        const num1 = Math.floor(Math.random() * 90) + 10;
-        const num2 = Math.floor(Math.random() * 90) + 10;
-
-        if (estAddition) {
-          reponseCorrecte = num1 + num2;
-          document.getElementById('quizEnonce').innerText = `${num1} + ${num2} = ?`;
-        } else {
-          let maxVal = Math.max(num1, num2);
-          let minVal = Math.min(num1, num2);
-          reponseCorrecte = maxVal - minVal;
-          document.getElementById('quizEnonce').innerText = `${maxVal} - ${minVal} = ?`;
-        }
-
-        document.getElementById('vueQuizMaths').style.display = "block";
-        document.getElementById('vueQuizQCM').style.display = "none";
-        document.getElementById('quizReponseInput').value = "";
-
-        questionActiveCourante = { type: 'maths', bonneReponse: reponseCorrecte.toString() };
-
-      } else if (niveauQuizActif === 'extreme') {
-        const a = Math.floor(Math.random() * 8) + 3;
-        const b = Math.floor(Math.random() * 8) + 3;
-        reponseCorrecte = a * b;
-
-        document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
-        document.getElementById('vueQuizMaths').style.display = "none";
-        document.getElementById('vueQuizQCM').style.display = "block";
-
-        let choix = [reponseCorrecte];
-        while (choix.length < 3) {
-          let faux = reponseCorrecte + (Math.floor(Math.random() * 7) - 3) * 2 + (Math.random() < 0.5 ? 1 : -1);
-          if (faux > 0 && !choix.includes(faux)) {
-            choix.push(faux);
-          }
-        }
-        choix.sort(() => Math.random() - 0.5);
-
-        const container = document.getElementById('qcmContainer');
-        container.innerHTML = "";
-        choix.forEach(val => {
-          const btn = document.createElement('button');
-          btn.className = "btn-qcm";
-          btn.innerText = val;
-          btn.onclick = () => validerChoixQCM(val.toString());
-          container.appendChild(btn);
-        });
-
-        questionActiveCourante = { type: 'qcm', bonneReponse: reponseCorrecte.toString() };
-
-      } else {
-        const a = Math.floor(Math.random() * 8) + 3;
-        const b = Math.floor(Math.random() * 8) + 3;
-        reponseCorrecte = a * b;
-
-        document.getElementById('quizEnonce').innerText = `${a} × ${b} = ?`;
-        document.getElementById('vueQuizMaths').style.display = "block";
-        document.getElementById('vueQuizQCM').style.display = "none";
-        document.getElementById('quizReponseInput').value = "";
-
-        questionActiveCourante = { type: 'maths', bonneReponse: reponseCorrecte.toString() };
-      }
-
-      relancerChrono();
-    }
-
-    function taperQuizChiffre(chiffre) {
-      const input = document.getElementById('quizReponseInput');
-      input.value += chiffre;
-
-      if (input.value.length >= questionActiveCourante.bonneReponse.length) {
-        let repSaisie = input.value;
-        if (repSaisie === questionActiveCourante.bonneReponse) {
-          verifierSaisieMathsDirecte(repSaisie);
-        } else if (repSaisie.length > questionActiveCourante.bonneReponse.length) {
-          verifierSaisieMathsDirecte(repSaisie);
-        }
-      }
-    }
-
-    function effacerQuizChiffre() {
-      const input = document.getElementById('quizReponseInput');
-      input.value = input.value.slice(0, -1);
-    }
-
-    function verifierSaisieMathsDirecte(reponse) {
-      clearInterval(intervalChrono);
-      questionsJoueesDansSession++;
-
-      if (reponse === questionActiveCourante.bonneReponse) {
-        traiterBonneReponse();
-      } else {
-        traiterMauvaiseReponse();
-      }
-    }
-
-    function validerChoixQCM(valeurStr) {
-      clearInterval(intervalChrono);
-      questionsJoueesDansSession++;
-
-      if (valeurStr === questionActiveCourante.bonneReponse) {
-        traiterBonneReponse();
-      } else {
-        traiterMauvaiseReponse();
-      }
-    }
-
-    function traiterBonneReponse() {
-      jouerSonValidation();
-      gainsSessionQuiz += gainParQuestion;
-      appliquerMouvementSoldeFirebase(gainParQuestion, `Gagné Calcul Mental (${niveauQuizActif})`);
-      genererNouvelleQuestionQuiz();
-    }
-
-    function traiterMauvaiseReponse() {
-      jouerSonErreur();
-      if (navigator.vibrate) { navigator.vibrate([150, 50, 150]); }
-
-      if (estJoueurProtege(lastUserValide)) {
-        alert(`❌ Mauvaise réponse !\nBonne réponse : ${questionActiveCourante.bonneReponse}\n⭐ Bonus ${lastUserValide} : 0 € de perte !`);
-      } else {
-        gainsSessionQuiz -= perteParQuestion;
-        appliquerMouvementSoldeFirebase(-perteParQuestion, `Erreur Calcul Mental (${niveauQuizActif})`);
-        alert(`❌ Mauvaise réponse !\nBonne réponse : ${questionActiveCourante.bonneReponse}\nPénalité : -${perteParQuestion.toLocaleString('fr-FR')} €`);
-      }
-      genererNouvelleQuestionQuiz();
-    }
-
-    function appliquerMouvementSoldeFirebase(montantDelta, motif) {
-      let user = lastUserValide;
-      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
-      let nouveauSolde = Math.round((soldeActuel + montantDelta) * 100) / 100;
-
-      db.ref(`banques/${user}`).set(nouveauSolde);
-
-      const now = new Date();
-      db.ref('tickets').push({
-        codePin: lastPinValide || "QUIZ",
-        utilisateur: user,
-        date: now.toLocaleDateString('fr-FR') + " " + now.toLocaleTimeString('fr-FR') + " (" + motif + ")",
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        articles: [{ nom: motif, prix: montantDelta }],
-        total: montantDelta
-      });
-    }
-
-    /* REGLAGES */
-    function ouvrirEcranReglages() {
-      document.getElementById('reglagesOverlay').classList.add('active');
-      afficherArticlesReglages();
-      afficherJoueursReglages();
-    }
-
+    function ouvrirEcranReglages() { afficherListeArticlesReglages(); document.getElementById('reglagesOverlay').classList.add('active'); }
     function fermerReglages() { document.getElementById('reglagesOverlay').classList.remove('active'); }
 
-    function changerOngletReglages(onglet) {
-      document.getElementById('btnTabArticles').className = `tab-btn ${onglet === 'articles' ? 'active' : ''}`;
-      document.getElementById('btnTabJoueurs').className = `tab-btn ${onglet === 'joueurs' ? 'active' : ''}`;
-      document.getElementById('vueReglagesArticles').style.display = onglet === 'articles' ? 'flex' : 'none';
-      document.getElementById('vueReglagesJoueurs').style.display = onglet === 'joueurs' ? 'flex' : 'none';
+    function changerOngletReglages(tab) {
+      document.getElementById('btnTabArticles').className = `tab-btn ${tab === 'articles' ? 'active' : ''}`;
+      document.getElementById('btnTabJoueurs').className = `tab-btn ${tab === 'joueurs' ? 'active' : ''}`;
+      if (tab === 'articles') {
+        document.getElementById('vueReglagesArticles').style.display = 'flex';
+        document.getElementById('vueReglagesJoueurs').style.display = 'none';
+        afficherListeArticlesReglages();
+      } else {
+        document.getElementById('vueReglagesArticles').style.display = 'none';
+        document.getElementById('vueReglagesJoueurs').style.display = 'flex';
+        afficherListeJoueursReglages();
+      }
     }
 
-    function afficherArticlesReglages() {
+    function afficherListeArticlesReglages() {
       const container = document.getElementById('reglagesList');
       container.innerHTML = "";
       baseArticles.forEach((item, index) => {
-        let div = document.createElement('div');
-        div.className = "item-editor";
+        const div = document.createElement('div');
+        div.className = 'item-editor';
         div.innerHTML = `
-          <input type="text" value="${item.emoji}" class="emoji-input" onchange="modifierArticleSysteme(${index}, 'emoji', this.value)">
-          <input type="text" value="${item.nom}" class="nom-input" onchange="modifierArticleSysteme(${index}, 'nom', this.value)">
-          <input type="number" step="0.01" value="${item.prix}" class="prix-input" onchange="modifierArticleSysteme(${index}, 'prix', parseFloat(this.value))">
+          <input type="text" class="emoji-input" value="${item.emoji}" onchange="modifierArticleSysteme(${index}, 'emoji', this.value)">
+          <input type="text" class="nom-input" value="${item.nom}" onchange="modifierArticleSysteme(${index}, 'nom', this.value)">
+          <input type="number" class="prix-input" value="${item.prix}" onchange="modifierArticleSysteme(${index}, 'prix', parseFloat(this.value))">
+          <button style="background:#e53e3e; color:white; border:none; border-radius:8px; padding:6px 10px; cursor:pointer;" onclick="supprimerArticleSysteme(${index})">✕</button>
         `;
         container.appendChild(div);
       });
@@ -1668,44 +1499,43 @@
       afficherArticles();
     }
 
+    function supprimerArticleSysteme(index) {
+      baseArticles.splice(index, 1);
+      afficherListeArticlesReglages();
+      afficherArticles();
+    }
+
     function ajouterNouvelArticleSysteme() {
-      const emoji = document.getElementById('nouveauEmoji').value.trim() || "📦";
+      const emoji = document.getElementById('nouveauEmoji').value || '🍕';
       const nom = document.getElementById('nouveauNom').value.trim();
       const prix = parseFloat(document.getElementById('nouveauPrix').value);
       const cat = document.getElementById('nouvelleCategorie').value;
 
       if (!nom || isNaN(prix)) { alert("Veuillez saisir un nom et un prix valides."); return; }
 
-      let key = "art_" + Date.now();
-      let newObj = { id: Date.now(), cat: cat, emoji: emoji, nom: nom, prix: prix, immoKey: key };
-      if (cat === "Entreprises Connues") {
-        newObj.tauxPourcentHeure = 0.10;
-        newObj.delaiActivationHeures = 24;
-        newObj.estEntreprise = true;
-      }
-
-      baseArticles.push(newObj);
-      afficherArticlesReglages();
-      afficherArticles();
+      const newId = Date.now();
+      baseArticles.push({ id: newId, cat: cat, emoji: emoji, nom: nom, prix: prix });
 
       document.getElementById('nouveauNom').value = "";
       document.getElementById('nouveauPrix').value = "";
+
+      afficherListeArticlesReglages();
+      afficherArticles();
     }
 
-    function afficherJoueursReglages() {
+    function afficherListeJoueursReglages() {
       const container = document.getElementById('joueursList');
       container.innerHTML = "";
-      USERS_LIST.forEach((u, index) => {
-        let div = document.createElement('div');
-        div.className = "item-editor";
+      USERS_LIST.forEach((user, index) => {
+        let prenom = ObtenirPrenomUser(user);
+        let groupe = ObtenirGroupeUser(prenom);
+        const div = document.createElement('div');
+        div.className = 'item-editor';
         div.innerHTML = `
-          <span style="width:24px; font-weight:bold; color:#a0aec0;">${index+1}</span>
-          <input type="text" value="${u.nom}" class="nom-input" onchange="modifierJoueurSysteme(${index}, 'nom', this.value)">
-          <input type="text" value="${u.pin}" class="prix-input" maxlength="4" onchange="modifierJoueurSysteme(${index}, 'pin', this.value)">
-          <select onchange="modifierJoueurSysteme(${index}, 'groupe', this.value)" style="padding:8px; border-radius:8px; background:#121820; color:white; border:1px solid #4a5568;">
-            <option value="Famille" ${u.groupe === 'Famille' ? 'selected' : ''}>Famille</option>
-            <option value="École" ${u.groupe === 'École' ? 'selected' : ''}>École</option>
-          </select>
+          <span style="color:white; font-weight:bold; width:90px;">${prenom}</span>
+          <input type="text" class="prix-input" value="${user.pin || ''}" style="width:70px;" onchange="modifierJoueurSysteme(${index}, 'pin', this.value)">
+          <span style="color:#a0aec0; font-size:11px;">(${groupe})</span>
+          <button style="background:#e53e3e; color:white; border:none; border-radius:8px; padding:6px 10px; cursor:pointer; margin-left:auto;" onclick="supprimerJoueurSysteme('${prenom}')">✕</button>
         `;
         container.appendChild(div);
       });
@@ -1716,58 +1546,230 @@
       db.ref('utilisateurs_v2').set(USERS_LIST);
     }
 
+    function supprimerJoueurSysteme(prenom) {
+      if (estJoueurProtege(prenom)) { alert("Ce joueur est protégé et ne peut pas être supprimé !"); return; }
+      if (confirm(`Voulez-vous supprimer le joueur "${prenom}" ?`)) {
+        USERS_LIST = USERS_LIST.filter(u => ObtenirPrenomUser(u) !== prenom);
+        db.ref('utilisateurs_v2').set(USERS_LIST);
+        db.ref(`banques/${prenom}`).remove();
+        afficherListeJoueursReglages();
+      }
+    }
+
     function ajouterNouveauJoueurSysteme() {
       const nom = document.getElementById('nouveauJoueurNom').value.trim();
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
       const groupe = document.getElementById('nouveauJoueurGroupe').value;
 
-      if (!nom || pin.length !== 4) { alert("Nom valide et PIN 4 chiffres requis !"); return; }
+      if (!nom || pin.length !== 4 || isNaN(pin)) { alert("Veuillez remplir un prénom et un code PIN à 4 chiffres."); return; }
 
-      let doublonNom = USERS_LIST.find(u => u.nom.toLowerCase() === nom.toLowerCase());
-      if (doublonNom) { alert("Ce prénom est déjà utilisé !"); return; }
+      let doublonNom = USERS_LIST.find(u => ObtenirPrenomUser(u).toLowerCase() === nom.toLowerCase());
+      if (doublonNom) { alert("Ce prénom existe déjà !"); return; }
 
       USERS_LIST.push({ pin: pin, nom: nom, groupe: groupe });
       db.ref('utilisateurs_v2').set(USERS_LIST);
       db.ref(`banques/${nom}`).set(20000.00);
 
-      afficherJoueursReglages();
       document.getElementById('nouveauJoueurNom').value = "";
       document.getElementById('nouveauJoueurPin').value = "";
+
+      afficherListeJoueursReglages();
     }
 
-    /* EFFETS SONORES */
+    /* SECTION QUIZ / CALCUL MENTAL */
+    function ouvrirSelectionNiveauQuiz() {
+      document.getElementById('quizLevelOverlay').classList.add('active');
+    }
+
+    function demarrerQuizAvecNiveau(niveau) {
+      niveauQuizActif = niveau;
+      questionsJoueesDansSession = 0;
+      gainsSessionQuiz = 0;
+
+      if (niveau === 'facile') { gainParQuestion = 1000; perteParQuestion = 1000; }
+      else if (niveau === 'intermediaire') { gainParQuestion = 3000; perteParQuestion = 3000; }
+      else if (niveau === 'difficile') { gainParQuestion = 6000; perteParQuestion = 6000; }
+      else if (niveau === 'extreme') { gainParQuestion = 15000; perteParQuestion = 50000; }
+      else if (niveau === 'ultime') { gainParQuestion = 100000; perteParQuestion = 100000; }
+
+      document.getElementById('quizLevelOverlay').classList.remove('active');
+      document.getElementById('quizUserBadge').innerText = lastUserValide;
+      document.getElementById('quizOverlay').classList.add('active');
+
+      genererNouvelleQuestionQuiz();
+    }
+
+    function genererNouvelleQuestionQuiz() {
+      if (intervalChrono) clearInterval(intervalChrono);
+
+      tempsRestant = 10;
+      mettreAJourChronoHTML();
+
+      let n1, n2, rep, opStr;
+
+      if (niveauQuizActif === 'facile') {
+        n1 = Math.floor(Math.random() * 8) + 2;
+        n2 = Math.floor(Math.random() * 8) + 2;
+        rep = n1 * n2;
+        opStr = `${n1} × ${n2}`;
+      } else if (niveauQuizActif === 'intermediaire') {
+        n1 = Math.floor(Math.random() * 12) + 3;
+        n2 = Math.floor(Math.random() * 12) + 3;
+        rep = n1 * n2;
+        opStr = `${n1} × ${n2}`;
+      } else if (niveauQuizActif === 'difficile') {
+        n1 = Math.floor(Math.random() * 15) + 5;
+        n2 = Math.floor(Math.random() * 15) + 5;
+        rep = n1 * n2;
+        opStr = `${n1} × ${n2}`;
+      } else if (niveauQuizActif === 'extreme') {
+        n1 = Math.floor(Math.random() * 20) + 6;
+        n2 = Math.floor(Math.random() * 20) + 6;
+        rep = n1 * n2;
+        opStr = `${n1} × ${n2}`;
+      } else if (niveauQuizActif === 'ultime') {
+        let estAddition = Math.random() > 0.5;
+        n1 = Math.floor(Math.random() * 89) + 10;
+        n2 = Math.floor(Math.random() * 89) + 10;
+        if (estAddition) {
+          rep = n1 + n2;
+          opStr = `${n1} + ${n2}`;
+        } else {
+          if (n1 < n2) { let temp = n1; n1 = n2; n2 = temp; }
+          rep = n1 - n2;
+          opStr = `${n1} - ${n2}`;
+        }
+      }
+
+      questionActiveCourante = { enonce: opStr, reponse: rep.toString() };
+
+      document.getElementById('quizEnonce').innerText = opStr;
+      document.getElementById('quizRewardInfo').innerText = `Gain : +${gainParQuestion.toLocaleString('fr-FR')} € | Perte : -${perteParQuestion.toLocaleString('fr-FR')} €`;
+      document.getElementById('quizReponseInput').value = "";
+
+      if (niveauQuizActif === 'extreme') {
+        document.getElementById('vueQuizMaths').style.display = 'none';
+        document.getElementById('vueQuizQCM').style.display = 'block';
+        genererPropositionsQCM(rep);
+      } else {
+        document.getElementById('vueQuizMaths').style.display = 'block';
+        document.getElementById('vueQuizQCM').style.display = 'none';
+      }
+
+      intervalChrono = setInterval(demarrerTimerQuestion, 1000);
+    }
+
+    function genererPropositionsQCM(reponseExacte) {
+      const container = document.getElementById('qcmContainer');
+      container.innerHTML = "";
+
+      let choix = [reponseExacte];
+      while (choix.length < 3) {
+        let delta = (Math.floor(Math.random() * 5) + 1) * (Math.random() > 0.5 ? 1 : -1);
+        let faux = reponseExacte + delta;
+        if (faux > 0 && !choix.includes(faux)) { choix.push(faux); }
+      }
+
+      choix.sort(() => Math.random() - 0.5);
+
+      choix.forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-qcm';
+        btn.innerText = val;
+        btn.onclick = () => validerChoixQCM(val.toString());
+        container.appendChild(btn);
+      });
+    }
+
+    function demarrerTimerQuestion() {
+      tempsRestant--;
+      mettreAJourChronoHTML();
+      if (tempsRestant <= 0) {
+        clearInterval(intervalChrono);
+        traiterErreurOuTempsEcoule("⌛ Temps écoulé !");
+      }
+    }
+
+    function mettreAJourChronoHTML() {
+      const box = document.getElementById('quizTimerBox');
+      box.innerText = `⏳ ${tempsRestant}s`;
+      if (tempsRestant <= 3) { box.classList.add('danger'); }
+      else { box.classList.remove('danger'); }
+    }
+
+    function taperQuizChiffre(chiffre) {
+      const input = document.getElementById('quizReponseInput');
+      input.value += chiffre;
+      if (input.value === questionActiveCourante.reponse) {
+        clearInterval(intervalChrono);
+        traiterBonneReponse();
+      } else if (input.value.length >= questionActiveCourante.reponse.length) {
+        clearInterval(intervalChrono);
+        traiterErreurOuTempsEcoule("❌ Mauvaise réponse !");
+      }
+    }
+
+    function effacerQuizChiffre() {
+      const input = document.getElementById('quizReponseInput');
+      input.value = input.value.slice(0, -1);
+    }
+
+    function validerChoixQCM(valSaisie) {
+      clearInterval(intervalChrono);
+      if (valSaisie === questionActiveCourante.reponse) { traiterBonneReponse(); }
+      else { traiterErreurOuTempsEcoule("❌ Mauvaise réponse QCM !"); }
+    }
+
+    function traiterBonneReponse() {
+      jouerSonValidation();
+      questionsJoueesDansSession++;
+      gainsSessionQuiz += gainParQuestion;
+
+      let user = lastUserValide;
+      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+      db.ref(`banques/${user}`).set(Math.round((soldeActuel + gainParQuestion) * 100) / 100);
+
+      setTimeout(() => { genererNouvelleQuestionQuiz(); }, 300);
+    }
+
+    function traiterErreurOuTempsEcoule(raison) {
+      questionsJoueesDansSession++;
+      gainsSessionQuiz -= perteParQuestion;
+
+      let user = lastUserValide;
+      let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
+      db.ref(`banques/${user}`).set(Math.round((soldeActuel - perteParQuestion) * 100) / 100);
+
+      alert(`${raison}\nRéponse : ${questionActiveCourante.reponse}\nPerte : -${perteParQuestion.toLocaleString('fr-FR')} €`);
+
+      if (niveauQuizActif === 'extreme' && questionsJoueesDansSession >= 10) {
+        quitterQuizManuel();
+      } else {
+        genererNouvelleQuestionQuiz();
+      }
+    }
+
+    function quitterQuizManuel() {
+      if (intervalChrono) clearInterval(intervalChrono);
+      document.getElementById('quizOverlay').classList.remove('active');
+      alert(`Fin de la session Calcul Mental !\nQuestions jouées : ${questionsJoueesDansSession}\nBilan session : ${gainsSessionQuiz >= 0 ? '+' : ''}${gainsSessionQuiz.toLocaleString('fr-FR')} €`);
+    }
+
     function jouerSonValidation() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-      } catch(e) {}
-    }
-
-    function jouerSonErreur() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.1);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
-      } catch(e) {}
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch(e){}
     }
   </script>
 </body>
