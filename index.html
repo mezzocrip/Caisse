@@ -269,12 +269,12 @@
 
         <div class="aide-section">
           <div class="aide-section-title">🧮 Calcul Mental (Gains & Pertes)</div>
-          Résolvez des calculs mathématiques sous un délai strict de <strong>10 secondes</strong> par question :<br>
-          • 🟢 <strong>Facile</strong> : Multiplications | Gain : +1 000 € | Perte : -1 000 €<br>
-          • 🟠 <strong>Intermédiaire</strong> : Multiplications | Gain : +3 000 € | Perte : -3 000 €<br>
-          • 🔴 <strong>Difficile</strong> : Multiplications | Gain : +6 000 € | Perte : -6 000 €<br>
-          • 💀 <strong>Extrême (QCM)</strong> : Multiplications (Min 10 questions) | Gain : +15 000 € | Perte : -50 000 €<br>
-          • 🔥 <strong>ULTIME</strong> : Additions & Souractions à 2 chiffres (ex: 45+56) | Gain : +100 000 € | Perte : -100 000 €
+          Résolvez des calculs mathématiques sous un délai strict de <strong>10 secondes</strong> par question. Une erreur fait perdre <strong>10 000 €</strong> quel que soit le niveau :<br>
+          • 🟢 <strong>Facile</strong> : Multiplications | Gain : +30 000 € | Perte : -10 000 €<br>
+          • 🟠 <strong>Intermédiaire</strong> : Multiplications | Gain : +50 000 € | Perte : -10 000 €<br>
+          • 🔴 <strong>Difficile</strong> : Multiplications | Gain : +100 000 € | Perte : -10 000 €<br>
+          • 💀 <strong>Extrême (QCM)</strong> : Tables de 4 à 10 (3 choix, Min 10 questions) | Gain : +200 000 € | Perte : -10 000 €<br>
+          • 🔥 <strong>ULTIME</strong> : Additions & Soustractions à 2 chiffres (ex: 45+56) | Gain : +200 000 € | Perte : -10 000 €
         </div>
 
         <div class="aide-section">
@@ -365,7 +365,7 @@
   <div class="quiz-level-overlay" id="quizLevelOverlay">
     <div class="level-card">
       <div class="level-title">Niveau de difficulté 🧮</div>
-      <div class="level-subtitle">Tous les niveaux : 10 secondes par question !</div>
+      <div class="level-subtitle">Tous les niveaux : 10 secondes par question ! Erreur : -10 000 €</div>
 
       <div class="level-btn-group">
         <button class="btn-level btn-level-facile" onclick="demarrerQuizAvecNiveau('facile')">
@@ -373,7 +373,7 @@
             <div class="level-name">🟢 Facile</div>
             <div class="level-desc">10 sec / Multiplications</div>
           </div>
-          <div class="level-name">+1 000 €</div>
+          <div class="level-name">+30 000 €</div>
         </button>
 
         <button class="btn-level btn-level-moyen" onclick="demarrerQuizAvecNiveau('intermediaire')">
@@ -381,7 +381,7 @@
             <div class="level-name">🟠 Intermédiaire</div>
             <div class="level-desc">10 sec / Multiplications</div>
           </div>
-          <div class="level-name">+3 000 €</div>
+          <div class="level-name">+50 000 €</div>
         </button>
 
         <button class="btn-level btn-level-difficile" onclick="demarrerQuizAvecNiveau('difficile')">
@@ -389,15 +389,15 @@
             <div class="level-name">🔴 Difficile</div>
             <div class="level-desc">10 sec / Multiplications</div>
           </div>
-          <div class="level-name">+6 000 €</div>
+          <div class="level-name">+100 000 €</div>
         </button>
 
         <button class="btn-level btn-level-extreme" onclick="demarrerQuizAvecNiveau('extreme')">
           <div>
             <div class="level-name">💀 Extrême (QCM 3 Choix)</div>
-            <div class="level-desc">10s / Réps. Min 10 questions. Err: -50k€</div>
+            <div class="level-desc">10s / Tables de 4 à 10. Min 10 questions. Err: -10k€</div>
           </div>
-          <div class="level-name">+15 000 €</div>
+          <div class="level-name">+200 000 €</div>
         </button>
 
         <button class="btn-level btn-level-ultime" onclick="demarrerQuizAvecNiveau('ultime')">
@@ -405,7 +405,7 @@
             <div class="level-name">🔥 ULTIME (+ / - à 2 chiffres)</div>
             <div class="level-desc">10s / Additions & Soustractions (ex: 45+56)</div>
           </div>
-          <div class="level-name">+100 000 €</div>
+          <div class="level-name">+200 000 €</div>
         </button>
       </div>
     </div>
@@ -424,7 +424,7 @@
       <div class="quiz-question-box">
         <div class="quiz-matiere" id="quizMatiere">Calcul Mental</div>
         <div class="quiz-enonce" id="quizEnonce">Chargement...</div>
-        <div class="quiz-reward-info" id="quizRewardInfo">+1 000 € / -1 000 €</div>
+        <div class="quiz-reward-info" id="quizRewardInfo">+30 000 € / -10 000 €</div>
         
         <div id="vueQuizMaths">
           <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" readonly>
@@ -663,8 +663,8 @@
 
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
-    let gainParQuestion = 1000;
-    let perteParQuestion = 1000;
+    let gainParQuestion = 30000;
+    let perteParQuestion = 10000;
     let questionsJoueesDansSession = 0;
     let gainsSessionQuiz = 0;
     let questionActiveCourante = null;
@@ -1586,11 +1586,13 @@
       questionsJoueesDansSession = 0;
       gainsSessionQuiz = 0;
 
-      if (niveau === 'facile') { gainParQuestion = 1000; perteParQuestion = 1000; }
-      else if (niveau === 'intermediaire') { gainParQuestion = 3000; perteParQuestion = 3000; }
-      else if (niveau === 'difficile') { gainParQuestion = 6000; perteParQuestion = 6000; }
-      else if (niveau === 'extreme') { gainParQuestion = 15000; perteParQuestion = 50000; }
-      else if (niveau === 'ultime') { gainParQuestion = 100000; perteParQuestion = 100000; }
+      perteParQuestion = 10000; // Pertes harmonisées à 10 000€ pour tous les niveaux
+
+      if (niveau === 'facile') { gainParQuestion = 30000; }
+      else if (niveau === 'intermediaire') { gainParQuestion = 50000; }
+      else if (niveau === 'difficile') { gainParQuestion = 100000; }
+      else if (niveau === 'extreme') { gainParQuestion = 200000; }
+      else if (niveau === 'ultime') { gainParQuestion = 200000; }
 
       document.getElementById('quizLevelOverlay').classList.remove('active');
       document.getElementById('quizUserBadge').innerText = lastUserValide;
@@ -1623,8 +1625,9 @@
         rep = n1 * n2;
         opStr = `${n1} × ${n2}`;
       } else if (niveauQuizActif === 'extreme') {
-        n1 = Math.floor(Math.random() * 20) + 6;
-        n2 = Math.floor(Math.random() * 20) + 6;
+        // Tables de multiplication de 4 à 10
+        n1 = Math.floor(Math.random() * 7) + 4; // Entre 4 et 10
+        n2 = Math.floor(Math.random() * 7) + 4; // Entre 4 et 10
         rep = n1 * n2;
         opStr = `${n1} × ${n2}`;
       } else if (niveauQuizActif === 'ultime') {
