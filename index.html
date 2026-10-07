@@ -187,6 +187,14 @@
 
     .badge-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.1); margin-left: 6px; font-weight: bold; }
 
+    .marche-immo-ticker {
+      background: #1e293b; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px;
+      padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; font-weight: bold; color: #e2e8f0;
+    }
+    .marche-immo-hausse { color: #38ef7d; font-family: monospace; font-size: 13px; }
+    .marche-immo-baisse { color: #ff453a; font-family: monospace; font-size: 13px; }
+
     .aide-content { font-size: 13px; color: #cbd5e0; line-height: 1.5; overflow-y: auto; max-height: 70vh; padding-right: 6px; }
     .aide-section { background: #1a222d; border-radius: 12px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
     .aide-section-title { font-size: 14px; font-weight: bold; color: #38bdf8; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
@@ -244,7 +252,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v4.3.0 (118 Entreprises • 10%/h)</div>
+    <div class="version-tag">v4.4.0 (118 Entreprises • 20%/h • Marché Immo 30m)</div>
   </div>
 
   <!-- MODAL AIDE ET REGLES -->
@@ -273,8 +281,8 @@
           • 🟢 <strong>Facile</strong> : Multiplications | Gain : +30 000 € | Perte : -10 000 €<br>
           • 🟠 <strong>Intermédiaire</strong> : Multiplications | Gain : +50 000 € | Perte : -10 000 €<br>
           • 🔴 <strong>Difficile</strong> : Multiplications | Gain : +100 000 € | Perte : -10 000 €<br>
-          • 💀 <strong>Extrême (QCM)</strong> : Tables de 4 à 10 (3 choix, Min 10 questions) | Gain : +200 000 € | Perte : -10 000 €<br>
-          • 🔥 <strong>ULTIME</strong> : Additions & Soustractions à 2 chiffres (ex: 45+56) | Gain : +200 000 € | Perte : -10 000 €
+          • 💀 <strong>Extrême (QCM)</strong> : Tables de 4 à 10 (3 choix, Min 10 questions) | Gain : +100 000 € | Perte : -10 000 €<br>
+          • 🔥 <strong>ULTIME</strong> : Additions & Soustractions à 2 chiffres (ex: 45+56) | Gain : +500 000 € | Perte : -10 000 €
         </div>
 
         <div class="aide-section">
@@ -285,10 +293,9 @@
 
         <div class="aide-section">
           <div class="aide-section-title">🏢 Immobilier, Malls & Entreprises</div>
-          • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels, Malls et Entreprises rapportent <strong>10%/h</strong> automatiquement après 24h d'achat.<br>
-          • <strong>Maisons</strong> : Revente possible à tout moment avec +150% de plus-value toutes les 12 heures !<br>
-          • <strong>Centres Commerciaux / Malls</strong> : Revente possible avec -20% de décote.<br>
-          • <strong>Autres Biens</strong> : Revente possible après 3 jours d'achat (+50%/jour).
+          • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels, Malls et Entreprises rapportent <strong>20%/h</strong> automatiquement 2 heures après l'achat !<br>
+          • <strong>Prise de Valeur</strong> : L'immobilier augmente sa valeur à partir de <strong>3 heures</strong> après l'acquisition.<br>
+          • <strong>Marché Immobilier Dynamique</strong> : Toutes les 30 minutes, le taux du marché immobilier varie aléatoirement entre <strong>+5% et +10 000 000%</strong> (attention, le marché peut également baisser et perdre de la valeur !).
         </div>
 
         <div class="aide-section">
@@ -397,7 +404,7 @@
             <div class="level-name">💀 Extrême (QCM 3 Choix)</div>
             <div class="level-desc">10s / Tables de 4 à 10. Min 10 questions. Err: -10k€</div>
           </div>
-          <div class="level-name">+200 000 €</div>
+          <div class="level-name">+100 000 €</div>
         </button>
 
         <button class="btn-level btn-level-ultime" onclick="demarrerQuizAvecNiveau('ultime')">
@@ -405,7 +412,7 @@
             <div class="level-name">🔥 ULTIME (+ / - à 2 chiffres)</div>
             <div class="level-desc">10s / Additions & Soustractions (ex: 45+56)</div>
           </div>
-          <div class="level-name">+200 000 €</div>
+          <div class="level-name">+500 000 €</div>
         </button>
       </div>
     </div>
@@ -472,6 +479,11 @@
       <div class="reglages-header">
         <span class="reglages-title" id="historiqueTitle">Classement Général 🧾</span>
         <button class="btn-close" onclick="fermerHistorique()">✕</button>
+      </div>
+
+      <div class="marche-immo-ticker" id="marcheImmoTicker">
+        <span>📈 Tendance Marché Immo (30 min) :</span>
+        <span id="marcheImmoValDisplay" class="marche-immo-hausse">+0%</span>
       </div>
 
       <div class="categories-tabs" id="tabsClassementGroupe" style="margin-bottom: 10px;">
@@ -661,6 +673,8 @@
     let joueurSelectionneVueDetail = null;
     let filtreClassementActif = "tous";
 
+    let marcheImmoPct = 0;
+
     let niveauQuizActif = "facile";
     let chronoMaxParQuestion = 10;
     let gainParQuestion = 30000;
@@ -671,7 +685,7 @@
     let tempsRestant = 10;
     let intervalChrono = null;
 
-    // BASE D'ARTICLES : AUTOMOBILES, IMMOBILIER & 118 GROSSES ENTREPRISES (TOUTES A 10%/H)
+    // BASE D'ARTICLES : AUTOMOBILES, IMMOBILIER & 118 GROSSES ENTREPRISES (REVENUS PASSIFS A 20%/H APRES 2H)
     let baseArticles = [
       // AUTOMOBILES
       { id: 801, cat: "Automobiles", emoji: "🚗", nom: "Audi A3 Sportback", prix: 36790.00 },
@@ -702,134 +716,134 @@
       { id: 506, cat: "Immobilier Marseille", emoji: "🏡", nom: "Maison T5 (13012)", prix: 780000.00, immoKey: "maisonT5", estMaison: true },
       { id: 507, cat: "Immobilier Marseille", emoji: "🏰", nom: "Villa T6 (8ème)", prix: 1250000.00, immoKey: "villaT6", estMaison: true },
       { id: 508, cat: "Immobilier Marseille", emoji: "🥪", nom: "Snack (+1 000€/h)", prix: 150000.00, immoKey: "snack", revenuHeure: 1000.00 },
-      { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (10%/h après 24h)", prix: 500000.00, immoKey: "hotel", tauxPourcentHeure: 0.10, delaiActivationHeures: 24 },
-      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (10%/h après 24h)", prix: 1000000.00, immoKey: "centreCommercial", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estCentreCommercial: true },
-      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (10%/h après 24h)", prix: 50000000.00, immoKey: "dubaiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
-      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (10%/h après 24h)", prix: 100000000.00, immoKey: "abuDhabiMall", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estMall: true, estCentreCommercial: true },
+      { id: 509, cat: "Immobilier Marseille", emoji: "🏨", nom: "Hôtel (20%/h après 2h)", prix: 500000.00, immoKey: "hotel", tauxPourcentHeure: 0.20, delaiActivationHeures: 2 },
+      { id: 510, cat: "Immobilier Marseille", emoji: "🏬", nom: "Centre Commercial (20%/h après 2h)", prix: 1000000.00, immoKey: "centreCommercial", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estCentreCommercial: true },
+      { id: 511, cat: "Immobilier Marseille", emoji: "🏬", nom: "Dubai Mall Center (20%/h après 2h)", prix: 50000000.00, immoKey: "dubaiMall", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estMall: true, estCentreCommercial: true },
+      { id: 512, cat: "Immobilier Marseille", emoji: "🏬", nom: "Abu Dhabi Mega Mall (20%/h après 2h)", prix: 100000000.00, immoKey: "abuDhabiMall", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estMall: true, estCentreCommercial: true },
       { id: 513, cat: "Immobilier Marseille", emoji: "🚘", nom: "Garage 5 voitures", prix: 50000.00, immoKey: "garage5", capaciteGarage: 5 },
       { id: 514, cat: "Immobilier Marseille", emoji: "🏎", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
 
-      // ENTREPRISES CONNUES (118 ENTREPRISES AU TOTAL • 10%/H APRES 24H)
-      { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 904, cat: "Entreprises Connues", emoji: "🔍", nom: "Alphabet (Google)", prix: 2100000000000.00, immoKey: "ent_goog", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 350000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 909, cat: "Entreprises Connues", emoji: "🎬", nom: "Netflix", prix: 280000000000.00, immoKey: "ent_nflx", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 910, cat: "Entreprises Connues", emoji: "✨", nom: "Walt Disney Company", prix: 210000000000.00, immoKey: "ent_disney", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 911, cat: "Entreprises Connues", emoji: "🥤", nom: "Coca-Cola", prix: 290000000000.00, immoKey: "ent_ko", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 912, cat: "Entreprises Connues", emoji: "🍟", nom: "McDonald's", prix: 220000000000.00, immoKey: "ent_mcd", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 913, cat: "Entreprises Connues", emoji: "👟", nom: "Nike", prix: 130000000000.00, immoKey: "ent_nike", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 914, cat: "Entreprises Connues", emoji: "☕", nom: "Starbucks", prix: 110000000000.00, immoKey: "ent_sbux", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 915, cat: "Entreprises Connues", emoji: "🧬", nom: "Eli Lilly", prix: 850000000000.00, immoKey: "ent_lly", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 916, cat: "Entreprises Connues", emoji: "💊", nom: "Novo Nordisk", prix: 550000000000.00, immoKey: "ent_nvo", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 917, cat: "Entreprises Connues", emoji: "💉", nom: "Pfizer", prix: 160000000000.00, immoKey: "ent_pfe", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 918, cat: "Entreprises Connues", emoji: "💳", nom: "Visa", prix: 570000000000.00, immoKey: "ent_v", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 919, cat: "Entreprises Connues", emoji: "💳", nom: "Mastercard", prix: 450000000000.00, immoKey: "ent_ma", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 920, cat: "Entreprises Connues", emoji: "🏦", nom: "JPMorgan Chase", prix: 590000000000.00, immoKey: "ent_jpm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 921, cat: "Entreprises Connues", emoji: "📈", nom: "Berkshire Hathaway", prix: 980000000000.00, immoKey: "ent_brk", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 922, cat: "Entreprises Connues", emoji: "🛢️", nom: "ExxonMobil", prix: 480000000000.00, immoKey: "ent_xom", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 923, cat: "Entreprises Connues", emoji: "🇸🇦", nom: "Saudi Aramco", prix: 1800000000000.00, immoKey: "ent_aramco", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 924, cat: "Entreprises Connues", emoji: "🛒", nom: "Walmart", prix: 630000000000.00, immoKey: "ent_wmt", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 925, cat: "Entreprises Connues", emoji: "🏭", nom: "TSMC", prix: 880000000000.00, immoKey: "ent_tsm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 926, cat: "Entreprises Connues", emoji: "🔬", nom: "ASML", prix: 350000000000.00, immoKey: "ent_asml", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 927, cat: "Entreprises Connues", emoji: "📲", nom: "Samsung Electronics", prix: 390000000000.00, immoKey: "ent_samsung", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 928, cat: "Entreprises Connues", emoji: "💾", nom: "Oracle", prix: 420000000000.00, immoKey: "ent_orcl", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 929, cat: "Entreprises Connues", emoji: "🔴", nom: "AMD", prix: 240000000000.00, immoKey: "ent_amd", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 930, cat: "Entreprises Connues", emoji: "📶", nom: "Qualcomm", prix: 190000000000.00, immoKey: "ent_qcom", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 931, cat: "Entreprises Connues", emoji: "🎨", nom: "Adobe", prix: 220000000000.00, immoKey: "ent_adbe", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 932, cat: "Entreprises Connues", emoji: "☁️", nom: "Salesforce", prix: 260000000000.00, immoKey: "ent_crm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 933, cat: "Entreprises Connues", emoji: "🎵", nom: "Spotify", prix: 65000000000.00, immoKey: "ent_spot", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 934, cat: "Entreprises Connues", emoji: "🚖", nom: "Uber", prix: 150000000000.00, immoKey: "ent_uber", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 935, cat: "Entreprises Connues", emoji: "✈️", nom: "Airbus", prix: 115000000000.00, immoKey: "ent_airbus", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 936, cat: "Entreprises Connues", emoji: "🏎️", nom: "Ferrari", prix: 75000000000.00, immoKey: "ent_race", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 937, cat: "Entreprises Connues", emoji: "💄", nom: "L'Oréal", prix: 220000000000.00, immoKey: "ent_or", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 938, cat: "Entreprises Connues", emoji: "🕊️", nom: "Hermès", prix: 230000000000.00, immoKey: "ent_rms", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
+      // ENTREPRISES CONNUES (118 ENTREPRISES AU TOTAL • 20%/H APRES 2H)
+      { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 904, cat: "Entreprises Connues", emoji: "🔍", nom: "Alphabet (Google)", prix: 2100000000000.00, immoKey: "ent_goog", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 350000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 909, cat: "Entreprises Connues", emoji: "🎬", nom: "Netflix", prix: 280000000000.00, immoKey: "ent_nflx", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 910, cat: "Entreprises Connues", emoji: "✨", nom: "Walt Disney Company", prix: 210000000000.00, immoKey: "ent_disney", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 911, cat: "Entreprises Connues", emoji: "🥤", nom: "Coca-Cola", prix: 290000000000.00, immoKey: "ent_ko", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 912, cat: "Entreprises Connues", emoji: "🍟", nom: "McDonald's", prix: 220000000000.00, immoKey: "ent_mcd", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 913, cat: "Entreprises Connues", emoji: "👟", nom: "Nike", prix: 130000000000.00, immoKey: "ent_nike", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 914, cat: "Entreprises Connues", emoji: "☕", nom: "Starbucks", prix: 110000000000.00, immoKey: "ent_sbux", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 915, cat: "Entreprises Connues", emoji: "🧬", nom: "Eli Lilly", prix: 850000000000.00, immoKey: "ent_lly", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 916, cat: "Entreprises Connues", emoji: "💊", nom: "Novo Nordisk", prix: 550000000000.00, immoKey: "ent_nvo", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 917, cat: "Entreprises Connues", emoji: "💉", nom: "Pfizer", prix: 160000000000.00, immoKey: "ent_pfe", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 918, cat: "Entreprises Connues", emoji: "💳", nom: "Visa", prix: 570000000000.00, immoKey: "ent_v", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 919, cat: "Entreprises Connues", emoji: "💳", nom: "Mastercard", prix: 450000000000.00, immoKey: "ent_ma", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 920, cat: "Entreprises Connues", emoji: "🏦", nom: "JPMorgan Chase", prix: 590000000000.00, immoKey: "ent_jpm", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 921, cat: "Entreprises Connues", emoji: "📈", nom: "Berkshire Hathaway", prix: 980000000000.00, immoKey: "ent_brk", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 922, cat: "Entreprises Connues", emoji: "🛢️", nom: "ExxonMobil", prix: 480000000000.00, immoKey: "ent_xom", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 923, cat: "Entreprises Connues", emoji: "🇸🇦", nom: "Saudi Aramco", prix: 1800000000000.00, immoKey: "ent_aramco", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 924, cat: "Entreprises Connues", emoji: "🛒", nom: "Walmart", prix: 630000000000.00, immoKey: "ent_wmt", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 925, cat: "Entreprises Connues", emoji: "🏭", nom: "TSMC", prix: 880000000000.00, immoKey: "ent_tsm", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 926, cat: "Entreprises Connues", emoji: "🔬", nom: "ASML", prix: 350000000000.00, immoKey: "ent_asml", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 927, cat: "Entreprises Connues", emoji: "📲", nom: "Samsung Electronics", prix: 390000000000.00, immoKey: "ent_samsung", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 928, cat: "Entreprises Connues", emoji: "💾", nom: "Oracle", prix: 420000000000.00, immoKey: "ent_orcl", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 929, cat: "Entreprises Connues", emoji: "🔴", nom: "AMD", prix: 240000000000.00, immoKey: "ent_amd", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 930, cat: "Entreprises Connues", emoji: "📶", nom: "Qualcomm", prix: 190000000000.00, immoKey: "ent_qcom", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 931, cat: "Entreprises Connues", emoji: "🎨", nom: "Adobe", prix: 220000000000.00, immoKey: "ent_adbe", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 932, cat: "Entreprises Connues", emoji: "☁️", nom: "Salesforce", prix: 260000000000.00, immoKey: "ent_crm", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 933, cat: "Entreprises Connues", emoji: "🎵", nom: "Spotify", prix: 65000000000.00, immoKey: "ent_spot", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 934, cat: "Entreprises Connues", emoji: "🚖", nom: "Uber", prix: 150000000000.00, immoKey: "ent_uber", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 935, cat: "Entreprises Connues", emoji: "✈️", nom: "Airbus", prix: 115000000000.00, immoKey: "ent_airbus", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 936, cat: "Entreprises Connues", emoji: "🏎️", nom: "Ferrari", prix: 75000000000.00, immoKey: "ent_race", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 937, cat: "Entreprises Connues", emoji: "💄", nom: "L'Oréal", prix: 220000000000.00, immoKey: "ent_or", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 938, cat: "Entreprises Connues", emoji: "🕊️", nom: "Hermès", prix: 230000000000.00, immoKey: "ent_rms", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
 
       // 80 NOUVELLES ENTREPRISES (VALEURS DE 1 MRD A 1000 MRDS €)
-      { id: 939, cat: "Entreprises Connues", emoji: "⛽", nom: "TotalEnergies", prix: 140000000000.00, immoKey: "ent_tte", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 940, cat: "Entreprises Connues", emoji: "🏦", nom: "BNP Paribas", prix: 70000000000.00, immoKey: "ent_bnp", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 941, cat: "Entreprises Connues", emoji: "🛡️", nom: "AXA", prix: 75000000000.00, immoKey: "ent_cs", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 942, cat: "Entreprises Connues", emoji: "💊", nom: "Sanofi", prix: 110000000000.00, immoKey: "ent_san", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 943, cat: "Entreprises Connues", emoji: "⚡", nom: "Schneider Electric", prix: 130000000000.00, immoKey: "ent_su", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 944, cat: "Entreprises Connues", emoji: "🎈", nom: "Air Liquide", prix: 90000000000.00, immoKey: "ent_ai", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 945, cat: "Entreprises Connues", emoji: "🏗️", nom: "Vinci", prix: 60000000000.00, immoKey: "ent_dg", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 946, cat: "Entreprises Connues", emoji: "🕶️", nom: "EssilorLuxottica", prix: 95000000000.00, immoKey: "ent_el", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 947, cat: "Entreprises Connues", emoji: "✈️", nom: "Safran", prix: 85000000000.00, immoKey: "ent_saf", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 948, cat: "Entreprises Connues", emoji: "💎", nom: "Kering", prix: 35000000000.00, immoKey: "ent_ker", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 949, cat: "Entreprises Connues", emoji: "🥛", nom: "Danone", prix: 40000000000.00, immoKey: "ent_bn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 950, cat: "Entreprises Connues", emoji: "🚘", nom: "Stellantis", prix: 50000000000.00, immoKey: "ent_stla", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 951, cat: "Entreprises Connues", emoji: "🍷", nom: "Pernod Ricard", prix: 35000000000.00, immoKey: "ent_ri", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 952, cat: "Entreprises Connues", emoji: "💻", nom: "Capgemini", prix: 30000000000.00, immoKey: "ent_cap", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 953, cat: "Entreprises Connues", emoji: "🧱", nom: "Saint-Gobain", prix: 40000000000.00, immoKey: "ent_sgb", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 954, cat: "Entreprises Connues", emoji: "💡", nom: "ENGIE", prix: 38000000000.00, immoKey: "ent_engi", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 955, cat: "Entreprises Connues", emoji: "🌾", nom: "Crédit Agricole", prix: 42000000000.00, immoKey: "ent_aca", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 956, cat: "Entreprises Connues", emoji: "🔴", nom: "Société Générale", prix: 22000000000.00, immoKey: "ent_gle", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 957, cat: "Entreprises Connues", emoji: "📱", nom: "Orange", prix: 28000000000.00, immoKey: "ent_ora", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 958, cat: "Entreprises Connues", emoji: "🛞", nom: "Michelin", prix: 24000000000.00, immoKey: "ent_ml", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 959, cat: "Entreprises Connues", emoji: "🌱", nom: "Veolia", prix: 20000000000.00, immoKey: "ent_vie", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 960, cat: "Entreprises Connues", emoji: "🛒", nom: "Carrefour", prix: 12000000000.00, immoKey: "ent_ca", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 961, cat: "Entreprises Connues", emoji: "📢", nom: "Publicis Groupe", prix: 25000000000.00, immoKey: "ent_pub", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 962, cat: "Entreprises Connues", emoji: "🏢", nom: "Bouygues", prix: 13000000000.00, immoKey: "ent_en", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 963, cat: "Entreprises Connues", emoji: "🛡️", nom: "Thales", prix: 32000000000.00, immoKey: "ent_ho", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 964, cat: "Entreprises Connues", emoji: "🔌", nom: "Legrand", prix: 26000000000.00, immoKey: "ent_lr", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 965, cat: "Entreprises Connues", emoji: "📐", nom: "Dassault Systèmes", prix: 48000000000.00, immoKey: "ent_dsy", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 966, cat: "Entreprises Connues", emoji: "🔬", nom: "STMicroelectronics", prix: 35000000000.00, immoKey: "ent_stmpa", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 967, cat: "Entreprises Connues", emoji: "🏨", nom: "Accor", prix: 10000000000.00, immoKey: "ent_ac", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 968, cat: "Entreprises Connues", emoji: "🚗", nom: "Renault Group", prix: 11000000000.00, immoKey: "ent_rnno", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 969, cat: "Entreprises Connues", emoji: "🎮", nom: "Ubisoft", prix: 2500000000.00, immoKey: "ent_ubi", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 970, cat: "Entreprises Connues", emoji: "🎰", nom: "La Française des Jeux (FDJ)", prix: 7000000000.00, immoKey: "ent_fdj", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 971, cat: "Entreprises Connues", emoji: "📺", nom: "TF1 Groupe", prix: 2000000000.00, immoKey: "ent_tf1", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 972, cat: "Entreprises Connues", emoji: "📺", nom: "M6 Groupe", prix: 1500000000.00, immoKey: "ent_m6", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 973, cat: "Entreprises Connues", emoji: "🍽️", nom: "Sodexo", prix: 12000000000.00, immoKey: "ent_sw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 974, cat: "Entreprises Connues", emoji: "🎫", nom: "Edenred", prix: 11000000000.00, immoKey: "ent_eden", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 975, cat: "Entreprises Connues", emoji: "✅", nom: "Bureau Veritas", prix: 13000000000.00, immoKey: "ent_bvi", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 976, cat: "Entreprises Connues", emoji: "🏗️", nom: "Eiffage", prix: 10000000000.00, immoKey: "ent_fgr", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 977, cat: "Entreprises Connues", emoji: "🧫", nom: "Eurofins Scientific", prix: 10000000000.00, immoKey: "ent_erf", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 978, cat: "Entreprises Connues", emoji: "🧪", nom: "Arkema", prix: 7000000000.00, immoKey: "ent_ake", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 979, cat: "Entreprises Connues", emoji: "🥃", nom: "Rémy Cointreau", prix: 3500000000.00, immoKey: "ent_rco", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 980, cat: "Entreprises Connues", emoji: "☕", nom: "Groupe SEB", prix: 5000000000.00, immoKey: "ent_sk", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 981, cat: "Entreprises Connues", emoji: "🎧", nom: "Teleperformance", prix: 6000000000.00, immoKey: "ent_tep", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 982, cat: "Entreprises Connues", emoji: "🏢", nom: "Klépierre", prix: 7500000000.00, immoKey: "ent_li", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 983, cat: "Entreprises Connues", emoji: "🏢", nom: "Gecina", prix: 7000000000.00, immoKey: "ent_gfc", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 984, cat: "Entreprises Connues", emoji: "🏙️", nom: "Covivio", prix: 5000000000.00, immoKey: "ent_cov", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 985, cat: "Entreprises Connues", emoji: "💼", nom: "Wendel", prix: 4000000000.00, immoKey: "ent_mf", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 986, cat: "Entreprises Connues", emoji: "🚢", nom: "Bolloré", prix: 16000000000.00, immoKey: "ent_bol", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 987, cat: "Entreprises Connues", emoji: "🎵", nom: "Vivendi", prix: 10000000000.00, immoKey: "ent_viv", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 988, cat: "Entreprises Connues", emoji: "📡", nom: "Iliad (Free)", prix: 9000000000.00, immoKey: "ent_ild", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 989, cat: "Entreprises Connues", emoji: "🚢", nom: "CMA CGM", prix: 40000000000.00, immoKey: "ent_cmacgm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 990, cat: "Entreprises Connues", emoji: "⛺", nom: "Decathlon", prix: 15000000000.00, immoKey: "ent_decath", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 991, cat: "Entreprises Connues", emoji: "🔨", nom: "Leroy Merlin (Adeo)", prix: 18000000000.00, immoKey: "ent_leroy", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 992, cat: "Entreprises Connues", emoji: "🛒", nom: "Groupe Auchan", prix: 8000000000.00, immoKey: "ent_auchan", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 993, cat: "Entreprises Connues", emoji: "🏷️", nom: "E.Leclerc", prix: 25000000000.00, immoKey: "ent_leclerc", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 994, cat: "Entreprises Connues", emoji: "💻", nom: "SAP", prix: 250000000000.00, immoKey: "ent_sap", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 995, cat: "Entreprises Connues", emoji: "⚙️", nom: "Siemens", prix: 140000000000.00, immoKey: "ent_sie", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 996, cat: "Entreprises Connues", emoji: "📞", nom: "Deutsche Telekom", prix: 110000000000.00, immoKey: "ent_dte", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 997, cat: "Entreprises Connues", emoji: "🦅", nom: "Allianz", prix: 100000000000.00, immoKey: "ent_alv", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 998, cat: "Entreprises Connues", emoji: "🚘", nom: "Mercedes-Benz Group", prix: 65000000000.00, immoKey: "ent_mbg", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 999, cat: "Entreprises Connues", emoji: "🏎️", nom: "BMW Group", prix: 55000000000.00, immoKey: "ent_bmw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1000, cat: "Entreprises Connues", emoji: "🚗", nom: "Volkswagen Group", prix: 50000000000.00, immoKey: "ent_vw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1001, cat: "Entreprises Connues", emoji: "🏎️", nom: "Porsche AG", prix: 60000000000.00, immoKey: "ent_p911", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1002, cat: "Entreprises Connues", emoji: "👟", nom: "Adidas", prix: 40000000000.00, immoKey: "ent_ads", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1003, cat: "Entreprises Connues", emoji: "📦", nom: "Deutsche Post (DHL)", prix: 45000000000.00, immoKey: "ent_dpw", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1004, cat: "Entreprises Connues", emoji: "🧪", nom: "Bayer", prix: 28000000000.00, immoKey: "ent_bayn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1005, cat: "Entreprises Connues", emoji: "⚗️", nom: "BASF", prix: 40000000000.00, immoKey: "ent_bas", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1006, cat: "Entreprises Connues", emoji: "👗", nom: "Inditex (Zara)", prix: 140000000000.00, immoKey: "ent_itx", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1007, cat: "Entreprises Connues", emoji: "🏦", nom: "Banco Santander", prix: 70000000000.00, immoKey: "ent_san_es", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1008, cat: "Entreprises Connues", emoji: "🏦", nom: "BBVA", prix: 55000000000.00, immoKey: "ent_bbva", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1009, cat: "Entreprises Connues", emoji: "⚡", nom: "Iberdrola", prix: 75000000000.00, immoKey: "ent_ibe", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1010, cat: "Entreprises Connues", emoji: "💡", nom: "Enel", prix: 65000000000.00, immoKey: "ent_enel", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1011, cat: "Entreprises Connues", emoji: "🏦", nom: "Intesa Sanpaolo", prix: 60000000000.00, immoKey: "ent_isp", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1012, cat: "Entreprises Connues", emoji: "🎮", nom: "Sony Group", prix: 110000000000.00, immoKey: "ent_sony", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1013, cat: "Entreprises Connues", emoji: "🍄", nom: "Nintendo", prix: 60000000000.00, immoKey: "ent_ntdo", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1014, cat: "Entreprises Connues", emoji: "🚘", nom: "Toyota Motor", prix: 260000000000.00, immoKey: "ent_tm", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1015, cat: "Entreprises Connues", emoji: "🐧", nom: "Tencent", prix: 400000000000.00, immoKey: "ent_700", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1016, cat: "Entreprises Connues", emoji: "📦", nom: "Alibaba Group", prix: 200000000000.00, immoKey: "ent_baba", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1017, cat: "Entreprises Connues", emoji: "⛽", nom: "Shell", prix: 200000000000.00, immoKey: "ent_shel", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true },
-      { id: 1018, cat: "Entreprises Connues", emoji: "🍫", nom: "Nestlé", prix: 250000000000.00, immoKey: "ent_nesn", tauxPourcentHeure: 0.10, delaiActivationHeures: 24, estEntreprise: true }
+      { id: 939, cat: "Entreprises Connues", emoji: "⛽", nom: "TotalEnergies", prix: 140000000000.00, immoKey: "ent_tte", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 940, cat: "Entreprises Connues", emoji: "🏦", nom: "BNP Paribas", prix: 70000000000.00, immoKey: "ent_bnp", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 941, cat: "Entreprises Connues", emoji: "🛡️", nom: "AXA", prix: 75000000000.00, immoKey: "ent_cs", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 942, cat: "Entreprises Connues", emoji: "💊", nom: "Sanofi", prix: 110000000000.00, immoKey: "ent_san", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 943, cat: "Entreprises Connues", emoji: "⚡", nom: "Schneider Electric", prix: 130000000000.00, immoKey: "ent_su", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 944, cat: "Entreprises Connues", emoji: "🎈", nom: "Air Liquide", prix: 90000000000.00, immoKey: "ent_ai", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 945, cat: "Entreprises Connues", emoji: "🏗️", nom: "Vinci", prix: 60000000000.00, immoKey: "ent_dg", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 946, cat: "Entreprises Connues", emoji: "🕶️", nom: "EssilorLuxottica", prix: 95000000000.00, immoKey: "ent_el", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 947, cat: "Entreprises Connues", emoji: "✈️", nom: "Safran", prix: 85000000000.00, immoKey: "ent_saf", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 948, cat: "Entreprises Connues", emoji: "💎", nom: "Kering", prix: 35000000000.00, immoKey: "ent_ker", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 949, cat: "Entreprises Connues", emoji: "🥛", nom: "Danone", prix: 40000000000.00, immoKey: "ent_bn", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 950, cat: "Entreprises Connues", emoji: "🚘", nom: "Stellantis", prix: 50000000000.00, immoKey: "ent_stla", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 951, cat: "Entreprises Connues", emoji: "🍷", nom: "Pernod Ricard", prix: 35000000000.00, immoKey: "ent_ri", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 952, cat: "Entreprises Connues", emoji: "💻", nom: "Capgemini", prix: 30000000000.00, immoKey: "ent_cap", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 953, cat: "Entreprises Connues", emoji: "🧱", nom: "Saint-Gobain", prix: 40000000000.00, immoKey: "ent_sgb", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 954, cat: "Entreprises Connues", emoji: "💡", nom: "ENGIE", prix: 38000000000.00, immoKey: "ent_engi", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 955, cat: "Entreprises Connues", emoji: "🌾", nom: "Crédit Agricole", prix: 42000000000.00, immoKey: "ent_aca", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 956, cat: "Entreprises Connues", emoji: "🔴", nom: "Société Générale", prix: 22000000000.00, immoKey: "ent_gle", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 957, cat: "Entreprises Connues", emoji: "📱", nom: "Orange", prix: 28000000000.00, immoKey: "ent_ora", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 958, cat: "Entreprises Connues", emoji: "🛞", nom: "Michelin", prix: 24000000000.00, immoKey: "ent_ml", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 959, cat: "Entreprises Connues", emoji: "🌱", nom: "Veolia", prix: 20000000000.00, immoKey: "ent_vie", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 960, cat: "Entreprises Connues", emoji: "🛒", nom: "Carrefour", prix: 12000000000.00, immoKey: "ent_ca", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 961, cat: "Entreprises Connues", emoji: "📢", nom: "Publicis Groupe", prix: 25000000000.00, immoKey: "ent_pub", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 962, cat: "Entreprises Connues", emoji: "🏢", nom: "Bouygues", prix: 13000000000.00, immoKey: "ent_en", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 963, cat: "Entreprises Connues", emoji: "🛡️", nom: "Thales", prix: 32000000000.00, immoKey: "ent_ho", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 964, cat: "Entreprises Connues", emoji: "🔌", nom: "Legrand", prix: 26000000000.00, immoKey: "ent_lr", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 965, cat: "Entreprises Connues", emoji: "📐", nom: "Dassault Systèmes", prix: 48000000000.00, immoKey: "ent_dsy", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 966, cat: "Entreprises Connues", emoji: "🔬", nom: "STMicroelectronics", prix: 35000000000.00, immoKey: "ent_stmpa", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 967, cat: "Entreprises Connues", emoji: "🏨", nom: "Accor", prix: 10000000000.00, immoKey: "ent_ac", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 968, cat: "Entreprises Connues", emoji: "🚗", nom: "Renault Group", prix: 11000000000.00, immoKey: "ent_rnno", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 969, cat: "Entreprises Connues", emoji: "🎮", nom: "Ubisoft", prix: 2500000000.00, immoKey: "ent_ubi", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 970, cat: "Entreprises Connues", emoji: "🎰", nom: "La Française des Jeux (FDJ)", prix: 7000000000.00, immoKey: "ent_fdj", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 971, cat: "Entreprises Connues", emoji: "📺", nom: "TF1 Groupe", prix: 2000000000.00, immoKey: "ent_tf1", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 972, cat: "Entreprises Connues", emoji: "📺", nom: "M6 Groupe", prix: 1500000000.00, immoKey: "ent_m6", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 973, cat: "Entreprises Connues", emoji: "🍽️", nom: "Sodexo", prix: 12000000000.00, immoKey: "ent_sw", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 974, cat: "Entreprises Connues", emoji: "🎫", nom: "Edenred", prix: 11000000000.00, immoKey: "ent_eden", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 975, cat: "Entreprises Connues", emoji: "✅", nom: "Bureau Veritas", prix: 13000000000.00, immoKey: "ent_bvi", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 976, cat: "Entreprises Connues", emoji: "🏗️", nom: "Eiffage", prix: 10000000000.00, immoKey: "ent_fgr", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 977, cat: "Entreprises Connues", emoji: "🧫", nom: "Eurofins Scientific", prix: 10000000000.00, immoKey: "ent_erf", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 978, cat: "Entreprises Connues", emoji: "🧪", nom: "Arkema", prix: 7000000000.00, immoKey: "ent_ake", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 979, cat: "Entreprises Connues", emoji: "🥃", nom: "Rémy Cointreau", prix: 3500000000.00, immoKey: "ent_rco", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 980, cat: "Entreprises Connues", emoji: "☕", nom: "Groupe SEB", prix: 5000000000.00, immoKey: "ent_sk", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 981, cat: "Entreprises Connues", emoji: "🎧", nom: "Teleperformance", prix: 6000000000.00, immoKey: "ent_tep", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 982, cat: "Entreprises Connues", emoji: "🏢", nom: "Klépierre", prix: 7500000000.00, immoKey: "ent_li", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 983, cat: "Entreprises Connues", emoji: "🏢", nom: "Gecina", prix: 7000000000.00, immoKey: "ent_gfc", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 984, cat: "Entreprises Connues", emoji: "🏙️", nom: "Covivio", prix: 5000000000.00, immoKey: "ent_cov", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 985, cat: "Entreprises Connues", emoji: "💼", nom: "Wendel", prix: 4000000000.00, immoKey: "ent_mf", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 986, cat: "Entreprises Connues", emoji: "🚢", nom: "Bolloré", prix: 16000000000.00, immoKey: "ent_bol", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 987, cat: "Entreprises Connues", emoji: "🎵", nom: "Vivendi", prix: 10000000000.00, immoKey: "ent_viv", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 988, cat: "Entreprises Connues", emoji: "📡", nom: "Iliad (Free)", prix: 9000000000.00, immoKey: "ent_ild", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 989, cat: "Entreprises Connues", emoji: "🚢", nom: "CMA CGM", prix: 40000000000.00, immoKey: "ent_cmacgm", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 990, cat: "Entreprises Connues", emoji: "⛺", nom: "Decathlon", prix: 15000000000.00, immoKey: "ent_decath", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 991, cat: "Entreprises Connues", emoji: "🔨", nom: "Leroy Merlin (Adeo)", prix: 18000000000.00, immoKey: "ent_leroy", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 992, cat: "Entreprises Connues", emoji: "🛒", nom: "Groupe Auchan", prix: 8000000000.00, immoKey: "ent_auchan", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 993, cat: "Entreprises Connues", emoji: "🏷️", nom: "E.Leclerc", prix: 25000000000.00, immoKey: "ent_leclerc", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 994, cat: "Entreprises Connues", emoji: "💻", nom: "SAP", prix: 250000000000.00, immoKey: "ent_sap", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 995, cat: "Entreprises Connues", emoji: "⚙️", nom: "Siemens", prix: 140000000000.00, immoKey: "ent_sie", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 996, cat: "Entreprises Connues", emoji: "📞", nom: "Deutsche Telekom", prix: 110000000000.00, immoKey: "ent_dte", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 997, cat: "Entreprises Connues", emoji: "🦅", nom: "Allianz", prix: 100000000000.00, immoKey: "ent_alv", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 998, cat: "Entreprises Connues", emoji: "🚘", nom: "Mercedes-Benz Group", prix: 65000000000.00, immoKey: "ent_mbg", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 999, cat: "Entreprises Connues", emoji: "🏎️", nom: "BMW Group", prix: 55000000000.00, immoKey: "ent_bmw", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1000, cat: "Entreprises Connues", emoji: "🚗", nom: "Volkswagen Group", prix: 50000000000.00, immoKey: "ent_vw", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1001, cat: "Entreprises Connues", emoji: "🏎️", nom: "Porsche AG", prix: 60000000000.00, immoKey: "ent_p911", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1002, cat: "Entreprises Connues", emoji: "👟", nom: "Adidas", prix: 40000000000.00, immoKey: "ent_ads", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1003, cat: "Entreprises Connues", emoji: "📦", nom: "Deutsche Post (DHL)", prix: 45000000000.00, immoKey: "ent_dpw", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1004, cat: "Entreprises Connues", emoji: "🧪", nom: "Bayer", prix: 28000000000.00, immoKey: "ent_bayn", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1005, cat: "Entreprises Connues", emoji: "⚗️", nom: "BASF", prix: 40000000000.00, immoKey: "ent_bas", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1006, cat: "Entreprises Connues", emoji: "👗", nom: "Inditex (Zara)", prix: 140000000000.00, immoKey: "ent_itx", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1007, cat: "Entreprises Connues", emoji: "🏦", nom: "Banco Santander", prix: 70000000000.00, immoKey: "ent_san_es", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1008, cat: "Entreprises Connues", emoji: "🏦", nom: "BBVA", prix: 55000000000.00, immoKey: "ent_bbva", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1009, cat: "Entreprises Connues", emoji: "⚡", nom: "Iberdrola", prix: 75000000000.00, immoKey: "ent_ibe", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1010, cat: "Entreprises Connues", emoji: "💡", nom: "Enel", prix: 65000000000.00, immoKey: "ent_enel", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1011, cat: "Entreprises Connues", emoji: "🏦", nom: "Intesa Sanpaolo", prix: 60000000000.00, immoKey: "ent_isp", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1012, cat: "Entreprises Connues", emoji: "🎮", nom: "Sony Group", prix: 110000000000.00, immoKey: "ent_sony", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1013, cat: "Entreprises Connues", emoji: "🍄", nom: "Nintendo", prix: 60000000000.00, immoKey: "ent_ntdo", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1014, cat: "Entreprises Connues", emoji: "🚘", nom: "Toyota Motor", prix: 260000000000.00, immoKey: "ent_tm", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1015, cat: "Entreprises Connues", emoji: "🐧", nom: "Tencent", prix: 400000000000.00, immoKey: "ent_700", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1016, cat: "Entreprises Connues", emoji: "📦", nom: "Alibaba Group", prix: 200000000000.00, immoKey: "ent_baba", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1017, cat: "Entreprises Connues", emoji: "⛽", nom: "Shell", prix: 200000000000.00, immoKey: "ent_shel", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
+      { id: 1018, cat: "Entreprises Connues", emoji: "🍫", nom: "Nestlé", prix: 250000000000.00, immoKey: "ent_nesn", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true }
     ];
 
     let categorieActive = "Automobiles";
@@ -844,7 +858,49 @@
       ecouterHistoriqueFirebase();
       initialiserEtEcouterComptes();
       ecouterPossessionsImmo();
+      ecouterMarcheImmobilier();
       setInterval(traiterRevenusHorairesImmo, 10000);
+    }
+
+    /* SYNCHRONISATION MARCHE IMMOBILIER EN TEMPS REEL (30 MIN) */
+    function ecouterMarcheImmobilier() {
+      db.ref('marche_immobilier').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const maintenant = Date.now();
+        const tranche30min = Math.floor(maintenant / (30 * 60 * 1000));
+
+        if (!data || data.tranche !== tranche30min) {
+          // Tirage aléatoire : 25% de chance de perte, 75% de hausse entre 5% et 10 000 000%
+          const estPerte = Math.random() < 0.25;
+          let pct = 0;
+          if (estPerte) {
+            pct = - (Math.floor(Math.random() * 85) + 5); // perte de -5% à -90%
+          } else {
+            let min = 5;
+            let max = 10000000;
+            pct = Math.floor(Math.exp(Math.random() * Math.log(max / min)) * min);
+          }
+          db.ref('marche_immobilier').set({ tranche: tranche30min, pourcentage: pct });
+        } else {
+          marcheImmoPct = data.pourcentage;
+          afficherIndicateurMarche();
+          if (joueurSelectionneVueDetail) {
+            afficherDetailJoueur(joueurSelectionneVueDetail);
+          }
+        }
+      });
+    }
+
+    function afficherIndicateurMarche() {
+      const display = document.getElementById('marcheImmoValDisplay');
+      if (!display) return;
+      if (marcheImmoPct >= 0) {
+        display.className = "marche-immo-hausse";
+        display.innerText = `+${marcheImmoPct.toLocaleString('fr-FR')}% 📈`;
+      } else {
+        display.className = "marche-immo-baisse";
+        display.innerText = `${marcheImmoPct.toLocaleString('fr-FR')}% 📉`;
+      }
     }
 
     /* MODAL AIDE */
@@ -920,6 +976,7 @@
       });
     }
 
+    /* REVENUS PASSIFS : DEBLOCAGE DES GAINS A 2 HEURES DE L'ACQUISITION (20%/H) */
     function traiterRevenusHorairesImmo() {
       if (!possessionsImmo) return;
       const maintenant = Date.now();
@@ -948,9 +1005,10 @@
             let gainParHeure = 0;
 
             if (catalogueRef && catalogueRef.tauxPourcentHeure) {
-              delaiMin = (catalogueRef.delaiActivationHeures || 24) * 3600 * 1000;
+              delaiMin = (catalogueRef.delaiActivationHeures || 2) * 3600 * 1000; // 2h de délai
               gainParHeure = catalogueRef.prix * catalogueRef.tauxPourcentHeure;
             } else if (immoKey === 'snack') {
+              delaiMin = 2 * 3600 * 1000;
               gainParHeure = 1000;
             }
 
@@ -1001,32 +1059,39 @@
       });
     }
 
-    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien, estMaison, estCentreCommercial) {
+    /* REVENTE ET CALCUL DE VALEUR : AUGMENTATION A PARTIR DE 3H + VARIATION DU MARCHE (30 MIN) */
+    function calculerPrixReventeImmo(dateAchat, prixBase) {
+      const maintenant = Date.now();
+      const heuresEcoulees = (maintenant - dateAchat) / (1000 * 3600);
+
+      // L'immobilier augmente sa valeur seulement à partir de 3 heures d'acquisition
+      if (heuresEcoulees < 3) {
+        return { prix: prixBase, augmente: false, heuresRestantes: (3 - heuresEcoulees).toFixed(1) };
+      }
+
+      // À partir de 3 heures : application du multiplicateur du marché dynamique (30 min)
+      let multMarche = 1 + (marcheImmoPct / 100);
+      if (multMarche < 0.1) multMarche = 0.1; // plancher minimal à 10% de la valeur de base
+
+      let prixActuel = Math.round(prixBase * multMarche * 100) / 100;
+      return { prix: prixActuel, augmente: true, heuresRestantes: 0 };
+    }
+
+    function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien) {
       const ref = db.ref(`immobilier/${user}/${immoKey}`);
       ref.once('value', (snapshot) => {
         const data = snapshot.val();
         if (!data || !data.achats || !data.achats[indexAchat]) return;
 
         const dateAchat = data.achats[indexAchat];
-        const maintenant = Date.now();
-        const heuresEcoulees = (maintenant - dateAchat) / (1000 * 3600);
-        const tranches12h = Math.floor(heuresEcoulees / 12);
+        const calculVal = calculerPrixReventeImmo(dateAchat, prixBase);
+        const prixRevente = calculVal.prix;
 
-        let prixRevente = 0;
-        if (estMaison) {
-          prixRevente = Math.round(prixBase * (1 + 1.50 * tranches12h) * 100) / 100;
-        } else if (estCentreCommercial) {
-          prixRevente = Math.round(prixBase * 0.80 * 100) / 100;
-        } else {
-          const joursEcoules = heuresEcoulees / 24;
-          if (joursEcoules < 3) {
-            alert("Vous devez attendre au moins 3 jours après l'achat pour revendre ce bien !");
-            return;
-          }
-          prixRevente = Math.round(prixBase * (1 + 0.50 * joursEcoules) * 100) / 100;
-        }
+        let messageConfirmation = calculVal.augmente
+          ? `Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € (Valeur actualisée selon le marché : ${marcheImmoPct >= 0 ? '+' : ''}${marcheImmoPct}%) ?`
+          : `Ce bien a moins de 3h d'ancienneté. Sa valeur n'a pas encore augmenté. Voulez-vous le revendre à son prix initial de ${prixBase.toLocaleString('fr-FR')} € ?`;
 
-        if (confirm(`Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € ?`)) {
+        if (confirm(messageConfirmation)) {
           let nouveauxAchats = [...data.achats];
           let nouveauxPaiements = data.derniersPaiements ? [...data.derniersPaiements] : [];
           nouveauxAchats.splice(indexAchat, 1);
@@ -1431,8 +1496,6 @@
         const nomBien = catalogueRef ? catalogueRef.nom : immoKey;
         const emojiBien = catalogueRef ? catalogueRef.emoji : '🏠';
         const prixBase = catalogueRef ? catalogueRef.prix : 0;
-        const estMaison = catalogueRef ? !!catalogueRef.estMaison : false;
-        const estCentreCommercial = catalogueRef ? !!catalogueRef.estCentreCommercial : false;
 
         dataBien.achats.forEach((dateAchat, indexAchat) => {
           const mainDiv = document.createElement('div');
@@ -1440,15 +1503,23 @@
 
           let dateFormatee = new Date(dateAchat).toLocaleDateString('fr-FR') + ' ' + new Date(dateAchat).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
           
-          let boutonVente = `<button class="btn-vente-immo" onclick="revendreBienImmobilier('${user}', '${immoKey}', ${indexAchat}, ${prixBase}, '${nomBien.replace(/'/g, "\\'")}', ${estMaison}, ${estCentreCommercial})">💰 Revendre</button>`;
+          let calculVal = calculerPrixReventeImmo(dateAchat, prixBase);
+          let prixAffiche = calculVal.prix;
+
+          let infoPriseValeur = calculVal.augmente
+            ? `<div style="font-size:10px; color:#38ef7d;">📈 Valeur marché : ${prixAffiche.toLocaleString('fr-FR')} € (${marcheImmoPct >= 0 ? '+' : ''}${marcheImmoPct}%)</div>`
+            : `<div style="font-size:10px; color:#a0aec0;">⏳ Prise de valeur dans ${calculVal.heuresRestantes}h</div>`;
+
+          let boutonVente = `<button class="btn-vente-immo" onclick="revendreBienImmobilier('${user}', '${immoKey}', ${indexAchat}, ${prixBase}, '${nomBien.replace(/'/g, "\\'")}')">💰 Revendre (${prixAffiche.toLocaleString('fr-FR')} €)</button>`;
 
           mainDiv.innerHTML = `
             <div>
               <div style="font-weight:bold;">${emojiBien} ${nomBien}</div>
               <div style="font-size:11px; opacity:0.7;">Acquis le : ${dateFormatee}</div>
+              ${infoPriseValeur}
             </div>
             <div style="text-align:right;">
-              <div class="possession-badge-green">${prixBase.toLocaleString('fr-FR')} €</div>
+              <div class="possession-badge-green">Base: ${prixBase.toLocaleString('fr-FR')} €</div>
               ${boutonVente}
             </div>
           `;
@@ -1576,7 +1647,7 @@
       afficherListeJoueursReglages();
     }
 
-    /* SECTION QUIZ / CALCUL MENTAL */
+    /* SECTION QUIZ / CALCUL MENTAL (EXTREME -> +100k€, ULTIME -> +500k€) */
     function ouvrirSelectionNiveauQuiz() {
       document.getElementById('quizLevelOverlay').classList.add('active');
     }
@@ -1586,13 +1657,13 @@
       questionsJoueesDansSession = 0;
       gainsSessionQuiz = 0;
 
-      perteParQuestion = 10000; // Pertes harmonisées à 10 000€ pour tous les niveaux
+      perteParQuestion = 10000;
 
       if (niveau === 'facile') { gainParQuestion = 30000; }
       else if (niveau === 'intermediaire') { gainParQuestion = 50000; }
       else if (niveau === 'difficile') { gainParQuestion = 100000; }
-      else if (niveau === 'extreme') { gainParQuestion = 200000; }
-      else if (niveau === 'ultime') { gainParQuestion = 200000; }
+      else if (niveau === 'extreme') { gainParQuestion = 100000; } // Mis à jour à 100 000 €
+      else if (niveau === 'ultime') { gainParQuestion = 500000; }  // Mis à jour à 500 000 €
 
       document.getElementById('quizLevelOverlay').classList.remove('active');
       document.getElementById('quizUserBadge').innerText = lastUserValide;
@@ -1625,9 +1696,8 @@
         rep = n1 * n2;
         opStr = `${n1} × ${n2}`;
       } else if (niveauQuizActif === 'extreme') {
-        // Tables de multiplication de 4 à 10
-        n1 = Math.floor(Math.random() * 7) + 4; // Entre 4 et 10
-        n2 = Math.floor(Math.random() * 7) + 4; // Entre 4 et 10
+        n1 = Math.floor(Math.random() * 7) + 4;
+        n2 = Math.floor(Math.random() * 7) + 4;
         rep = n1 * n2;
         opStr = `${n1} × ${n2}`;
       } else if (niveauQuizActif === 'ultime') {
