@@ -103,14 +103,10 @@
     .pin-card { background: #1c1c1e; width: 90%; max-width: 400px; border-radius: 28px; padding: 22px; color: white; text-align: center; }
     .pin-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
     .pin-subtitle { font-size: 14px; color: #8e8e93; margin-bottom: 18px; }
-    .pin-dots { display: flex; justify-content: center; gap: 16px; margin-bottom: 18px; }
-    .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #3a3a3c; background: transparent; transition: all 0.15s ease; }
-    .dot.filled { background: #0a84ff; border-color: #0a84ff; }
-    .dot.error { background: #ff453a; border-color: #ff453a; }
-    .error-msg { color: #ff453a; font-size: 13px; font-weight: 600; min-height: 20px; margin-bottom: 15px; text-align: center; }
+    .error-msg { color: #ff453a; font-size: 13px; font-weight: 600; min-height: 20px; margin-bottom: 10px; text-align: center; }
 
-    .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 10px; }
-    .btn-pin { background: #2c2c2e; color: white; border: none; border-radius: 50%; width: 68px; height: 68px; margin: 0 auto; font-size: 24px; font-weight: 600; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+    .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 10px; }
+    .btn-pin { background: #2c2c2e; color: white; border: none; border-radius: 50%; width: 62px; height: 62px; margin: 0 auto; font-size: 22px; font-weight: 600; display: flex; justify-content: center; align-items: center; cursor: pointer; }
     .btn-pin.btn-cancel { font-size: 14px; color: #ff453a; background: transparent; font-weight: bold; }
     .btn-pin.btn-del { font-size: 20px; color: #8e8e93; background: transparent; }
 
@@ -150,7 +146,7 @@
     .item-editor input, .item-editor select { padding: 8px; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 13px; }
     .item-editor input.emoji-input { width: 44px; text-align: center; }
     .item-editor input.nom-input { flex-grow: 1; }
-    .item-editor input.prix-input { width: 80px; }
+    .item-editor input.prix-input { width: 110px; }
 
     .form-ajout { background: #1a222d; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; }
     .form-ajout-title { font-size: 12px; font-weight: bold; color: #a0aec0; margin-bottom: 6px; }
@@ -252,7 +248,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v4.5.0 (Règles Équité • Max 10 Hôtels • Entreprises Uniques)</div>
+    <div class="version-tag">v4.6.0 (Royalties 15% Entreprises & Hôtels • Mots de Passe Sans Limite)</div>
   </div>
 
   <!-- MODAL AIDE ET REGLES -->
@@ -269,9 +265,9 @@
         </div>
 
         <div class="aide-section">
-          <div class="aide-section-title">🔑 Codes PIN & Connexion</div>
-          • Chaque joueur dispose d'un code PIN à 4 chiffres.<br>
-          • Les codes PIN peuvent être identiques entre joueurs tant qu'ils n'ont pas le même prénom.<br>
+          <div class="aide-section-title">🔑 Mots de passe & Connexion</div>
+          • Chaque joueur dispose d'un mot de passe / code PIN.<br>
+          • Les mots de passe peuvent contenir des mots, des lettres ou des chiffres sans aucune limite de longueur.<br>
           • Pour créer un joueur École, cliquez sur <strong>🏫 + Joueur École</strong> (solde de départ : 20 000 €).
         </div>
 
@@ -292,11 +288,11 @@
         </div>
 
         <div class="aide-section">
-          <div class="aide-section-title">🏢 Immobilier, Hôtels & Entreprises</div>
+          <div class="aide-section-title">🏢 Immobilier, Hôtels, Entreprises & Royalties (15%)</div>
           • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels, Malls et Entreprises rapportent <strong>20%/h</strong> automatiquement 2 heures après l'achat !<br>
-          • <strong>Règles de Possession & Équité</strong> :<br>
-          &nbsp;&nbsp;- L'achat d'hôtels est limité à <strong>10 hôtels maximum</strong> par joueur.<br>
-          &nbsp;&nbsp;- Une entreprise ne peut être achetée qu'<strong>une seule fois</strong> par joueur.<br>
+          • <strong>Règles de Possession & Royalties</strong> :<br>
+          &nbsp;&nbsp;- 👑 <strong>Entreprises</strong> : Les entreprises peuvent être acquises par un seul joueur principal. Si un autre joueur en achète une déjà possédée, il doit automatiquement verser des <strong>royalties de 15%</strong> du montant de l'entreprise au propriétaire initial.<br>
+          &nbsp;&nbsp;- 🏨 <strong>Hôtels</strong> : Limité à <strong>10 hôtels maximum par gamme/joueur</strong>. Si vous achetez un hôtel alors qu'un autre joueur en possède déjà, vous devez verser des <strong>royalties de 15%</strong> du montant de l'hôtel au(x) propriétaire(s).<br>
           • <strong>Revente de Biens</strong> : Seuls les biens de la section <em>Immobilier Marseille</em> peuvent être revendus (les Hôtels ne sont pas revendables).<br>
           • <strong>Prise de Valeur</strong> : L'immobilier augmente sa valeur à partir de <strong>3 heures</strong> après l'acquisition.<br>
           • <strong>Marché Immobilier Dynamique</strong> : Toutes les 30 minutes, le taux du marché immobilier varie aléatoirement entre <strong>+5% et +10 000 000%</strong> (attention, le marché peut également baisser !).
@@ -318,38 +314,38 @@
         <span class="reglages-title">Nouveau Joueur École 🏫</span>
         <button class="btn-close" onclick="fermerModalCreerEcole()">✕</button>
       </div>
-      <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Saisissez le prénom et le code PIN à 4 chiffres du joueur. Solde initial : 20 000 €.</p>
+      <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Saisissez le prénom et le mot de passe du joueur (sans limite de caractères). Solde initial : 20 000 €.</p>
       <div class="item-editor" style="margin-bottom: 10px;">
         <input type="text" id="ecoleNomInput" class="nom-input" placeholder="Prénom" style="width:100%; padding:12px; font-size:15px;">
       </div>
       <div class="item-editor" style="margin-bottom: 16px;">
-        <input type="number" inputmode="numeric" id="ecolePinInput" class="nom-input" placeholder="Code PIN (4 chiffres)" maxlength="4" style="width:100%; padding:12px; font-size:15px;">
+        <input type="text" id="ecolePinInput" class="nom-input" placeholder="Mot de passe / PIN (texte ou chiffres)" style="width:100%; padding:12px; font-size:15px;">
       </div>
       <button class="btn-ajouter-article" style="background:#2b6cb0; padding:14px; font-size:15px;" onclick="validerCreationJoueurEcole()">Créer le joueur (20 000 €)</button>
     </div>
   </div>
 
-  <!-- MODAL CODE PIN -->
+  <!-- MODAL CODE PIN / MOT DE PASSE -->
   <div class="pin-overlay" id="pinOverlay">
     <div class="pin-card" id="pinCard">
-      <div class="pin-title" id="pinTitleModal">Code PIN requis</div>
-      <div class="pin-subtitle" id="pinSubtitleModal">Saisissez votre code à 4 chiffres</div>
+      <div class="pin-title" id="pinTitleModal">Mot de passe requis</div>
+      <div class="pin-subtitle" id="pinSubtitleModal">Saisissez votre mot de passe ou code PIN</div>
       
       <div id="selectionJoueurPinSimilaire" style="display:none; margin-bottom: 14px;">
-        <div style="font-size:13px; color:#f97316; margin-bottom:8px; font-weight:bold;">Plusieurs joueurs ont ce code PIN !</div>
+        <div style="font-size:13px; color:#f97316; margin-bottom:8px; font-weight:bold;">Plusieurs joueurs ont ce mot de passe !</div>
         <select id="selectJoueurPinDoublon" style="width:100%; padding:10px; border-radius:10px; background:#2c2c2e; color:white; border:1px solid #4a5568; font-size:14px; font-weight:bold;"></select>
         <button class="btn-ajouter-article" style="margin-top:10px; background:#38ef7d; color:#000;" onclick="confirmerChoixJoueurDoublon()">Valider mon choix</button>
       </div>
 
       <div id="pinBoxContainer">
-        <div class="pin-dots">
-          <div class="dot" id="dot0"></div>
-          <div class="dot" id="dot1"></div>
-          <div class="dot" id="dot2"></div>
-          <div class="dot" id="dot3"></div>
-        </div>
+        <input type="password" id="pinTextInput" placeholder="Mot de passe / PIN" style="width:100%; padding:14px; font-size:18px; border-radius:14px; border:2px solid #3a3a3c; background:#2c2c2e; color:white; text-align:center; margin-bottom:12px; font-weight:bold;" onkeydown="if(event.key==='Enter') verifierCodePin()">
 
         <div class="error-msg" id="pinErrorMsg"></div>
+
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <button class="btn-validation" style="background:#0a84ff; flex:1;" onclick="verifierCodePin()">Valider</button>
+          <button class="btn-validation" style="background:#3a3a3c; color:#ff453a; flex:1;" onclick="fermerCodePin()">Annuler</button>
+        </div>
 
         <div class="pin-grid">
           <button class="btn-pin" onclick="taperCodePin('1')">1</button>
@@ -364,7 +360,7 @@
           <button class="btn-pin" onclick="taperCodePin('8')">8</button>
           <button class="btn-pin" onclick="taperCodePin('9')">9</button>
           
-          <button class="btn-pin btn-cancel" onclick="fermerCodePin()">Annuler</button>
+          <button class="btn-pin btn-cancel" onclick="fermerCodePin()">✕</button>
           <button class="btn-pin" onclick="taperCodePin('0')">0</button>
           <button class="btn-pin btn-del" onclick="effacerChiffrePin()">⌫</button>
         </div>
@@ -414,7 +410,7 @@
         <button class="btn-level btn-level-ultime" onclick="demarrerQuizAvecNiveau('ultime')">
           <div>
             <div class="level-name">🔥 ULTIME (+ / - à 2 chiffres)</div>
-            <div class="level-desc">10s / Additions & Soustractions (ex: 45+56)</div>
+            <div class="level-desc">10s / Additions & Souractions (ex: 45+56)</div>
           </div>
           <div class="level-name">+500 000 €</div>
         </button>
@@ -543,7 +539,7 @@
           <div class="form-ajout-title">Inscrire un joueur (20 000€)</div>
           <div class="item-editor">
             <input type="text" id="nouveauJoueurNom" class="nom-input" placeholder="Prénom">
-            <input type="number" inputmode="numeric" id="nouveauJoueurPin" class="prix-input" placeholder="PIN (4 ch.)" maxlength="4">
+            <input type="text" id="nouveauJoueurPin" class="prix-input" placeholder="Mot de passe" style="width:110px;">
           </div>
           <div class="item-editor" style="margin-top: 5px;">
             <select id="nouveauJoueurGroupe" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 13px;">
@@ -767,8 +763,6 @@
       { id: 936, cat: "Entreprises Connues", emoji: "🏎️", nom: "Ferrari", prix: 75000000000.00, immoKey: "ent_race", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
       { id: 937, cat: "Entreprises Connues", emoji: "💄", nom: "L'Oréal", prix: 220000000000.00, immoKey: "ent_or", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
       { id: 938, cat: "Entreprises Connues", emoji: "🕊️", nom: "Hermès", prix: 230000000000.00, immoKey: "ent_rms", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-
-      // 80 NOUVELLES ENTREPRISES
       { id: 939, cat: "Entreprises Connues", emoji: "⛽", nom: "TotalEnergies", prix: 140000000000.00, immoKey: "ent_tte", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
       { id: 940, cat: "Entreprises Connues", emoji: "🏦", nom: "BNP Paribas", prix: 70000000000.00, immoKey: "ent_bnp", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
       { id: 941, cat: "Entreprises Connues", emoji: "🛡️", nom: "AXA", prix: 75000000000.00, immoKey: "ent_cs", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
@@ -927,7 +921,7 @@
       const pin = document.getElementById('ecolePinInput').value.trim();
 
       if (!prenom) { alert("Veuillez saisir un prénom !"); return; }
-      if (pin.length !== 4 || isNaN(pin)) { alert("Veuillez saisir un code PIN à 4 chiffres !"); return; }
+      if (!pin) { alert("Veuillez saisir un mot de passe ou code PIN !"); return; }
 
       let doublonNom = USERS_LIST.find(u => u.nom.toLowerCase() === prenom.toLowerCase());
       if (doublonNom) { alert("Ce prénom est déjà utilisé ! Choisissez un autre prénom."); return; }
@@ -937,7 +931,7 @@
       db.ref(`banques/${prenom}`).set(20000.00);
 
       fermerModalCreerEcole();
-      alert(`🎉 Joueur "${prenom}" créé avec succès !\nPIN: ${pin}\nSolde: 20 000 €`);
+      alert(`🎉 Joueur "${prenom}" créé avec succès !\nMot de passe: ${pin}\nSolde: 20 000 €`);
     }
 
     function ecouterJoueursFirebase() {
@@ -971,7 +965,7 @@
       });
     }
 
-    /* NETTOYAGE DU SURPLUS DES BIENS (EQUITE SUR FIREBASE) */
+    /* NETTOYAGE DES BIENS EN SURPLUS (LIMITE 10 HOTELS PAR JOUEUR) */
     function nettoyerBiensSurplus(dataImmo) {
       if (!dataImmo || estEnTrainDeNettoyer) return;
       let updates = {};
@@ -980,7 +974,7 @@
         let userBiens = dataImmo[user];
         if (!userBiens) return;
 
-        // 1. Limite à 10 Hôtels Max par joueur
+        // Limite à 10 Hôtels Max par joueur
         if (userBiens.hotel && userBiens.hotel.achats && userBiens.hotel.achats.length > 10) {
           let nouveauxAchats = userBiens.hotel.achats.slice(0, 10);
           let nouveauxPaiements = userBiens.hotel.derniersPaiements ? userBiens.hotel.derniersPaiements.slice(0, 10) : nouveauxAchats;
@@ -990,23 +984,6 @@
             derniersPaiements: nouveauxPaiements
           };
         }
-
-        // 2. Limite à 1 seule acquisition par entreprise
-        Object.keys(userBiens).forEach(immoKey => {
-          if (immoKey === 'dernierePartie30k' || immoKey === 'hotel') return;
-          let catalogueRef = baseArticles.find(a => a.immoKey === immoKey);
-          let estEntreprise = (immoKey.startsWith('ent_')) || (catalogueRef && (catalogueRef.cat === "Entreprises Connues" || catalogueRef.estEntreprise));
-
-          if (estEntreprise && userBiens[immoKey] && userBiens[immoKey].achats && userBiens[immoKey].achats.length > 1) {
-            let nouveauAchat = userBiens[immoKey].achats.slice(0, 1);
-            let nouveauPaiement = userBiens[immoKey].derniersPaiements ? userBiens[immoKey].derniersPaiements.slice(0, 1) : nouveauAchat;
-            updates[`immobilier/${user}/${immoKey}`] = {
-              quantite: 1,
-              achats: nouveauAchat,
-              derniersPaiements: nouveauPaiement
-            };
-          }
-        });
       });
 
       if (Object.keys(updates).length > 0) {
@@ -1131,7 +1108,6 @@
     function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien) {
       const catalogueRef = baseArticles.find(a => a.immoKey === immoKey);
       
-      // Sécurité : Vérification que le bien appartient à la section Immobilier et n'est pas un Hôtel
       if (!catalogueRef || catalogueRef.cat !== "Immobilier Marseille" || immoKey === 'hotel') {
         alert("🚫 Seuls les biens de la section Immobilier Marseille (hors Hôtels) peuvent être revendus !");
         return;
@@ -1260,15 +1236,6 @@
     }
 
     function ajouterArticle(nom, prix, fullItem) {
-      if (fullItem) {
-        // Interdiction d'ajouter 2 fois la même entreprise dans le panier
-        if (fullItem.cat === "Entreprises Connues" || fullItem.estEntreprise) {
-          if (listeArticles.some(item => item.immoKey === fullItem.immoKey)) {
-            alert("🚫 Vous avez déjà cette entreprise dans votre panier ! Une entreprise ne peut être achetée qu'une seule fois.");
-            return;
-          }
-        }
-      }
       listeArticles.push({ nom: nom, prix: prix, immoKey: fullItem ? fullItem.immoKey : null, cat: fullItem ? fullItem.cat : null });
       MettreAJourEcran();
     }
@@ -1282,24 +1249,26 @@
       if (action === 'paiement') {
         let totalFinal = listeArticles.reduce((acc, item) => acc + item.prix, 0);
         if (!totalFinal || totalFinal === 0) { alert("Ajoutez au moins un article avant de payer !"); return; }
-        document.getElementById('pinTitleModal').innerText = "Code PIN requis";
-        document.getElementById('pinSubtitleModal').innerText = "Saisissez votre code à 4 chiffres";
+        document.getElementById('pinTitleModal').innerText = "Mot de passe requis";
+        document.getElementById('pinSubtitleModal').innerText = "Saisissez votre mot de passe ou code PIN";
       } else if (action === 'reglages') {
         document.getElementById('pinTitleModal').innerText = "Sécurité Réglages";
-        document.getElementById('pinSubtitleModal').innerText = "Code administrateur requis";
+        document.getElementById('pinSubtitleModal').innerText = "Mot de passe administrateur requis";
       } else if (action === 'quiz_login') {
         document.getElementById('pinTitleModal').innerText = "Connexion Calcul Mental 🧮";
-        document.getElementById('pinSubtitleModal').innerText = "Entrez votre code PIN pour jouer";
+        document.getElementById('pinSubtitleModal').innerText = "Entrez votre mot de passe pour jouer";
       }
 
       actionApresPin = action;
       pinSaisi = "";
       blocageSaisie = false;
+      const inputElem = document.getElementById('pinTextInput');
+      if (inputElem) { inputElem.value = ""; }
       document.getElementById('selectionJoueurPinSimilaire').style.display = "none";
       document.getElementById('pinBoxContainer').style.display = "block";
-      mettreAJourPointsPin();
       document.getElementById('pinErrorMsg').innerText = "";
       document.getElementById('pinOverlay').classList.add('active');
+      setTimeout(() => { if (inputElem) inputElem.focus(); }, 200);
     }
 
     function fermerCodePin() {
@@ -1310,31 +1279,31 @@
 
     function taperCodePin(chiffre) {
       if (blocageSaisie) return;
-      if (pinSaisi.length < 4) {
-        pinSaisi += chiffre;
-        mettreAJourPointsPin();
-        if (pinSaisi.length === 4) {
-          blocageSaisie = true;
-          setTimeout(verifierCodePin, 150);
-        }
+      const inputElem = document.getElementById('pinTextInput');
+      if (inputElem) {
+        inputElem.value += chiffre;
+        pinSaisi = inputElem.value;
       }
     }
 
     function effacerChiffrePin() {
       if (blocageSaisie) return;
-      if (pinSaisi.length > 0) { pinSaisi = pinSaisi.slice(0, -1); mettreAJourPointsPin(); }
-    }
-
-    function mettreAJourPointsPin(isError = false) {
-      for (let i = 0; i < 4; i++) {
-        const dot = document.getElementById(`dot${i}`);
-        dot.className = "dot";
-        if (isError) { dot.classList.add('error'); }
-        else if (i < pinSaisi.length) { dot.classList.add('filled'); }
+      const inputElem = document.getElementById('pinTextInput');
+      if (inputElem && inputElem.value.length > 0) {
+        inputElem.value = inputElem.value.slice(0, -1);
+        pinSaisi = inputElem.value;
       }
     }
 
     async function verifierCodePin() {
+      const inputElem = document.getElementById('pinTextInput');
+      if (inputElem) { pinSaisi = inputElem.value.trim(); }
+
+      if (!pinSaisi) {
+        document.getElementById('pinErrorMsg').innerText = "Veuillez entrer votre mot de passe";
+        return;
+      }
+
       const hashSaisi = await hashPin(pinSaisi);
 
       if (PIN_HASH_MAP[hashSaisi]) {
@@ -1364,14 +1333,8 @@
         });
         document.getElementById('selectionJoueurPinSimilaire').style.display = "block";
       } else {
-        document.getElementById('pinErrorMsg').innerText = "Code PIN incorrect, réessayez";
-        mettreAJourPointsPin(true);
+        document.getElementById('pinErrorMsg').innerText = "Mot de passe / PIN incorrect, réessayez";
         if (navigator.vibrate) { navigator.vibrate([80, 50, 80]); }
-        setTimeout(() => {
-          pinSaisi = "";
-          mettreAJourPointsPin();
-          blocageSaisie = false;
-        }, 400);
       }
     }
 
@@ -1426,10 +1389,10 @@
         return;
       }
 
-      // VÉRIFICATION LIMITE D'HÔTELS (MAX 10 HÔTELS)
-      let hotelsPossedes = (possessionsImmo[user] && possessionsImmo[user].hotel && possessionsImmo[user].hotel.achats) 
-        ? possessionsImmo[user].hotel.achats.length 
-        : 0;
+      let userBiens = possessionsImmo[user] || {};
+
+      // VÉRIFICATION LIMITE D'HÔTELS (MAX 10 HÔTELS PAR JOUEUR)
+      let hotelsPossedes = (userBiens.hotel && userBiens.hotel.achats) ? userBiens.hotel.achats.length : 0;
       let hotelsDansPanier = listeArticles.filter(i => i.immoKey === 'hotel').length;
 
       if (hotelsPossedes + hotelsDansPanier > 10) {
@@ -1437,27 +1400,7 @@
         return;
       }
 
-      // VÉRIFICATION UNICITÉ DES ENTREPRISES (1 SEULE PAR JOUEUR)
-      let userBiens = possessionsImmo[user] || {};
-      let entrepriseEnDouble = false;
-      let nomEntrepriseDouble = "";
-
-      for (let item of listeArticles) {
-        if (item.cat === "Entreprises Connues" || (item.immoKey && item.immoKey.startsWith('ent_'))) {
-          let dejaPossede = userBiens[item.immoKey] && userBiens[item.immoKey].achats && userBiens[item.immoKey].achats.length > 0;
-          if (dejaPossede) {
-            entrepriseEnDouble = true;
-            nomEntrepriseDouble = item.nom;
-            break;
-          }
-        }
-      }
-
-      if (entrepriseEnDouble) {
-        alert(`🚫 ACHAT IMPOSSIBLE !\nVous possédez déjà l'entreprise "${nomEntrepriseDouble}". Une entreprise ne peut être achetée qu'une seule fois.`);
-        return;
-      }
-
+      // VÉRIFICATION VÉHICULES ET GARAGES
       let voituresDansPanier = listeArticles.filter(i => i.cat === "Automobiles").length;
       if (voituresDansPanier > 0) {
         let statsGarage = calculerCapaciteEtVoitures(user);
@@ -1471,16 +1414,62 @@
         }
       }
 
+      // CALCUL DES ROYALTIES (15%) POUR LES ENTREPRISES ET LES HOTELS
+      let royaltiesAverser = {};
+      let detailsRoyalties = [];
+
+      for (let item of listeArticles) {
+        // Royalties 15% Entreprises déjà possédées
+        if (item.cat === "Entreprises Connues" || (item.immoKey && item.immoKey.startsWith('ent_'))) {
+          Object.keys(possessionsImmo).forEach(autreJoueur => {
+            if (autreJoueur !== user) {
+              let biensAutre = possessionsImmo[autreJoueur];
+              if (biensAutre && biensAutre[item.immoKey] && biensAutre[item.immoKey].quantite > 0) {
+                let royalty = Math.round(item.prix * 0.15 * 100) / 100;
+                royaltiesAverser[autreJoueur] = (royaltiesAverser[autreJoueur] || 0) + royalty;
+                detailsRoyalties.push(`👑 15% pour ${item.nom} (${royalty.toLocaleString('fr-FR')} €) → ${autreJoueur}`);
+              }
+            }
+          });
+        }
+
+        // Royalties 15% Hôtels
+        if (item.immoKey === 'hotel') {
+          Object.keys(possessionsImmo).forEach(autreJoueur => {
+            if (autreJoueur !== user) {
+              let biensAutre = possessionsImmo[autreJoueur];
+              if (biensAutre && biensAutre.hotel && biensAutre.hotel.quantite > 0) {
+                let royalty = Math.round(item.prix * 0.15 * 100) / 100;
+                royaltiesAverser[autreJoueur] = (royaltiesAverser[autreJoueur] || 0) + royalty;
+                detailsRoyalties.push(`🏨 15% pour Hôtel (${royalty.toLocaleString('fr-FR')} €) → ${autreJoueur}`);
+              }
+            }
+          });
+        }
+      }
+
+      // Déduction du solde de l'acheteur
       let nouveauSolde = Math.round((soldeActuel - totalPaye) * 100) / 100;
       db.ref(`banques/${user}`).set(nouveauSolde);
 
+      // Versement des royalties aux propriétaires
+      Object.keys(royaltiesAverser).forEach(proprio => {
+        let montant = royaltiesAverser[proprio];
+        let soldeProprio = comptesComplets[proprio] !== undefined ? comptesComplets[proprio] : 20000.00;
+        db.ref(`banques/${proprio}`).set(Math.round((soldeProprio + montant) * 100) / 100);
+      });
+
+      // Ajout des biens
       listeArticles.forEach(item => { if (item.immoKey) { ajouterPossessionImmo(user, item); } });
+
+      // Enregistrement du ticket
       enregistrerTicketFirebase(lastPinValide, user, listeArticles, totalPaye);
 
+      // Animation de confirmation
       const apOverlay = document.getElementById('applePayOverlay');
       document.getElementById('apAmountDisplay').innerText = totalPaye.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
       document.getElementById('apUserDisplay').innerText = user;
-      document.getElementById('apStatusText').innerText = "Paiement en cours...";
+      document.getElementById('apStatusText').innerText = detailsRoyalties.length > 0 ? "Paiement & Royalties en cours..." : "Paiement en cours...";
       document.getElementById('faceIdIcon').className = "face-id-icon";
       document.getElementById('faceIdIcon').innerText = "😃";
       apOverlay.classList.add('active');
@@ -1489,11 +1478,17 @@
         jouerSonValidation();
         document.getElementById('faceIdIcon').className = "face-id-icon success";
         document.getElementById('faceIdIcon').innerText = "✓";
-        document.getElementById('apStatusText').innerText = "Payé avec succès";
+        
+        let msgFin = "Payé avec succès";
+        if (detailsRoyalties.length > 0) {
+          msgFin += "\n" + detailsRoyalties.join("\n");
+        }
+        document.getElementById('apStatusText').innerText = msgFin;
+
         setTimeout(() => {
           apOverlay.classList.remove('active');
           reinitialiser();
-        }, 1200);
+        }, detailsRoyalties.length > 0 ? 2500 : 1200);
       }, 1000);
     }
 
@@ -1597,7 +1592,6 @@
         const emojiBien = catalogueRef ? catalogueRef.emoji : '🏠';
         const prixBase = catalogueRef ? catalogueRef.prix : 0;
 
-        // La revente ne marche que pour la section Immobilier, et les Hôtels ne peuvent pas être vendus
         const estImmobilier = catalogueRef ? (catalogueRef.cat === "Immobilier Marseille") : false;
         const estHotel = (immoKey === 'hotel');
         const peutEtreVendu = estImmobilier && !estHotel;
@@ -1711,7 +1705,7 @@
         div.className = 'item-editor';
         div.innerHTML = `
           <span style="color:white; font-weight:bold; width:90px;">${prenom}</span>
-          <input type="text" class="prix-input" value="${user.pin || ''}" style="width:70px;" onchange="modifierJoueurSysteme(${index}, 'pin', this.value)">
+          <input type="text" class="prix-input" value="${user.pin || ''}" style="width:110px;" onchange="modifierJoueurSysteme(${index}, 'pin', this.value)">
           <span style="color:#a0aec0; font-size:11px;">(${groupe})</span>
           <button style="background:#e53e3e; color:white; border:none; border-radius:8px; padding:6px 10px; cursor:pointer; margin-left:auto;" onclick="supprimerJoueurSysteme('${prenom}')">✕</button>
         `;
@@ -1739,7 +1733,7 @@
       const pin = document.getElementById('nouveauJoueurPin').value.trim();
       const groupe = document.getElementById('nouveauJoueurGroupe').value;
 
-      if (!nom || pin.length !== 4 || isNaN(pin)) { alert("Veuillez remplir un prénom et un code PIN à 4 chiffres."); return; }
+      if (!nom || !pin) { alert("Veuillez remplir un prénom et un mot de passe."); return; }
 
       let doublonNom = USERS_LIST.find(u => ObtenirPrenomUser(u).toLowerCase() === nom.toLowerCase());
       if (doublonNom) { alert("Ce prénom existe déjà !"); return; }
