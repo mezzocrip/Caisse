@@ -182,7 +182,7 @@
     .quiz-matiere { font-size: 11px; text-transform: uppercase; color: #a0aec0; font-weight: bold; margin-bottom: 4px; }
     .quiz-enonce { font-size: 22px; font-weight: bold; color: #ffffff; margin-bottom: 8px; line-height: 1.3; }
     .quiz-reward-info { font-size: 12px; color: #38ef7d; font-weight: bold; margin-bottom: 6px; }
-    .quiz-input { width: 100%; padding: 10px; font-size: 24px; font-weight: bold; border: 2px solid #4a5568; background: #0d1117; color: #38ef7d; border-radius: 12px; text-align: center; margin-bottom: 4px; pointer-events: none; }
+    .quiz-input { width: 100%; padding: 10px; font-size: 24px; font-weight: bold; border: 2px solid #4a5568; background: #0d1117; color: #38ef7d; border-radius: 12px; text-align: center; margin-bottom: 4px; }
 
     .apple-pay-card { background: #1c1c1e; width: 100%; max-width: 440px; border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 24px; color: white; text-align: center; }
     .ap-amount { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
@@ -223,7 +223,6 @@
         </select>
         <button class="btn-quick-add" onclick="ouvrirModalCreerEcole()">🏫 + Joueur École</button>
         <button class="btn-icon" onclick="ouvrirBanque()" title="Comptes Bancaires">🏦</button>
-        <button class="btn-icon" onclick="ouvrirHistorique()" title="Acquisitions">🧾</button>
         <button class="btn-icon" onclick="ouvrirAide()" title="Règles du jeu">❓</button>
       </div>
     </div>
@@ -264,7 +263,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v4.9.2 (Quiz Handicaps & Automatisme)</div>
+    <div class="version-tag">v5.0.0 (Propriété unique Entreprises & Clavier Quiz)</div>
   </div>
 
   <!-- MODAL AIDE ET REGLES -->
@@ -299,10 +298,10 @@
         </div>
 
         <div class="aide-section">
-          <div class="aide-section-title">🏢 Immobilier, Hôtels, Entreprises & Royalties (15%)</div>
+          <div class="aide-section-title">🏢 Immobilier, Hôtels & Entreprises</div>
           • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels, Malls et Entreprises rapportent <strong>20%/h</strong> automatiquement 2 heures après l'achat !<br>
           • <strong>Règles de Possession & Royalties</strong> :<br>
-          &nbsp;&nbsp;- 👑 <strong>Entreprises</strong> : Les entreprises peuvent être acquises par un seul joueur principal. Si un autre joueur en achète une déjà possédée, il doit automatiquement verser des <strong>royalties de 15%</strong> du montant de l'entreprise au propriétaire initial.<br>
+          &nbsp;&nbsp;- 👑 <strong>Entreprises</strong> : Les entreprises ne peuvent avoir qu'<strong>un seul propriétaire</strong>. Une fois achetée par un joueur, l'entreprise est grisée et ne peut plus être achetée par d'autres[cite: 1].<br>
           &nbsp;&nbsp;- 🏨 <strong>Hôtels</strong> : Limité à <strong>10 hôtels maximum par gamme/joueur</strong>. Si vous achetez un hôtel alors qu'un autre joueur en possède déjà, vous devez verser des <strong>royalties de 15%</strong> du montant de l'hôtel au(x) propriétaire(s).<br>
           • <strong>Revente de Biens</strong> : Seuls les biens de la section <em>Immobilier Marseille</em> peuvent être revendus (les Hôtels ne sont pas revendables).
         </div>
@@ -437,7 +436,7 @@
         <div class="quiz-reward-info" id="quizRewardInfo">+30 000 € / -25 000 €</div>
         
         <div id="vueQuizMaths">
-          <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" readonly>
+          <input type="text" id="quizReponseInput" class="quiz-input" placeholder="?" oninput="testerReponseClavierQuiz()" onkeydown="gererSaisieClavierQuiz(event)">
           <div class="quiz-numpad">
             <button class="btn-num" onclick="taperQuizChiffre('1')">1</button>
             <button class="btn-num" onclick="taperQuizChiffre('2')">2</button>
@@ -994,7 +993,19 @@
         afficherSoldesBanque();
         afficherClassementEtPossessions();
         if (categorieActive === "🏠 Mes Biens") afficherArticles();
+        else afficherArticles();
       });
+    }
+
+    // OBTENIR LE PROPRIÉTAIRE D'UNE ENTREPRISE
+    function obtenirProprietaireEntreprise(immoKey) {
+      if (!possessionsImmo) return null;
+      for (let user in possessionsImmo) {
+        if (possessionsImmo[user] && possessionsImmo[user][immoKey] && possessionsImmo[user][immoKey].quantite > 0) {
+          return user;
+        }
+      }
+      return null;
     }
 
     function traiterRevenusHorairesImmo() {
@@ -1138,6 +1149,20 @@
         return;
       }
 
+      // VÉRIFICATION PROPRIÉTAIRE UNIQUE ENTREPRISES
+      if (article.cat === "Entreprises Connues" || article.estEntreprise) {
+        let prop = obtenirProprietaireEntreprise(article.immoKey);
+        if (prop) {
+          alert(`🏢 L'entreprise "${article.nom}" appartient déjà à ${prop} !`);
+          return;
+        }
+        let dejaDansPanier = panier.some(p => p.immoKey === article.immoKey);
+        if (dejaDansPanier) {
+          alert(`🏢 L'entreprise "${article.nom}" est déjà dans votre panier !`);
+          return;
+        }
+      }
+
       if (article.cat === "Automobiles") {
         let capaciteTotale = 0;
         const userImmo = possessionsImmo[joueurActif] || {};
@@ -1273,7 +1298,7 @@
 
           panier.forEach(item => {
             for (let i = 0; i < item.qte; i++) {
-              if (item.cat === "Entreprises Connues" || item.immoKey === "hotel") {
+              if (item.immoKey === "hotel") {
                 Object.keys(possessionsImmo).forEach(owner => {
                   if (owner !== lastUserValide && possessionsImmo[owner] && possessionsImmo[owner][item.immoKey] && possessionsImmo[owner][item.immoKey].quantite > 0) {
                     let royalty = Math.round(item.prix * 0.15 * 100) / 100;
@@ -1368,19 +1393,39 @@
         return;
       }
 
-      // AFFICHAGE DES ARTICLES standard
+      // AFFICHAGE DES ARTICLES STANDARD (AVEC VERROUILLAGE DES ENTREPRISES DÉJÀ ACHETÉES)
       let articlesFiltres = baseArticles.filter(a => a.cat === categorieActive);
 
       articlesFiltres.forEach(art => {
         let btn = document.createElement('button');
         btn.className = "btn-article";
-        btn.onclick = () => ajouterAuPanier(art);
 
-        btn.innerHTML = `
-          <span class="emoji">${art.emoji}</span>
-          <span style="line-height:1.2;">${art.nom}</span>
-          <span class="prix-tag">${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
-        `;
+        let estEntreprise = (art.cat === "Entreprises Connues" || art.estEntreprise);
+        let prop = estEntreprise ? obtenirProprietaireEntreprise(art.immoKey) : null;
+
+        if (prop) {
+          btn.style.opacity = '0.55';
+          btn.style.backgroundColor = '#1e293b';
+          btn.style.borderColor = '#475569';
+          btn.style.cursor = 'not-allowed';
+          btn.onclick = () => {
+            alert(`🔒 L'entreprise "${art.nom}" appartient déjà à ${prop}.`);
+          };
+
+          btn.innerHTML = `
+            <span class="emoji">${art.emoji}</span>
+            <span style="line-height:1.2; text-decoration: line-through;">${art.nom}</span>
+            <span class="prix-tag" style="background:#334155; color:#94a3b8;">${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
+            <span style="font-size:10px; color:#f87171; font-weight:bold; margin-top:2px;">🔒 ${prop}</span>
+          `;
+        } else {
+          btn.onclick = () => ajouterAuPanier(art);
+          btn.innerHTML = `
+            <span class="emoji">${art.emoji}</span>
+            <span style="line-height:1.2;">${art.nom}</span>
+            <span class="prix-tag">${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
+          `;
+        }
 
         grid.appendChild(btn);
       });
@@ -1488,6 +1533,12 @@
       questionActiveCourante = { enonce, reponseExacte };
       document.getElementById('quizEnonce').innerText = enonce;
 
+      setTimeout(() => {
+        if (repInput && vueMaths.style.display !== 'none') {
+          repInput.focus();
+        }
+      }, 100);
+
       intervalChrono = setInterval(() => {
         tempsRestant--;
         mettreAJourChronoDisplay();
@@ -1512,6 +1563,22 @@
       if (input) {
         input.value += c;
         if (parseInt(input.value) === questionActiveCourante.reponseExacte) {
+          verifierReponseQuiz(parseInt(input.value));
+        }
+      }
+    }
+
+    function testerReponseClavierQuiz() {
+      const input = document.getElementById('quizReponseInput');
+      if (input && questionActiveCourante && parseInt(input.value) === questionActiveCourante.reponseExacte) {
+        verifierReponseQuiz(parseInt(input.value));
+      }
+    }
+
+    function gererSaisieClavierQuiz(e) {
+      if (e.key === 'Enter') {
+        const input = document.getElementById('quizReponseInput');
+        if (input && input.value.trim() !== '') {
           verifierReponseQuiz(parseInt(input.value));
         }
       }
