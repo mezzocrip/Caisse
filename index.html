@@ -193,7 +193,7 @@
 
     .marche-immo-ticker {
       background: #1e293b; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px;
-      padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
       font-size: 12px; font-weight: bold; color: #e2e8f0;
     }
     .marche-immo-hausse { color: #38ef7d; font-family: monospace; font-size: 13px; }
@@ -263,7 +263,7 @@
       <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v5.0.0 (Propriété unique Entreprises & Clavier Quiz)</div>
+    <div class="version-tag">v5.1.0 (Revente Entreprises & Bourse Horaire)</div>
   </div>
 
   <!-- MODAL AIDE ET REGLES -->
@@ -299,11 +299,12 @@
 
         <div class="aide-section">
           <div class="aide-section-title">🏢 Immobilier, Hôtels & Entreprises</div>
-          • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels, Malls et Entreprises rapportent <strong>20%/h</strong> automatiquement 2 heures après l'achat !<br>
+          • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels et Malls rapportent <strong>20%/h</strong> automatiquement 2 heures après l'achat.<br>
+          • <strong>Entreprises en Bourse (Toutes les heures)</strong> : Les entreprises rapportent ou font perdre de l'argent toutes les heures selon leur valeur réelle en bourse (1% réel = 10% dans le jeu). Si la bourse baisse, vous perdez de l'argent sur votre compte !<br>
           • <strong>Règles de Possession & Royalties</strong> :<br>
           &nbsp;&nbsp;- 👑 <strong>Entreprises</strong> : Les entreprises ne peuvent avoir qu'<strong>un seul propriétaire</strong>. Une fois achetée par un joueur, l'entreprise est grisée et ne peut plus être achetée par d'autres[cite: 1].<br>
           &nbsp;&nbsp;- 🏨 <strong>Hôtels</strong> : Limité à <strong>10 hôtels maximum par gamme/joueur</strong>. Si vous achetez un hôtel alors qu'un autre joueur en possède déjà, vous devez verser des <strong>royalties de 15%</strong> du montant de l'hôtel au(x) propriétaire(s).<br>
-          • <strong>Revente de Biens</strong> : Seuls les biens de la section <em>Immobilier Marseille</em> peuvent être revendus (les Hôtels ne sont pas revendables).
+          • <strong>Revente de Biens</strong> : Seuls les biens de la section <em>Immobilier Marseille</em> (hors Hôtels) et les <strong>Entreprises</strong> peuvent être revendus pour récupérer leur valeur actualisée.
         </div>
       </div>
     </div>
@@ -488,6 +489,11 @@
         <span id="marcheImmoValDisplay" class="marche-immo-hausse">+0%</span>
       </div>
 
+      <div class="marche-immo-ticker" id="marcheBourseTicker">
+        <span>📊 Tendance Bourse Entreprises (1h) :</span>
+        <span id="marcheBourseValDisplay" class="marche-immo-hausse">+0%</span>
+      </div>
+
       <div class="categories-tabs" id="tabsClassementGroupe" style="margin-bottom: 10px;">
         <button class="tab-btn active" id="btnTabClassementTous" onclick="changerOngletClassement('tous')">🌐 Tous</button>
         <button class="tab-btn" id="btnTabClassementFamille" onclick="changerOngletClassement('famille')">👨‍👩‍👧‍👦 Famille</button>
@@ -615,6 +621,7 @@
     let filtreClassementActif = "tous";
 
     let marcheImmoPct = 0;
+    let marcheBoursePct = 0; // pourcentage réel de la bourse
 
     let niveauQuizActif = "facile";
     let gainParQuestion = 30000;
@@ -663,26 +670,26 @@
       { id: 514, cat: "Immobilier Marseille", emoji: "🏎", nom: "Garage 20 voitures", prix: 150000.00, immoKey: "garage20", capaciteGarage: 20 },
 
       // ENTREPRISES CONNUES
-      { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 904, cat: "Entreprises Connues", emoji: "🔍", nom: "Alphabet (Google)", prix: 2100000000000.00, immoKey: "ent_goog", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 3500000000000.00, immoKey: "ent_lvmh", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 909, cat: "Entreprises Connues", emoji: "🎬", nom: "Netflix", prix: 280000000000.00, immoKey: "ent_nflx", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 910, cat: "Entreprises Connues", emoji: "✨", nom: "Walt Disney Company", prix: 210000000000.00, immoKey: "ent_disney", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 911, cat: "Entreprises Connues", emoji: "🥤", nom: "Coca-Cola", prix: 290000000000.00, immoKey: "ent_ko", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 912, cat: "Entreprises Connues", emoji: "🍟", nom: "McDonald's", prix: 220000000000.00, immoKey: "ent_mcd", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 913, cat: "Entreprises Connues", emoji: "👟", nom: "Nike", prix: 130000000000.00, immoKey: "ent_nike", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 914, cat: "Entreprises Connues", emoji: "☕", nom: "Starbucks", prix: 110000000000.00, immoKey: "ent_sbux", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 915, cat: "Entreprises Connues", emoji: "🧬", nom: "Eli Lilly", prix: 850000000000.00, immoKey: "ent_lly", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 916, cat: "Entreprises Connues", emoji: "💊", nom: "Novo Nordisk", prix: 550000000000.00, immoKey: "ent_nvo", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 917, cat: "Entreprises Connues", emoji: "💉", nom: "Pfizer", prix: 160000000000.00, immoKey: "ent_pfe", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 918, cat: "Entreprises Connues", emoji: "💳", nom: "Visa", prix: 570000000000.00, immoKey: "ent_v", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 919, cat: "Entreprises Connues", emoji: "💳", nom: "Mastercard", prix: 4500000000000.00, immoKey: "ent_ma", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true },
-      { id: 920, cat: "Entreprises Connues", emoji: "🏦", nom: "JPMorgan Chase", prix: 590000000000.00, immoKey: "ent_jpm", tauxPourcentHeure: 0.20, delaiActivationHeures: 2, estEntreprise: true }
+      { id: 901, cat: "Entreprises Connues", emoji: "🍎", nom: "Apple Inc.", prix: 3400000000000.00, immoKey: "ent_apple", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 902, cat: "Entreprises Connues", emoji: "💻", nom: "Microsoft", prix: 3100000000000.00, immoKey: "ent_msft", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 903, cat: "Entreprises Connues", emoji: "👁️", nom: "NVIDIA", prix: 3200000000000.00, immoKey: "ent_nvda", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 904, cat: "Entreprises Connues", emoji: "🔍", nom: "Alphabet (Google)", prix: 2100000000000.00, immoKey: "ent_goog", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 905, cat: "Entreprises Connues", emoji: "📦", nom: "Amazon", prix: 2200000000000.00, immoKey: "ent_amzn", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 906, cat: "Entreprises Connues", emoji: "♾️", nom: "Meta Platforms", prix: 1400000000000.00, immoKey: "ent_meta", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 907, cat: "Entreprises Connues", emoji: "⚡", nom: "Tesla", prix: 800000000000.00, immoKey: "ent_tsla", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 908, cat: "Entreprises Connues", emoji: "👜", nom: "LVMH", prix: 3500000000000.00, immoKey: "ent_lvmh", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 909, cat: "Entreprises Connues", emoji: "🎬", nom: "Netflix", prix: 280000000000.00, immoKey: "ent_nflx", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 910, cat: "Entreprises Connues", emoji: "✨", nom: "Walt Disney Company", prix: 210000000000.00, immoKey: "ent_disney", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 911, cat: "Entreprises Connues", emoji: "🥤", nom: "Coca-Cola", prix: 290000000000.00, immoKey: "ent_ko", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 912, cat: "Entreprises Connues", emoji: "🍟", nom: "McDonald's", prix: 220000000000.00, immoKey: "ent_mcd", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 913, cat: "Entreprises Connues", emoji: "👟", nom: "Nike", prix: 130000000000.00, immoKey: "ent_nike", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 914, cat: "Entreprises Connues", emoji: "☕", nom: "Starbucks", prix: 110000000000.00, immoKey: "ent_sbux", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 915, cat: "Entreprises Connues", emoji: "🧬", nom: "Eli Lilly", prix: 850000000000.00, immoKey: "ent_lly", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 916, cat: "Entreprises Connues", emoji: "💊", nom: "Novo Nordisk", prix: 550000000000.00, immoKey: "ent_nvo", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 917, cat: "Entreprises Connues", emoji: "💉", nom: "Pfizer", prix: 160000000000.00, immoKey: "ent_pfe", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 918, cat: "Entreprises Connues", emoji: "💳", nom: "Visa", prix: 570000000000.00, immoKey: "ent_v", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 919, cat: "Entreprises Connues", emoji: "💳", nom: "Mastercard", prix: 4500000000000.00, immoKey: "ent_ma", delaiActivationHeures: 2, estEntreprise: true },
+      { id: 920, cat: "Entreprises Connues", emoji: "🏦", nom: "JPMorgan Chase", prix: 590000000000.00, immoKey: "ent_jpm", delaiActivationHeures: 2, estEntreprise: true }
     ];
 
     let categorieActive = "Automobiles";
@@ -696,6 +703,7 @@
       initialiserEtEcouterComptes();
       ecouterPossessionsImmo();
       ecouterMarcheImmobilier();
+      ecouterMarcheBourse();
       setInterval(traiterRevenusHorairesImmo, 10000);
     }
 
@@ -912,6 +920,26 @@
       });
     }
 
+    function ecouterMarcheBourse() {
+      db.ref('marche_bourse').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const maintenant = Date.now();
+        const trancheHeure = Math.floor(maintenant / (3600 * 1000)); // Mis à jour toutes les heures
+
+        if (!data || data.tranche !== trancheHeure) {
+          // Variation réelle entre -4% et +6%
+          const estPerte = Math.random() < 0.35;
+          let pctReel = estPerte ? - (Math.floor(Math.random() * 40) / 10 + 0.5) : (Math.floor(Math.random() * 50) / 10 + 0.5);
+          db.ref('marche_bourse').set({ tranche: trancheHeure, pourcentageReel: pctReel });
+        } else {
+          marcheBoursePct = data.pourcentageReel;
+          afficherIndicateurBourse();
+          if (joueurSelectionneVueDetail) afficherDetailJoueur(joueurSelectionneVueDetail);
+          if (categorieActive === "🏠 Mes Biens") afficherArticles();
+        }
+      });
+    }
+
     function afficherIndicateurMarche() {
       const display = document.getElementById('marcheImmoValDisplay');
       if (!display) return;
@@ -921,6 +949,19 @@
       } else {
         display.className = "marche-immo-baisse";
         display.innerText = `${marcheImmoPct.toLocaleString('fr-FR')}% 📉`;
+      }
+    }
+
+    function afficherIndicateurBourse() {
+      const display = document.getElementById('marcheBourseValDisplay');
+      if (!display) return;
+      let jeuPct = marcheBoursePct * 10; // 1% réel = 10% dans le jeu
+      if (jeuPct >= 0) {
+        display.className = "marche-immo-hausse";
+        display.innerText = `+${jeuPct.toFixed(1)}% (${marcheBoursePct >= 0 ? '+' : ''}${marcheBoursePct.toFixed(1)}% réel) 📈`;
+      } else {
+        display.className = "marche-immo-baisse";
+        display.innerText = `${jeuPct.toFixed(1)}% (${marcheBoursePct.toFixed(1)}% réel) 📉`;
       }
     }
 
@@ -1029,24 +1070,30 @@
           dataBien.achats.forEach((dateAchat, index) => {
             let dernierPaiementIndiv = (dataBien.derniersPaiements && dataBien.derniersPaiements[index]) ? dataBien.derniersPaiements[index] : dateAchat;
             let delaiMin = 0;
-            let gainParHeure = 0;
+            let gainOuPerteHeure = 0;
+            let estEntrepriseItem = (catalogueRef && (catalogueRef.cat === "Entreprises Connues" || catalogueRef.estEntreprise));
 
-            if (catalogueRef && catalogueRef.tauxPourcentHeure) {
+            if (estEntrepriseItem) {
               delaiMin = (catalogueRef.delaiActivationHeures || 2) * 3600 * 1000;
-              gainParHeure = catalogueRef.prix * catalogueRef.tauxPourcentHeure;
+              // 1% réel = 10% dans le jeu -> taux = marcheBoursePct * 0.10
+              let tauxJeu = marcheBoursePct * 0.10;
+              gainOuPerteHeure = catalogueRef.prix * tauxJeu;
+            } else if (catalogueRef && catalogueRef.tauxPourcentHeure) {
+              delaiMin = (catalogueRef.delaiActivationHeures || 2) * 3600 * 1000;
+              gainOuPerteHeure = catalogueRef.prix * catalogueRef.tauxPourcentHeure;
             } else if (immoKey === 'snack') {
               delaiMin = 2 * 3600 * 1000;
-              gainParHeure = 1000;
+              gainOuPerteHeure = 1000;
             }
 
-            if (gainParHeure > 0) {
+            if (gainOuPerteHeure !== 0) {
               let debutEligibilite = dateAchat + delaiMin;
               let debutCalcul = Math.max(dernierPaiementIndiv, debutEligibilite);
 
               if (maintenant > debutCalcul) {
                 let heuresCompletes = Math.floor((maintenant - debutCalcul) / (3600 * 1000));
                 if (heuresCompletes >= 1) {
-                  deltaTotalARecup += heuresCompletes * gainParHeure;
+                  deltaTotalARecup += heuresCompletes * gainOuPerteHeure;
                   if (!updatesImmo[`immobilier/${user}/${immoKey}/derniersPaiements`]) {
                     updatesImmo[`immobilier/${user}/${immoKey}/derniersPaiements`] = [...(dataBien.derniersPaiements || dataBien.achats)];
                   }
@@ -1057,7 +1104,7 @@
           });
         });
 
-        if (deltaTotalARecup > 0) {
+        if (deltaTotalARecup !== 0) {
           let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
           updatesBanque[`banques/${user}`] = Math.round((soldeActuel + deltaTotalARecup) * 100) / 100;
         }
@@ -1084,15 +1131,16 @@
       });
     }
 
-    function calculerPrixReventeImmo(dateAchat, prixBase) {
+    function calculerPrixReventeBien(dateAchat, prixBase, isEntreprise) {
       const maintenant = Date.now();
       const heuresEcoulees = (maintenant - dateAchat) / (1000 * 3600);
 
-      if (heuresEcoulees < 3) {
+      if (heuresEcoulees < 3 && !isEntreprise) {
         return { prix: prixBase, augmente: false };
       }
 
-      let multMarche = 1 + (marcheImmoPct / 100);
+      let pctMarche = isEntreprise ? (marcheBoursePct * 10) : marcheImmoPct;
+      let multMarche = 1 + (pctMarche / 100);
       if (multMarche < 0.1) multMarche = 0.1;
 
       return { prix: Math.round(prixBase * multMarche * 100) / 100, augmente: true };
@@ -1101,8 +1149,11 @@
     function revendreBienImmobilier(user, immoKey, indexAchat, prixBase, nomBien) {
       const catalogueRef = baseArticles.find(a => a.immoKey === immoKey);
       
-      if (!catalogueRef || catalogueRef.cat !== "Immobilier Marseille" || immoKey === 'hotel') {
-        alert("🚫 Seuls les biens de la section Immobilier Marseille (hors Hôtels) peuvent être revendus !");
+      let estImmoRevendable = (catalogueRef && catalogueRef.cat === "Immobilier Marseille" && immoKey !== "hotel");
+      let estEntRevendable = (catalogueRef && (catalogueRef.cat === "Entreprises Connues" || catalogueRef.estEntreprise));
+
+      if (!catalogueRef || (!estImmoRevendable && !estEntRevendable)) {
+        alert("🚫 Seuls les biens de la section Immobilier Marseille (hors Hôtels) et les Entreprises peuvent être revendus !");
         return;
       }
 
@@ -1112,11 +1163,12 @@
         if (!data || !data.achats || data.achats[indexAchat] === undefined) return;
 
         const dateAchat = data.achats[indexAchat];
-        const calculVal = calculerPrixReventeImmo(dateAchat, prixBase);
+        const calculVal = calculerPrixReventeBien(dateAchat, prixBase, estEntRevendable);
         const prixRevente = calculVal.prix;
 
+        let pctRefAffiche = estEntRevendable ? (marcheBoursePct * 10) : marcheImmoPct;
         let msg = calculVal.augmente
-          ? `Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € (Selon le marché : ${marcheImmoPct >= 0 ? '+' : ''}${marcheImmoPct}%) ?`
+          ? `Voulez-vous revendre ${nomBien} pour ${prixRevente.toLocaleString('fr-FR')} € (Selon le marché : ${pctRefAffiche >= 0 ? '+' : ''}${pctRefAffiche.toFixed(1)}%) ?`
           : `Ce bien a moins de 3h d'ancienneté. Voulez-vous le revendre à son prix initial de ${prixBase.toLocaleString('fr-FR')} € ?`;
 
         if (confirm(msg)) {
@@ -1125,11 +1177,20 @@
           nouveauxAchats.splice(indexAchat, 1);
           if (nouveauxPaiements.length > indexAchat) nouveauxPaiements.splice(indexAchat, 1);
 
-          ref.set({
-            quantite: (data.quantite || 1) - 1,
-            achats: nouveauxAchats,
-            derniersPaiements: nouveauxPaiements
-          }).then(() => {
+          let nouvelleQuantite = (data.quantite || 1) - 1;
+          let actionUpdate = {};
+
+          if (nouvelleQuantite <= 0) {
+            actionUpdate[`immobilier/${user}/${immoKey}`] = null;
+          } else {
+            actionUpdate[`immobilier/${user}/${immoKey}`] = {
+              quantite: nouvelleQuantite,
+              achats: nouveauxAchats,
+              derniersPaiements: nouveauxPaiements
+            };
+          }
+
+          db.ref().update(actionUpdate).then(() => {
             let soldeActuel = comptesComplets[user] !== undefined ? comptesComplets[user] : 20000.00;
             let nouveauSolde = Math.round((soldeActuel + prixRevente) * 100) / 100;
             db.ref(`banques/${user}`).set(nouveauSolde).then(() => {
@@ -1369,8 +1430,8 @@
             const btn = document.createElement('div');
             btn.className = "btn-article mes-biens-card";
 
-            const estRevendable = (article.cat === "Immobilier Marseille" && immoKey !== "hotel");
-            let infoCalcul = estRevendable ? calculerPrixReventeImmo(dateAchat, article.prix) : { prix: article.prix, augmente: false };
+            let estRevendable = ((article.cat === "Immobilier Marseille" && immoKey !== "hotel") || article.cat === "Entreprises Connues" || article.estEntreprise);
+            let infoCalcul = estRevendable ? calculerPrixReventeBien(dateAchat, article.prix, (article.cat === "Entreprises Connues" || article.estEntreprise)) : { prix: article.prix, augmente: false };
             let prixAffichage = infoCalcul.prix;
 
             let htmlRevendre = estRevendable 
@@ -1623,7 +1684,6 @@
 
       db.ref(`banques/${joueurActif}`).set(nouveauSolde).then(() => {
         mettreAJourSoldeJoueurActif();
-        // Passage automatique à la question suivante
         genererNouvelleQuestionQuiz();
       });
     }
@@ -1652,7 +1712,6 @@
             quitterQuizAutomatique();
           });
         } else {
-          // Reprendre le quiz si l'utilisateur annule l'abandon
           genererNouvelleQuestionQuiz();
         }
       } else {
@@ -1810,8 +1869,8 @@
           let div = document.createElement('div');
           div.className = "possession-pill";
 
-          let estRevendable = (catalogueRef.cat === "Immobilier Marseille" && immoKey !== "hotel");
-          let infoCalcul = estRevendable ? calculerPrixReventeImmo(dateAchat, catalogueRef.prix) : { prix: catalogueRef.prix, augmente: false };
+          let estRevendable = ((catalogueRef.cat === "Immobilier Marseille" && immoKey !== "hotel") || catalogueRef.cat === "Entreprises Connues" || catalogueRef.estEntreprise);
+          let infoCalcul = estRevendable ? calculerPrixReventeBien(dateAchat, catalogueRef.prix, (catalogueRef.cat === "Entreprises Connues" || catalogueRef.estEntreprise)) : { prix: catalogueRef.prix, augmente: false };
           let prixAffichage = infoCalcul.prix;
 
           let btnVendreHtml = estRevendable 
