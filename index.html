@@ -81,7 +81,7 @@
 
     .articles-scroll { flex-grow: 1; overflow-y: auto; padding-right: 2px; -webkit-overflow-scrolling: touch; }
     .articles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .btn-article { background: #f7fafc; border: 1.5px solid #cbd5e0; border-radius: 14px; padding: 10px 6px; font-size: 12px; font-weight: 600; color: #2d3748; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 72px; text-align: center; }
+    .btn-article { background: #f7fafc; border: 1.5px solid #cbd5e0; border-radius: 14px; padding: 10px 6px; font-size: 12px; font-weight: 600; color: #2d3748; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 72px; text-align: center; position: relative; }
     .btn-article:active { background-color: #e2e8f0; transform: scale(0.98); }
     .btn-article.mes-biens-card { background: #1a222d; border: 1px solid rgba(255, 255, 255, 0.12); color: white; justify-content: space-between; position: relative; }
     .emoji { font-size: 22px; }
@@ -89,18 +89,17 @@
 
     .actions-section { flex-shrink: 0; margin-top: 4px; }
     .btn-validation { background: #000; color: #fff; border: none; border-radius: 14px; padding: 12px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; margin-bottom: 6px; }
-    .btn-reset { background: none; border: none; color: #e53e3e; font-weight: bold; cursor: pointer; padding: 6px; font-size: 12px; width: 100%; text-align: center; }
 
-    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .creer-ecole-overlay, .aide-overlay, .vente-quantite-overlay {
+    .pin-overlay, .banque-overlay, .historique-overlay, .reglages-overlay, .creer-ecole-overlay, .aide-overlay, .vente-quantite-overlay, .arrondissement-choix-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center;
       opacity: 0; pointer-events: none; transition: opacity 0.25s ease; z-index: 9998;
     }
-    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .creer-ecole-overlay.active, .aide-overlay.active, .vente-quantite-overlay.active {
+    .pin-overlay.active, .banque-overlay.active, .historique-overlay.active, .reglages-overlay.active, .creer-ecole-overlay.active, .aide-overlay.active, .vente-quantite-overlay.active, .arrondissement-choix-overlay.active {
       opacity: 1; pointer-events: auto;
     }
     
-    .banque-card, .historique-card, .reglages-card, .creer-ecole-card, .aide-card, .vente-card {
+    .banque-card, .historique-card, .reglages-card, .creer-ecole-card, .aide-card, .vente-card, .arrondissement-choix-card {
       background: #121820; width: 92%; max-width: 440px; border-radius: 24px; padding: 22px; color: white;
       text-align: left; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.08);
       max-height: 90vh; display: flex; flex-direction: column;
@@ -218,10 +217,25 @@
 
     <div class="actions-section">
       <button class="btn-validation" onclick="lancerPaiementJoueur()">Payer</button>
-      <button class="btn-reset" onclick="reinitialiser()">Remise à zéro</button>
     </div>
 
-    <div class="version-tag">v5.8.0 (Revente immo 2h & Investissements)</div>
+    <div class="version-tag">v5.9.0 (Taxe 5% Arrondissements & Comptes)</div>
+  </div>
+
+  <!-- MODAL CHOIX ARRONDISSEMENT LORS DE L'ACHAT -->
+  <div class="arrondissement-choix-overlay" id="arrondissementChoixOverlay">
+    <div class="arrondissement-choix-card">
+      <div class="reglages-header">
+        <span class="reglages-title">Arrondissement d'achat 🏙️</span>
+        <button class="btn-close" onclick="fermerChoixArrondissementAchat()">✕</button>
+      </div>
+      <p style="font-size: 13px; color: #a0aec0; margin-bottom: 16px;">Sélectionnez l'arrondissement où vous achetez ce bien ou cette entreprise (taxe de 5% reversée au propriétaire ou au compte de l'arrondissement) :</p>
+      <div style="margin-bottom: 16px;">
+        <select id="selectArrondissementAchat" style="width:100%; padding:12px; border-radius:10px; background:#1a222d; color:white; border:1px solid #4a5568; font-size:14px; font-weight:bold; outline:none;"></select>
+      </div>
+      <div class="error-msg" id="arrChoixErrorMsg"></div>
+      <button class="btn-ajouter-article" style="background:#2b6cb0; padding:14px; font-size:15px;" onclick="validerChoixArrondissementAchat()">Confirmer l'arrondissement et Payer</button>
+    </div>
   </div>
 
   <!-- MODAL AIDE ET REGLES -->
@@ -252,6 +266,7 @@
 
         <div class="aide-section">
           <div class="aide-section-title">🏢 Immobilier, Arrondissements & Entreprises</div>
+          • <strong>Taxe Arrondissement (5%)</strong> : Lors de l'achat d'un bien ou d'une entreprise, vous devez choisir un arrondissement. 5% du montant est versé au propriétaire de l'arrondissement. Si personne n'est propriétaire, l'argent alimente le compte de l'arrondissement et sera crédité directement au propriétaire lors de son achat ultérieur.<br>
           • <strong>Revenus passifs</strong> : Snacks (+1 000€/h), Hôtels et Malls rapportent <strong>20%/h</strong> automatiquement 2 heures après l'achat.<br>
           • <strong>Place de Parking</strong> : Disponible à 5 000 € dans l'immobilier marseillais, elle suit le cours de l'immobilier comme les maisons.<br>
           • <strong>Entreprises en Bourse & Arrondissements</strong> : Chaque entreprise possède son propre cours de bourse indépendant mis à jour toutes les heures. Les arrondissements suivent l'indice global du marché.<br>
@@ -487,6 +502,8 @@
     let panier = [];
     let comptesComplets = {};
     let possessionsImmo = {};
+    let arrondissementsComptes = {};
+    let arrondissementSelectionneAchat = "";
     let joueurSelectionneVueDetail = null;
     let filtreClassementActif = "tous";
 
@@ -633,6 +650,7 @@
       MettreAJourEcran();
       initialiserEtEcouterComptes();
       ecouterPossessionsImmo();
+      ecouterArrondissementsComptes();
       ecouterMarcheImmobilier();
       ecouterBourseEntreprises();
       ecouterMarcheBourse();
@@ -818,7 +836,57 @@
         alert("Votre panier est vide !");
         return;
       }
+
+      if (!joueurActif) {
+        alert("⚠️ Veuillez d'abord choisir un joueur dans le menu déroulant !");
+        demanderCodePin('select_player');
+        return;
+      }
+
+      // Vérifier si le panier contient des biens ou entreprises (nécessitant le choix d'un arrondissement)
+      let besoinArrondissement = panier.some(item => item.cat === "Automobiles" || item.cat === "Immobilier Marseille" || item.cat === "Entreprises Connues");
+
+      if (besoinArrondissement) {
+        ouvrirModalChoixArrondissementAchat();
+      } else {
+        demanderCodePin('paiement');
+      }
+    }
+
+    function ouvrirModalChoixArrondissementAchat() {
+      const select = document.getElementById('selectArrondissementAchat');
+      select.innerHTML = "";
+      baseArticles.filter(a => a.cat === "Arrondissements Marseille").forEach(arr => {
+        let prop = obtenirProprietaireUnique(arr.immoKey);
+        let opt = document.createElement('option');
+        opt.value = arr.immoKey;
+        opt.innerText = `${arr.emoji} ${arr.nom} ${prop ? '(Propriétaire : ' + prop + ')' : '(Non possédé - Compte arr.)'}`;
+        select.appendChild(opt);
+      });
+      document.getElementById('arrChoixErrorMsg').innerText = "";
+      document.getElementById('arrondissementChoixOverlay').classList.add('active');
+    }
+
+    function fermerChoixArrondissementAchat() {
+      document.getElementById('arrondissementChoixOverlay').classList.remove('active');
+    }
+
+    function validerChoixArrondissementAchat() {
+      const select = document.getElementById('selectArrondissementAchat');
+      arrondissementSelectionneAchat = select.value;
+      if (!arrondissementSelectionneAchat) {
+        document.getElementById('arrChoixErrorMsg').innerText = "Veuillez sélectionner un arrondissement !";
+        return;
+      }
+      fermerChoixArrondissementAchat();
       demanderCodePin('paiement');
+    }
+
+    function ecouterArrondissementsComptes() {
+      db.ref('arrondissements_comptes').on('value', (snapshot) => {
+        arrondissementsComptes = snapshot.val() || {};
+        if (categorieActive === "Arrondissements Marseille") afficherArticles();
+      });
     }
 
     function ecouterMarcheImmobilier() {
@@ -1428,7 +1496,34 @@
           let updates = {};
           updates[`banques/${lastUserValide}`] = nouveauSolde;
 
+          // Traitement des taxes de 5% et des achats d'arrondissements
           panier.forEach(item => {
+            if (item.cat === "Arrondissements Marseille") {
+              // Si l'utilisateur achète un arrondissement, on lui verse le solde accumulé de son compte d'arrondissement s'il existe
+              let arrKey = item.immoKey;
+              let compteArrInitial = arrondissementsComptes[arrKey] || 0;
+              if (compteArrInitial > 0) {
+                nouveauSolde = Math.round((nouveauSolde + compteArrInitial) * 100) / 100;
+                updates[`banques/${lastUserValide}`] = nouveauSolde;
+                updates[`arrondissements_comptes/${arrKey}`] = 0;
+              }
+            } else if (item.cat === "Automobiles" || item.cat === "Immobilier Marseille" || item.cat === "Entreprises Connues") {
+              // Si c'est un bien ou une entreprise, prélèvement de 5% pour l'arrondissement choisi
+              if (arrondissementSelectionneAchat) {
+                let montantTaxe5Pct = Math.round(item.prix * 0.05 * item.qte * 100) / 100;
+                let proprietaireArr = obtenirProprietaireUnique(arrondissementSelectionneAchat);
+
+                if (proprietaireArr) {
+                  let soldeProp = comptesComplets[proprietaireArr] !== undefined ? comptesComplets[proprietaireArr] : 20000.00;
+                  updates[`banques/${proprietaireArr}`] = Math.round((soldeProp + montantTaxe5Pct) * 100) / 100;
+                } else {
+                  let compteArrActuel = arrondissementsComptes[arrondissementSelectionneAchat] || 0;
+                  let nouveauCompteArr = Math.round((compteArrActuel + montantTaxe5Pct) * 100) / 100;
+                  updates[`arrondissements_comptes/${arrondissementSelectionneAchat}`] = nouveauCompteArr;
+                }
+              }
+            }
+
             for (let i = 0; i < item.qte; i++) {
               if (item.immoKey === "hotel") {
                 Object.keys(possessionsImmo).forEach(owner => {
@@ -1446,6 +1541,7 @@
           db.ref().update(updates).then(() => {
             alert(`✅ Paiement de ${total.toLocaleString('fr-FR')} € effectué avec succès pour ${lastUserValide} !`);
             reinitialiser();
+            arrondissementSelectionneAchat = "";
             mettreAJourSoldeJoueurActif();
           });
         }, 1000);
@@ -1578,6 +1674,13 @@
         let entObj = (art.cat === "Entreprises Connues" || art.estEntreprise) ? (bourseEntreprisesData[art.immoKey] || { pourcentageReel: 0 }) : null;
         let pctTexte = entObj ? `${entObj.pourcentageReel >= 0 ? '+' : ''}${entObj.pourcentageReel.toFixed(1)}%` : '';
 
+        // Badge du compte de l'arrondissement en haut à gauche si c'est un arrondissement
+        let badgeArrHtml = "";
+        if (art.cat === "Arrondissements Marseille") {
+          let soldeArr = arrondissementsComptes[art.immoKey] || 0;
+          badgeArrHtml = `<div style="position: absolute; top: 6px; left: 8px; font-size: 10px; font-family: monospace; font-weight: bold; color: #38ef7d; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 6px;" title="Compte Arrondissement">${soldeArr.toLocaleString('fr-FR', {minimumFractionDigits:0, maximumFractionDigits:0})} €</div>`;
+        }
+
         if (prop) {
           btn.style.opacity = '0.55';
           btn.style.backgroundColor = '#1e293b';
@@ -1588,7 +1691,8 @@
           };
 
           btn.innerHTML = `
-            <span class="emoji">${art.emoji}</span>
+            ${badgeArrHtml}
+            <span class="emoji" style="margin-top:10px;">${art.emoji}</span>
             <span style="line-height:1.2; text-decoration: line-through;">${art.nom}</span>
             <span class="prix-tag" style="background:#334155; color:#94a3b8;">${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
             <span style="font-size:10px; color:#f87171; font-weight:bold; margin-top:2px;">🔒 ${prop}</span>
@@ -1597,7 +1701,8 @@
           btn.onclick = () => ajouterAuPanier(art);
           let badgeGainHtml = entObj ? `<span style="font-size:10px; color:${entObj.pourcentageReel >= 0 ? '#38ef7d' : '#ff453a'}; font-weight:bold; margin-top:2px;">Bourse: ${pctTexte}/h</span>` : '';
           btn.innerHTML = `
-            <span class="emoji">${art.emoji}</span>
+            ${badgeArrHtml}
+            <span class="emoji" style="margin-top:10px;">${art.emoji}</span>
             <span style="line-height:1.2;">${art.nom}</span>
             <span class="prix-tag">${art.prix.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} €</span>
             ${badgeGainHtml}
